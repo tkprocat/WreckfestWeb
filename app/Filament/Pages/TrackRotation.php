@@ -1,0 +1,461 @@
+<?php
+
+namespace App\Filament\Pages;
+
+use App\Models\TrackCollection;
+use App\Services\WreckfestApiClient;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Pages\Page;
+
+class TrackRotation extends Page implements HasForms
+{
+    use InteractsWithForms;
+
+    protected static ?string $navigationIcon = 'heroicon-o-map';
+    protected static ?string $navigationLabel = 'Track Rotation';
+    protected static ?int $navigationSort = 2;
+    protected static string $view = 'filament.pages.track-rotation';
+
+    public function getSubheading(): ?string
+    {
+        if ($this->currentCollectionName) {
+            return "Working on: {$this->currentCollectionName}";
+        }
+
+        return 'Loaded from server (unsaved)';
+    }
+
+    public ?array $data = [];
+    public ?string $defaultGamemode = null;
+    public ?int $currentCollectionId = null;
+    public ?string $currentCollectionName = null;
+
+    public function mount(): void
+    {
+        $apiClient = app(WreckfestApiClient::class);
+        $serverConfig = $apiClient->getServerConfig();
+
+        // Store the default gamemode from server config
+        $this->defaultGamemode = $serverConfig['gamemode'] ?? 'racing';
+
+        // Try to load the last worked-on collection from session
+        $lastCollectionId = session('track_rotation.current_collection_id');
+
+        if ($lastCollectionId) {
+            $collection = TrackCollection::find($lastCollectionId);
+            if ($collection) {
+                $this->currentCollectionId = $collection->id;
+                $this->currentCollectionName = $collection->name;
+                $this->form->fill(['tracks' => $collection->tracks]);
+                return;
+            }
+        }
+
+        // Otherwise load from server
+        $tracks = $apiClient->getTracks();
+        $this->form->fill(['tracks' => $tracks]);
+    }
+
+    protected function getAllTracks(): array
+    {
+        $trackLocations = config('wreckfest.tracks', []);
+        $allTracks = [];
+
+        foreach ($trackLocations as $locationKey => $location) {
+            $locationName = $location['name'] ?? $locationKey;
+            $variants = $location['variants'] ?? [];
+
+            foreach ($variants as $variantId => $variant) {
+                $variantName = is_array($variant) ? ($variant['name'] ?? $variantId) : $variant;
+                $allTracks[$variantId] = $locationName . ' - ' . $variantName;
+            }
+        }
+
+        return $allTracks;
+    }
+
+    public function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Repeater::make('tracks')
+                    ->label('Track Rotation')
+                    ->schema([
+                        Grid::make(2)->schema([
+                            Select::make('track')
+                                ->label('Track')
+                                ->options(fn () => $this->getAllTracks())
+                                ->searchable()
+                                ->getSearchResultsUsing(function (string $search): array {
+                                    if (empty($search)) {
+                                        return [];
+                                    }
+
+                                    $tracks = $this->getAllTracks();
+
+                                    return array_filter($tracks, function ($label) use ($search) {
+                                        return str_contains(strtolower($label), strtolower($search));
+                                    }, ARRAY_FILTER_USE_BOTH);
+                                })
+                                ->required()
+                                ->placeholder('Select a track'),
+                            Select::make('gamemode')
+                                ->label('Game Mode')
+                                ->options(config('wreckfest.gamemodes'))
+                                ->searchable()
+                                ->placeholder('Leave empty to use server default'),
+                        ]),
+                        Grid::make(3)->schema([
+                            TextInput::make('laps')
+                                ->label('Laps')
+                                ->numeric()
+                                ->minValue(1)
+                                ->maxValue(99)
+                                ->default(5),
+                            TextInput::make('bots')
+                                ->label('Number of Bots')
+                                ->numeric()
+                                ->minValue(0)
+                                ->maxValue(23)
+                                ->default(0),
+                            TextInput::make('numTeams')
+                                ->label('Number of Teams')
+                                ->numeric()
+                                ->minValue(0)
+                                ->maxValue(8),
+                        ]),
+                        Grid::make(2)->schema([
+                            Select::make('carClassRestriction')
+                                ->label('Car Class Restriction')
+                                ->options(config('wreckfest.car_classes'))
+                                ->searchable()
+                                ->placeholder('No restriction'),
+                            Select::make('carRestriction')
+                                ->label('Specific Car Restriction')
+                                ->options(config('wreckfest.cars'))
+                                ->searchable()
+                                ->placeholder('Leave empty for no restriction'),
+                        ]),
+                        Grid::make(2)->schema([
+                            Select::make('weather')
+                                ->label('Weather Condition')
+                                ->options(config('wreckfest.weather_conditions'))
+                                ->searchable()
+                                ->placeholder('Random'),
+                            Toggle::make('carResetDisabled')
+                                ->label('Disable Car Reset')
+                                ->inline(false),
+                        ]),
+                        Toggle::make('wrongWayLimiterDisabled')
+                            ->label('Disable Wrong Way Limiter')
+                            ->inline(false),
+                    ])
+                    ->reorderable()
+                    ->collapsible()
+                    ->collapsed(true)
+                    ->itemLabel(function (array $state): ?string {
+                        if (!isset($state['track'])) {
+                            return 'New Track';
+                        }
+
+                        $tracks = $this->getAllTracks();
+                        $trackName = $tracks[$state['track']] ?? $state['track'];
+                        $gamemodeName = config('wreckfest.gamemodes.' . ($state['gamemode'] ?? $this->defaultGamemode), ucfirst($state['gamemode'] ?? $this->defaultGamemode));
+                        $lapsText = isset($state['laps']) ? ' - ' . $state['laps'] . ' laps' : '';
+
+                        return $trackName . ' (' . $gamemodeName . $lapsText . ')';
+                    })
+                    ->addActionLabel('Add Track to Rotation')
+                    ->defaultItems(0)
+                    ->columns(1)
+            ])
+            ->statePath('data');
+    }
+
+    public function deployToServer(): void
+    {
+        $data = $this->form->getState();
+        $tracks = $data['tracks'] ?? [];
+
+        // Convert toggle values to integers
+        foreach ($tracks as &$track) {
+            if (isset($track['carResetDisabled'])) {
+                $track['carResetDisabled'] = $track['carResetDisabled'] ? 1 : 0;
+            }
+            if (isset($track['wrongWayLimiterDisabled'])) {
+                $track['wrongWayLimiterDisabled'] = $track['wrongWayLimiterDisabled'] ? 1 : 0;
+            }
+        }
+
+        $apiClient = app(WreckfestApiClient::class);
+
+        if ($apiClient->updateTracks($tracks)) {
+            Notification::make()
+                ->title('Track rotation deployed to server successfully')
+                ->success()
+                ->send();
+        } else {
+            Notification::make()
+                ->title('Failed to deploy track rotation to server')
+                ->danger()
+                ->send();
+        }
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('deployToServer')
+                ->label('Deploy to Server')
+                ->icon('heroicon-o-arrow-up-tray')
+                ->requiresConfirmation()
+                ->modalHeading('Deploy Track Rotation to Server')
+                ->modalDescription('This will update the track rotation on your game server. Are you sure?')
+                ->action(fn () => $this->deployToServer())
+                ->color('success'),
+
+            Action::make('newCollection')
+                ->label('New Collection')
+                ->icon('heroicon-o-document-plus')
+                ->form([
+                    TextInput::make('name')
+                        ->label('Collection Name')
+                        ->required()
+                        ->placeholder('e.g., New Track Rotation')
+                        ->maxLength(255)
+                        ->default('New Collection'),
+                ])
+                ->action(function (array $data): void {
+                    // Create a new empty collection
+                    $collection = TrackCollection::create([
+                        'name' => $data['name'],
+                        'tracks' => [],
+                    ]);
+
+                    // Set as current collection
+                    $this->currentCollectionId = $collection->id;
+                    $this->currentCollectionName = $collection->name;
+                    session(['track_rotation.current_collection_id' => $collection->id]);
+
+                    // Clear the form
+                    $this->form->fill(['tracks' => []]);
+
+                    Notification::make()
+                        ->title('New collection created')
+                        ->body("Working on: {$collection->name}")
+                        ->success()
+                        ->send();
+                })
+                ->color('gray'),
+
+            Action::make('refreshFromServer')
+                ->label('Refresh from Server')
+                ->icon('heroicon-o-arrow-path')
+                ->requiresConfirmation()
+                ->modalHeading('Refresh from Server')
+                ->modalDescription('This will load the current track rotation from your game server. Any unsaved changes will be lost.')
+                ->action(function (): void {
+                    $apiClient = app(WreckfestApiClient::class);
+                    $tracks = $apiClient->getTracks();
+                    $serverConfig = $apiClient->getServerConfig();
+
+                    // Update the default gamemode from server config
+                    $this->defaultGamemode = $serverConfig['gamemode'] ?? 'racing';
+
+                    // Clear current collection context
+                    $this->currentCollectionId = null;
+                    $this->currentCollectionName = null;
+                    session()->forget('track_rotation.current_collection_id');
+
+                    $this->form->fill(['tracks' => $tracks]);
+
+                    Notification::make()
+                        ->title('Tracks refreshed from server')
+                        ->body(count($tracks) . ' tracks loaded')
+                        ->success()
+                        ->send();
+                })
+                ->color('gray'),
+
+            Action::make('saveCollection')
+                ->label(fn () => $this->currentCollectionId ? 'Save Collection' : 'Save As New Collection')
+                ->icon('heroicon-o-bookmark')
+                ->form(fn () => $this->currentCollectionId ? [] : [
+                    TextInput::make('name')
+                        ->label('Collection Name')
+                        ->required()
+                        ->placeholder('e.g., Racing Only, Mixed Modes, etc.')
+                        ->maxLength(255),
+                ])
+                ->action(function (array $data): void {
+                    $formData = $this->form->getState();
+                    $tracks = $formData['tracks'] ?? [];
+
+                    if ($this->currentCollectionId) {
+                        // Update existing collection
+                        $collection = TrackCollection::find($this->currentCollectionId);
+                        if ($collection) {
+                            $collection->update(['tracks' => $tracks]);
+
+                            Notification::make()
+                                ->title('Collection saved')
+                                ->body("Saved: {$collection->name}")
+                                ->success()
+                                ->send();
+                        }
+                    } else {
+                        // Create new collection
+                        $collection = TrackCollection::create([
+                            'name' => $data['name'],
+                            'tracks' => $tracks,
+                        ]);
+
+                        // Set as current collection
+                        $this->currentCollectionId = $collection->id;
+                        $this->currentCollectionName = $collection->name;
+                        session(['track_rotation.current_collection_id' => $collection->id]);
+
+                        Notification::make()
+                            ->title('Collection saved')
+                            ->body("Working on: {$collection->name}")
+                            ->success()
+                            ->send();
+                    }
+                })
+                ->color('success'),
+
+            Action::make('saveAsCollection')
+                ->label('Save As New')
+                ->icon('heroicon-o-document-duplicate')
+                ->visible(fn () => $this->currentCollectionId !== null)
+                ->form([
+                    TextInput::make('name')
+                        ->label('New Collection Name')
+                        ->required()
+                        ->placeholder('e.g., Copy of ' . ($this->currentCollectionName ?? 'Collection'))
+                        ->maxLength(255),
+                ])
+                ->action(function (array $data): void {
+                    $formData = $this->form->getState();
+                    $tracks = $formData['tracks'] ?? [];
+
+                    // Create new collection
+                    $collection = TrackCollection::create([
+                        'name' => $data['name'],
+                        'tracks' => $tracks,
+                    ]);
+
+                    // Set as current collection
+                    $this->currentCollectionId = $collection->id;
+                    $this->currentCollectionName = $collection->name;
+                    session(['track_rotation.current_collection_id' => $collection->id]);
+
+                    Notification::make()
+                        ->title('Collection saved as new')
+                        ->body("Working on: {$collection->name}")
+                        ->success()
+                        ->send();
+                })
+                ->color('success'),
+
+            Action::make('loadCollection')
+                ->label('Load Collection')
+                ->icon('heroicon-o-folder-open')
+                ->form([
+                    Select::make('collection_id')
+                        ->label('Select Collection')
+                        ->options(TrackCollection::pluck('name', 'id'))
+                        ->required()
+                        ->searchable()
+                        ->placeholder('Choose a saved collection'),
+                ])
+                ->action(function (array $data): void {
+                    $collection = TrackCollection::find($data['collection_id']);
+
+                    if ($collection) {
+                        // Set as current collection
+                        $this->currentCollectionId = $collection->id;
+                        $this->currentCollectionName = $collection->name;
+                        session(['track_rotation.current_collection_id' => $collection->id]);
+
+                        $this->form->fill(['tracks' => $collection->tracks]);
+
+                        Notification::make()
+                            ->title('Collection loaded')
+                            ->body("Working on: {$collection->name}")
+                            ->success()
+                            ->send();
+                    }
+                })
+                ->color('info'),
+
+            Action::make('randomizeOrder')
+                ->label('Randomize Order')
+                ->icon('heroicon-o-arrow-path')
+                ->requiresConfirmation()
+                ->modalHeading('Randomize Track Order')
+                ->modalDescription('This will shuffle the current track rotation order. Are you sure?')
+                ->action(function (): void {
+                    $formData = $this->form->getState();
+                    $tracks = $formData['tracks'] ?? [];
+
+                    if (!empty($tracks)) {
+                        shuffle($tracks);
+                        $this->form->fill(['tracks' => $tracks]);
+
+                        Notification::make()
+                            ->title('Track order randomized')
+                            ->success()
+                            ->send();
+                    }
+                })
+                ->color('warning'),
+
+            Action::make('manageCollections')
+                ->label('Manage Collections')
+                ->icon('heroicon-o-cog-6-tooth')
+                ->modalWidth('2xl')
+                ->modalHeading('Manage Track Collections')
+                ->modalContent(view('filament.pages.manage-collections'))
+                ->modalFooterActions([])
+                ->color('gray'),
+        ];
+    }
+
+    public function deleteCollection(int $id): void
+    {
+        $collection = TrackCollection::find($id);
+
+        if ($collection) {
+            $collection->delete();
+
+            Notification::make()
+                ->title('Collection deleted successfully')
+                ->success()
+                ->send();
+        }
+    }
+
+    public function renameCollection(int $id, string $name): void
+    {
+        $collection = TrackCollection::find($id);
+
+        if ($collection) {
+            $collection->update(['name' => $name]);
+
+            Notification::make()
+                ->title('Collection renamed successfully')
+                ->success()
+                ->send();
+        }
+    }
+}
