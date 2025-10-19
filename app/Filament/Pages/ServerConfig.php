@@ -73,16 +73,19 @@ class ServerConfig extends Page implements HasForms
                     ->schema([
                         Grid::make(2)->schema([
                             TextInput::make('serverName')
-                                ->label('Server Name')
-                                ->required(),
+                                ->label('Server Name (supports color codes)')
+                                ->required()
+                                ->suffixIcon('heroicon-o-paint-brush')
+                                ->view('components.wreckfest-text-input'),
                             TextInput::make('maxPlayers')
                                 ->label('Max Players')
                                 ->numeric()
                                 ->required(),
                         ]),
                         Textarea::make('welcomeMessage')
-                            ->label('Welcome Message')
-                            ->rows(3),
+                            ->label('Welcome Message (supports color codes)')
+                            ->rows(3)
+                            ->view('components.wreckfest-textarea-input'),
                         TextInput::make('password')
                             ->label('Server Password')
                             ->password()
@@ -266,31 +269,51 @@ class ServerConfig extends Page implements HasForms
 
     public function save(): void
     {
-        $data = $this->form->getState();
+        try {
+            $data = $this->form->getState();
 
-        // Convert toggle values to integers (API expects 0/1)
-        $booleanFields = [
-            'lan', 'excludeFromQuickplay', 'enableTrackVote',
-            'disableIdleKick', 'specialVehiclesDisabled', 'carResetDisabled',
-            'wrongWayLimiterDisabled', 'clearUsers', 'ownerDisabled', 'adminControl'
-        ];
+            // Convert toggle values to integers (API expects 0/1)
+            $booleanFields = [
+                'lan', 'excludeFromQuickplay', 'enableTrackVote',
+                'disableIdleKick', 'specialVehiclesDisabled', 'carResetDisabled',
+                'wrongWayLimiterDisabled', 'clearUsers', 'ownerDisabled', 'adminControl'
+            ];
 
-        foreach ($booleanFields as $field) {
-            if (isset($data[$field])) {
-                $data[$field] = $data[$field] ? 1 : 0;
+            foreach ($booleanFields as $field) {
+                if (isset($data[$field])) {
+                    $data[$field] = $data[$field] ? 1 : 0;
+                }
             }
-        }
 
-        $apiClient = app(WreckfestApiClient::class);
+            // API requires these fields to be present even if empty
+            $requiredFields = [
+                'mods', 'weather', 'password', 'carRestriction',
+                'welcomeMessage', 'carClassRestriction'
+            ];
 
-        if ($apiClient->updateServerConfig($data)) {
+            foreach ($requiredFields as $field) {
+                if (!isset($data[$field]) || $data[$field] === null) {
+                    $data[$field] = '';
+                }
+            }
+
+            $apiClient = app(WreckfestApiClient::class);
+
+            if ($apiClient->updateServerConfig($data)) {
+                Notification::make()
+                    ->title('Configuration saved successfully')
+                    ->success()
+                    ->send();
+            } else {
+                Notification::make()
+                    ->title('Failed to save configuration')
+                    ->danger()
+                    ->send();
+            }
+        } catch (WreckfestApiException $e) {
             Notification::make()
-                ->title('Configuration saved successfully')
-                ->success()
-                ->send();
-        } else {
-            Notification::make()
-                ->title('Failed to save configuration')
+                ->title('Unable to contact Wreckfest Controller')
+                ->body('Please ensure the Wreckfest API is running and accessible.')
                 ->danger()
                 ->send();
         }

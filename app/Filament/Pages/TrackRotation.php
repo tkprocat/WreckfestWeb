@@ -336,29 +336,37 @@ class TrackRotation extends Page implements HasForms
 
     public function deployToServer(): void
     {
-        $data = $this->form->getState();
-        $tracks = $data['tracks'] ?? [];
+        try {
+            $data = $this->form->getState();
+            $tracks = $data['tracks'] ?? [];
 
-        // Convert toggle values to integers
-        foreach ($tracks as &$track) {
-            if (isset($track['carResetDisabled'])) {
-                $track['carResetDisabled'] = $track['carResetDisabled'] ? 1 : 0;
+            // Convert toggle values to integers
+            foreach ($tracks as &$track) {
+                if (isset($track['carResetDisabled'])) {
+                    $track['carResetDisabled'] = $track['carResetDisabled'] ? 1 : 0;
+                }
+                if (isset($track['wrongWayLimiterDisabled'])) {
+                    $track['wrongWayLimiterDisabled'] = $track['wrongWayLimiterDisabled'] ? 1 : 0;
+                }
             }
-            if (isset($track['wrongWayLimiterDisabled'])) {
-                $track['wrongWayLimiterDisabled'] = $track['wrongWayLimiterDisabled'] ? 1 : 0;
+
+            $apiClient = app(WreckfestApiClient::class);
+
+            if ($apiClient->updateTracks($tracks)) {
+                Notification::make()
+                    ->title('Track rotation deployed to server successfully')
+                    ->success()
+                    ->send();
+            } else {
+                Notification::make()
+                    ->title('Failed to deploy track rotation to server')
+                    ->danger()
+                    ->send();
             }
-        }
-
-        $apiClient = app(WreckfestApiClient::class);
-
-        if ($apiClient->updateTracks($tracks)) {
+        } catch (WreckfestApiException $e) {
             Notification::make()
-                ->title('Track rotation deployed to server successfully')
-                ->success()
-                ->send();
-        } else {
-            Notification::make()
-                ->title('Failed to deploy track rotation to server')
+                ->title('Unable to contact Wreckfest Controller')
+                ->body('Please ensure the Wreckfest API is running and accessible.')
                 ->danger()
                 ->send();
         }

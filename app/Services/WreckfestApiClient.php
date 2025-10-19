@@ -37,15 +37,26 @@ class WreckfestApiClient
 
     /**
      * Update server basic configuration
+     *
+     * @throws WreckfestApiException
      */
     public function updateServerConfig(array $config): bool
     {
         try {
-            $response = Http::withoutVerifying()->put("{$this->baseUrl}/Config/basic", $config);
+            $response = Http::withoutVerifying()->timeout(5)->put("{$this->baseUrl}/Config/basic", $config);
+
+            if (!$response->successful()) {
+                Log::error('Failed to update server config - API returned status: ' . $response->status());
+                Log::error('Response body: ' . $response->body());
+            }
+
             return $response->successful();
+        } catch (ConnectionException $e) {
+            Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
+            throw new WreckfestApiException();
         } catch (\Exception $e) {
             Log::error('Failed to update server config: ' . $e->getMessage());
-            return false;
+            throw new WreckfestApiException();
         }
     }
 
@@ -80,15 +91,26 @@ class WreckfestApiClient
 
     /**
      * Update entire track rotation list
+     *
+     * @throws WreckfestApiException
      */
     public function updateTracks(array $tracks): bool
     {
         try {
-            $response = Http::withoutVerifying()->put("{$this->baseUrl}/Config/tracks", $tracks);
+            $response = Http::withoutVerifying()->timeout(5)->put("{$this->baseUrl}/Config/tracks", $tracks);
+
+            if (!$response->successful()) {
+                Log::error('Failed to update tracks - API returned status: ' . $response->status());
+                Log::error('Response body: ' . $response->body());
+            }
+
             return $response->successful();
+        } catch (ConnectionException $e) {
+            Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
+            throw new WreckfestApiException();
         } catch (\Exception $e) {
             Log::error('Failed to update tracks: ' . $e->getMessage());
-            return false;
+            throw new WreckfestApiException();
         }
     }
 
