@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Exceptions\WreckfestApiException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Client\ConnectionException;
 
 class WreckfestApiClient
 {
@@ -16,15 +18,20 @@ class WreckfestApiClient
 
     /**
      * Get server basic configuration
+     *
+     * @throws WreckfestApiException
      */
     public function getServerConfig(): array
     {
         try {
-            $response = Http::withoutVerifying()->get("{$this->baseUrl}/Config/basic");
+            $response = Http::withoutVerifying()->timeout(5)->get("{$this->baseUrl}/Config/basic");
             return $response->successful() ? $response->json() : [];
+        } catch (ConnectionException $e) {
+            Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
+            throw new WreckfestApiException();
         } catch (\Exception $e) {
             Log::error('Failed to get server config: ' . $e->getMessage());
-            return [];
+            throw new WreckfestApiException();
         }
     }
 
@@ -44,11 +51,13 @@ class WreckfestApiClient
 
     /**
      * Get track rotation list
+     *
+     * @throws WreckfestApiException
      */
     public function getTracks(): array
     {
         try {
-            $response = Http::withoutVerifying()->get("{$this->baseUrl}/Config/tracks");
+            $response = Http::withoutVerifying()->timeout(5)->get("{$this->baseUrl}/Config/tracks");
             if ($response->successful()) {
                 $data = $response->json();
                 // API returns structure: {"count":30,"tracks":[...]}
@@ -60,9 +69,12 @@ class WreckfestApiClient
                 return is_array($data) ? $data : [];
             }
             return [];
+        } catch (ConnectionException $e) {
+            Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
+            throw new WreckfestApiException();
         } catch (\Exception $e) {
             Log::error('Failed to get tracks: ' . $e->getMessage());
-            return [];
+            throw new WreckfestApiException();
         }
     }
 
@@ -124,15 +136,20 @@ class WreckfestApiClient
 
     /**
      * Get server status
+     *
+     * @throws WreckfestApiException
      */
     public function getServerStatus(): array
     {
         try {
-            $response = Http::withoutVerifying()->get("{$this->baseUrl}/Server/status");
+            $response = Http::withoutVerifying()->timeout(5)->get("{$this->baseUrl}/Server/status");
             return $response->successful() ? $response->json() : [];
+        } catch (ConnectionException $e) {
+            Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
+            throw new WreckfestApiException();
         } catch (\Exception $e) {
             Log::error('Failed to get server status: ' . $e->getMessage());
-            return [];
+            throw new WreckfestApiException();
         }
     }
 
@@ -194,11 +211,13 @@ class WreckfestApiClient
 
     /**
      * Get server log file
+     *
+     * @throws WreckfestApiException
      */
     public function getLogFile(int $lines = 100): array
     {
         try {
-            $response = Http::withoutVerifying()->get("{$this->baseUrl}/Server/logfile", ['lines' => $lines]);
+            $response = Http::withoutVerifying()->timeout(5)->get("{$this->baseUrl}/Server/logfile", ['lines' => $lines]);
             if ($response->successful()) {
                 $data = $response->json();
                 // API returns nested structure: {"lines":100,"source":"logfile","logFilePath":"...","output":[...]}
@@ -210,19 +229,24 @@ class WreckfestApiClient
                 return is_array($data) ? $data : [];
             }
             return [];
+        } catch (ConnectionException $e) {
+            Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
+            throw new WreckfestApiException();
         } catch (\Exception $e) {
             Log::error('Failed to get log file: ' . $e->getMessage());
-            return [];
+            throw new WreckfestApiException();
         }
     }
 
     /**
      * Get current players
+     *
+     * @throws WreckfestApiException
      */
     public function getPlayers(): array
     {
         try {
-            $response = Http::withoutVerifying()->get("{$this->baseUrl}/Server/players");
+            $response = Http::withoutVerifying()->timeout(5)->get("{$this->baseUrl}/Server/players");
             if ($response->successful()) {
                 $data = $response->json();
                 // API returns nested structure: {"totalPlayers":0,"maxPlayers":24,"players":[],"lastUpdated":"..."}
@@ -234,9 +258,12 @@ class WreckfestApiClient
                 return is_array($data) ? $data : [];
             }
             return [];
+        } catch (ConnectionException $e) {
+            Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
+            throw new WreckfestApiException();
         } catch (\Exception $e) {
             Log::error('Failed to get players: ' . $e->getMessage());
-            return [];
+            throw new WreckfestApiException();
         }
     }
 }

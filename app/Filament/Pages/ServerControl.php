@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Exceptions\WreckfestApiException;
 use App\Services\WreckfestApiClient;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -22,8 +23,18 @@ class ServerControl extends Page
 
     public function refreshStatus(): void
     {
-        $apiClient = app(WreckfestApiClient::class);
-        $this->status = $apiClient->getServerStatus();
+        try {
+            $apiClient = app(WreckfestApiClient::class);
+            $this->status = $apiClient->getServerStatus();
+        } catch (WreckfestApiException $e) {
+            Notification::make()
+                ->title('Unable to contact Wreckfest Controller')
+                ->body('Please ensure the Wreckfest API is running and accessible.')
+                ->danger()
+                ->send();
+
+            $this->status = null;
+        }
     }
 
     public function startServer(): void

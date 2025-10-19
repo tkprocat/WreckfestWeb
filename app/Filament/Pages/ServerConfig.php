@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Exceptions\WreckfestApiException;
 use App\Helpers\TrackHelper;
 use App\Services\WreckfestApiClient;
 use Filament\Forms\Components\Grid;
@@ -29,10 +30,21 @@ class ServerConfig extends Page implements HasForms
 
     public function mount(): void
     {
-        $apiClient = app(WreckfestApiClient::class);
-        $config = $apiClient->getServerConfig();
+        try {
+            $apiClient = app(WreckfestApiClient::class);
+            $config = $apiClient->getServerConfig();
 
-        $this->form->fill($config);
+            $this->form->fill($config);
+        } catch (WreckfestApiException $e) {
+            Notification::make()
+                ->title('Unable to contact Wreckfest Controller')
+                ->body('Please ensure the Wreckfest API is running and accessible.')
+                ->danger()
+                ->persistent()
+                ->send();
+
+            $this->form->fill([]);
+        }
     }
 
     protected function getAllTracks(): array

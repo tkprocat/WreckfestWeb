@@ -2,7 +2,9 @@
 
 namespace App\Filament\Widgets;
 
+use App\Exceptions\WreckfestApiException;
 use App\Services\WreckfestApiClient;
+use Filament\Notifications\Notification;
 use Filament\Widgets\Widget;
 
 class CurrentPlayersWidget extends Widget
@@ -24,8 +26,18 @@ class CurrentPlayersWidget extends Widget
 
     public function refreshPlayers(): void
     {
-        $apiClient = app(WreckfestApiClient::class);
-        $this->players = $apiClient->getPlayers();
+        try {
+            $apiClient = app(WreckfestApiClient::class);
+            $this->players = $apiClient->getPlayers();
+        } catch (WreckfestApiException $e) {
+            Notification::make()
+                ->title('Unable to contact Wreckfest Controller')
+                ->body('Please ensure the Wreckfest API is running and accessible.')
+                ->danger()
+                ->send();
+
+            $this->players = null;
+        }
     }
 
     public static function canView(): bool

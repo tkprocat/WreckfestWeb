@@ -64,6 +64,28 @@
 
         <!-- Main Content -->
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            @if($apiError)
+                <!-- API Error Banner -->
+                <div class="mb-6 bg-red-900/50 border-2 border-red-600 rounded shadow-2xl p-6">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <svg class="h-8 w-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <h3 class="text-xl font-bold text-red-200 uppercase tracking-wide">Unable to Contact Wreckfest Controller</h3>
+                            <p class="mt-2 text-red-300 font-semibold">
+                                The Wreckfest API is not responding. Please ensure the Wreckfest Controller is running and accessible.
+                            </p>
+                            <p class="mt-1 text-red-400 text-sm font-medium">
+                                Expected API URL: {{ config('wreckfest.api_url') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                 <!-- Server Status Card -->

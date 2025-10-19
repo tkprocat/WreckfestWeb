@@ -2,7 +2,9 @@
 
 namespace App\Filament\Pages;
 
+use App\Exceptions\WreckfestApiException;
 use App\Services\WreckfestApiClient;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 
 class ServerLogs extends Page
@@ -21,7 +23,17 @@ class ServerLogs extends Page
 
     public function refreshLogs(): void
     {
-        $apiClient = app(WreckfestApiClient::class);
-        $this->logs = $apiClient->getLogFile(100);
+        try {
+            $apiClient = app(WreckfestApiClient::class);
+            $this->logs = $apiClient->getLogFile(100);
+        } catch (WreckfestApiException $e) {
+            Notification::make()
+                ->title('Unable to contact Wreckfest Controller')
+                ->body('Please ensure the Wreckfest API is running and accessible.')
+                ->danger()
+                ->send();
+
+            $this->logs = null;
+        }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Exceptions\WreckfestApiException;
 use App\Models\TrackCollection;
 use App\Services\WreckfestApiClient;
 use Filament\Actions\Action;
@@ -65,55 +66,76 @@ class TrackRotation extends Page implements HasForms
 
     public function loadFromServer(): void
     {
-        $apiClient = app(WreckfestApiClient::class);
-        $tracks = $apiClient->getTracks();
-        $serverConfig = $apiClient->getServerConfig();
+        try {
+            $apiClient = app(WreckfestApiClient::class);
+            $tracks = $apiClient->getTracks();
+            $serverConfig = $apiClient->getServerConfig();
 
-        // Update the default gamemode from server config
-        $this->defaultGamemode = $serverConfig['gamemode'] ?? 'racing';
+            // Update the default gamemode from server config
+            $this->defaultGamemode = $serverConfig['gamemode'] ?? 'racing';
 
-        // Clear current collection context
-        $this->currentCollectionId = null;
-        $this->currentCollectionName = null;
-        session()->forget('track_rotation.current_collection_id');
+            // Clear current collection context
+            $this->currentCollectionId = null;
+            $this->currentCollectionName = null;
+            session()->forget('track_rotation.current_collection_id');
 
-        $this->form->fill(['tracks' => $tracks]);
+            $this->form->fill(['tracks' => $tracks]);
 
-        $this->dispatch('collection-loaded', tracks: $tracks);
+            $this->dispatch('collection-loaded', tracks: $tracks);
 
-        Notification::make()
-            ->title('Loaded from server')
-            ->body(count($tracks) . ' tracks loaded')
-            ->success()
-            ->send();
+            Notification::make()
+                ->title('Loaded from server')
+                ->body(count($tracks) . ' tracks loaded')
+                ->success()
+                ->send();
+        } catch (WreckfestApiException $e) {
+            Notification::make()
+                ->title('Unable to contact Wreckfest Controller')
+                ->body('Please ensure the Wreckfest API is running and accessible.')
+                ->danger()
+                ->send();
+        }
     }
 
     public function mount(): void
     {
-        $apiClient = app(WreckfestApiClient::class);
-        $serverConfig = $apiClient->getServerConfig();
+        try {
+            $apiClient = app(WreckfestApiClient::class);
+            $serverConfig = $apiClient->getServerConfig();
 
-        // Store the default gamemode from server config
-        $this->defaultGamemode = $serverConfig['gamemode'] ?? 'racing';
+            // Store the default gamemode from server config
+            $this->defaultGamemode = $serverConfig['gamemode'] ?? 'racing';
 
-        // Try to load the last worked-on collection from session
-        $lastCollectionId = session('track_rotation.current_collection_id');
+            // Try to load the last worked-on collection from session
+            $lastCollectionId = session('track_rotation.current_collection_id');
 
-        if ($lastCollectionId) {
-            $collection = TrackCollection::find($lastCollectionId);
-            if ($collection) {
-                $this->currentCollectionId = $collection->id;
-                $this->currentCollectionName = $collection->name;
-                $this->form->fill(['tracks' => $collection->tracks]);
-                $this->dispatch('collection-loaded', tracks: $collection->tracks);
-                return;
+            if ($lastCollectionId) {
+                $collection = TrackCollection::find($lastCollectionId);
+                if ($collection) {
+                    $this->currentCollectionId = $collection->id;
+                    $this->currentCollectionName = $collection->name;
+                    $this->form->fill(['tracks' => $collection->tracks]);
+                    $this->dispatch('collection-loaded', tracks: $collection->tracks);
+                    return;
+                }
             }
-        }
 
-        // Otherwise load from server
-        $tracks = $apiClient->getTracks();
-        $this->form->fill(['tracks' => $tracks]);
-        $this->dispatch('collection-loaded', tracks: $tracks);
+            // Otherwise load from server
+            $tracks = $apiClient->getTracks();
+            $this->form->fill(['tracks' => $tracks]);
+            $this->dispatch('collection-loaded', tracks: $tracks);
+        } catch (WreckfestApiException $e) {
+            Notification::make()
+                ->title('Unable to contact Wreckfest Controller')
+                ->body('Please ensure the Wreckfest API is running and accessible.')
+                ->danger()
+                ->persistent()
+                ->send();
+
+            $this->defaultGamemode = 'racing';
+            $this->form->fill(['tracks' => []]);
+            $this->dispatch('collection-loaded', tracks: []);
+        }
     }
 
     protected function getAllTracks(): array
@@ -361,27 +383,35 @@ class TrackRotation extends Page implements HasForms
                 ->modalHeading('Refresh from Server')
                 ->modalDescription('This will load the current track rotation from your game server. Any unsaved changes will be lost.')
                 ->action(function (): void {
-                    $apiClient = app(WreckfestApiClient::class);
-                    $tracks = $apiClient->getTracks();
-                    $serverConfig = $apiClient->getServerConfig();
+                    try {
+                        $apiClient = app(WreckfestApiClient::class);
+                        $tracks = $apiClient->getTracks();
+                        $serverConfig = $apiClient->getServerConfig();
 
-                    // Update the default gamemode from server config
-                    $this->defaultGamemode = $serverConfig['gamemode'] ?? 'racing';
+                        // Update the default gamemode from server config
+                        $this->defaultGamemode = $serverConfig['gamemode'] ?? 'racing';
 
-                    // Clear current collection context
-                    $this->currentCollectionId = null;
-                    $this->currentCollectionName = null;
-                    session()->forget('track_rotation.current_collection_id');
+                        // Clear current collection context
+                        $this->currentCollectionId = null;
+                        $this->currentCollectionName = null;
+                        session()->forget('track_rotation.current_collection_id');
 
-                    $this->form->fill(['tracks' => $tracks]);
+                        $this->form->fill(['tracks' => $tracks]);
 
-                    $this->dispatch('collection-loaded', tracks: $tracks);
+                        $this->dispatch('collection-loaded', tracks: $tracks);
 
-                    Notification::make()
-                        ->title('Tracks refreshed from server')
-                        ->body(count($tracks) . ' tracks loaded')
-                        ->success()
-                        ->send();
+                        Notification::make()
+                            ->title('Tracks refreshed from server')
+                            ->body(count($tracks) . ' tracks loaded')
+                            ->success()
+                            ->send();
+                    } catch (WreckfestApiException $e) {
+                        Notification::make()
+                            ->title('Unable to contact Wreckfest Controller')
+                            ->body('Please ensure the Wreckfest API is running and accessible.')
+                            ->danger()
+                            ->send();
+                    }
                 })
                 ->color('gray'),
 
