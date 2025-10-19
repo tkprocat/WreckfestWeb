@@ -570,7 +570,7 @@ return [
             ],
             'crm01_2' => [
                 'name' => 'Free Roam',
-                'derby' => false,
+                'derby' => true,
             ],
             'crm01_3' => [
                 'name' => 'Demolition Arena',
@@ -592,7 +592,7 @@ return [
             ],
             'crm02_2' => [
                 'name' => 'Free Roam',
-                'derby' => false,
+                'derby' => true,
             ],
         ],
     ],
@@ -630,7 +630,7 @@ return [
             ],
             'fields10_2' => [
                 'name' => 'Mud Pit',
-                'derby' => false,
+                'derby' => true,
             ],
         ],
     ],
@@ -820,7 +820,7 @@ return [
         'variants' => [
             'wrecker01_1' => [
                 'name' => 'Main Area',
-                'derby' => false,
+                'derby' => true,
             ],
         ],
     ],

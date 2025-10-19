@@ -17,8 +17,106 @@
                 Track Results ({{ $this->tracks->count() }} tracks found)
             </x-slot>
 
-            <div class="overflow-x-auto">
-                <table class="w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <!-- Grid View -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                @forelse($this->tracks as $track)
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
+                        <!-- Track Image -->
+                        <div class="aspect-video bg-gray-100 dark:bg-gray-900 relative overflow-hidden pt-4">
+                            @php
+                                $imageFilename = str_replace(['/', ' '], ['_', '_'], strtolower($track->variant_id)) . '.png';
+                                $imagePath = asset("images/tracks/{$imageFilename}");
+                            @endphp
+
+                            <img
+                                src="{{ $imagePath }}"
+                                alt="{{ $track->variant }}"
+                                class="w-full h-full object-cover"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                            >
+                            <div class="w-full h-full flex items-center justify-center" style="display: none;">
+                                <div class="text-center">
+                                    <x-filament::icon icon="heroicon-o-photo" class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-2" />
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">No preview available</p>
+                                </div>
+                            </div>
+
+                            <!-- Derby Badge -->
+                            @if($track->derby)
+                                <div class="absolute top-2 right-2">
+                                    <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-red-600 text-white shadow-lg">
+                                        DERBY
+                                    </span>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Track Info -->
+                        <div class="p-4">
+                            <h3 class="font-bold text-gray-900 dark:text-gray-100 mb-1">{{ $track->location }}</h3>
+                            <p class="text-sm font-medium mb-2" style="color: {{ config('wreckfest.brand.primary') }};">
+                                {{ $track->variant }}
+                            </p>
+
+                            <div class="flex items-center gap-2 mb-3">
+                                <code class="text-xs bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded font-mono text-gray-600 dark:text-gray-400">
+                                    {{ $track->variant_id }}
+                                </code>
+                                <button
+                                    onclick="navigator.clipboard.writeText('{{ $track->variant_id }}'); this.innerHTML = '<svg class=\'w-3 h-3\' fill=\'currentColor\' viewBox=\'0 0 20 20\'><path d=\'M9 2a1 1 0 000 2h2a1 1 0 100-2H9z\'/><path d=\'M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z\'/></svg> Copied!'; setTimeout(() => this.innerHTML = '<svg class=\'w-3 h-3\' fill=\'currentColor\' viewBox=\'0 0 20 20\'><path d=\'M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z\'/><path d=\'M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z\'/></svg>', 2000);"
+                                    class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
+                                    title="Copy variant ID"
+                                >
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
+                                        <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Weather -->
+                            <div class="mb-2">
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Weather:</p>
+                                <div class="flex flex-wrap gap-1">
+                                    @foreach($track->weather as $weather)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200">
+                                            {{ ucfirst($weather) }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <!-- Game Modes -->
+                            <div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Game Modes:</p>
+                                <div class="flex flex-wrap gap-1">
+                                    @foreach($track->compatible_gamemodes as $gamemode)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200">
+                                            {{ config("wreckfest.gamemodes.$gamemode", ucfirst($gamemode)) }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-span-full py-12 text-center text-gray-500 dark:text-gray-400">
+                        <div class="flex flex-col items-center space-y-2">
+                            <x-filament::icon icon="heroicon-o-magnifying-glass" class="w-12 h-12 text-gray-400" />
+                            <p class="text-sm">No tracks found matching your criteria</p>
+                        </div>
+                    </div>
+                @endforelse
+            </div>
+
+            <!-- Table View (collapsed by default) -->
+            <details class="mt-6">
+                <summary class="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 mb-4">
+                    Show detailed table view
+                </summary>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead class="bg-gray-50 dark:bg-gray-800">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -111,7 +209,7 @@
                                 <td class="px-6 py-4 text-sm">
                                     <div class="flex flex-wrap gap-1">
                                         @foreach($track->weather as $weather)
-                                            <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium" style="background-color: {{ config('wreckfest.brand.primary') }}20; color: {{ config('wreckfest.brand.primary') }};">
+                                            <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200">
                                                 {{ ucfirst($weather) }}
                                             </span>
                                         @endforeach
@@ -120,7 +218,7 @@
                                 <td class="px-6 py-4 text-sm">
                                     <div class="flex flex-wrap gap-1">
                                         @foreach($track->compatible_gamemodes as $gamemode)
-                                            <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300">
+                                            <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200">
                                                 {{ config("wreckfest.gamemodes.$gamemode", ucfirst($gamemode)) }}
                                             </span>
                                         @endforeach
@@ -143,6 +241,7 @@
                     </tbody>
                 </table>
             </div>
+            </details>
         </x-filament::section>
     </div>
 </x-filament-panels::page>

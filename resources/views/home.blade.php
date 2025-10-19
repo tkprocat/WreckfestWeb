@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $serverName }}</title>
+    <title>{{ $serverNamePlain }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -46,7 +46,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h1 class="text-4xl font-black text-wreckfest uppercase tracking-wider" style="font-family: Impact, 'Arial Black', sans-serif;">{{ $serverName }}</h1>
+                        <h1 class="text-4xl font-black uppercase tracking-wider" style="font-family: Impact, 'Arial Black', sans-serif; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);">{!! $serverNameHtml !!}</h1>
                         <p class="text-gray-400 mt-1 font-semibold tracking-wide">WRECKFEST DEDICATED SERVER</p>
                     </div>
                     @auth
@@ -86,56 +86,24 @@
                 </div>
             @endif
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                <!-- Server Status Card -->
-                <div class="metal-texture rounded shadow-2xl p-8 border-2 border-gray-700">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-2xl font-black text-wreckfest uppercase tracking-wider" style="font-family: Impact, 'Arial Black', sans-serif;">Server Status</h2>
-                        @if(!empty($serverStatus))
-                            <span class="flex items-center">
-                                <span class="relative flex h-3 w-3">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                                </span>
-                                <span class="ml-2 text-green-400 font-black uppercase tracking-wide">Online</span>
-                            </span>
-                        @else
-                            <span class="flex items-center">
-                                <span class="relative flex h-3 w-3 rounded-full bg-red-500"></span>
-                                <span class="ml-2 text-red-400 font-black uppercase tracking-wide">Offline</span>
-                            </span>
-                        @endif
-                    </div>
-
-                    <div class="space-y-4">
-                        @if(!empty($serverStatus))
-                            @foreach($serverStatus as $key => $value)
-                                <div class="flex justify-between items-center py-3 border-b border-gray-700">
-                                    <span class="text-gray-400 font-semibold uppercase text-sm tracking-wide">{{ ucfirst(str_replace('_', ' ', $key)) }}</span>
-                                    <span class="text-white font-bold">
-                                        @if(is_bool($value))
-                                            {{ $value ? 'Yes' : 'No' }}
-                                        @elseif(is_array($value))
-                                            {{ json_encode($value) }}
-                                        @else
-                                            {{ $value }}
-                                        @endif
-                                    </span>
-                                </div>
-                            @endforeach
-                        @else
-                            <div class="text-center py-8">
-                                <svg class="mx-auto h-12 w-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <p class="mt-4 text-gray-500 font-semibold">Unable to connect to server</p>
-                            </div>
-                        @endif
-                    </div>
+            <!-- Server Status Badge -->
+            <div class="mb-8 flex justify-center">
+                <div class="metal-texture rounded-lg shadow-2xl p-6 border-2 border-gray-700 inline-flex items-center space-x-4">
+                    @if(!empty($serverStatus))
+                        <span class="relative flex h-5 w-5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-5 w-5 bg-green-500"></span>
+                        </span>
+                        <span class="text-green-400 font-black uppercase tracking-wider text-2xl">Server Online</span>
+                    @else
+                        <span class="relative flex h-5 w-5 rounded-full bg-red-500"></span>
+                        <span class="text-red-400 font-black uppercase tracking-wider text-2xl">Server Offline</span>
+                    @endif
                 </div>
+            </div>
 
-                <!-- Current Players Card -->
+            <!-- Current Players Card -->
+            <div class="max-w-3xl mx-auto">
                 <div class="metal-texture rounded shadow-2xl p-8 border-2 border-gray-700">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-2xl font-black text-wreckfest uppercase tracking-wider" style="font-family: Impact, 'Arial Black', sans-serif;">Current Players</h2>
@@ -184,6 +152,7 @@
                         @endif
                     </div>
                 </div>
+            </div>
             </div>
 
             <!-- Refresh Notice -->
