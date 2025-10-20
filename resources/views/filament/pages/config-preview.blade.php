@@ -70,7 +70,7 @@
                 </div>
                 <div class="ml-3 flex-1">
                     <p class="text-sm text-gray-700 dark:text-gray-300">
-                        This configuration is retrieved from the Wreckfest API at <code class="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-800 rounded text-xs">{{ config('wreckfest.api_url', config('services.wreckfest.api_url', 'https://localhost:5101/api')) }}</code>
+                        This configuration is retrieved from the Wreckfest API at <code class="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-800 rounded text-xs">{{ config('wreckfest.api_url', 'https://localhost:5101/api') }}</code>
                     </p>
                 </div>
             </div>

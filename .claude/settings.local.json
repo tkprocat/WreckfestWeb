@@ -1,11 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xargs -I {} \"C:\\temp\\breckfest.exe\" {})",
-      "Bash(/dev/null)",
-      "Bash(powershell.exe -ExecutionPolicy Bypass -File \"F:\\Projects\\Web\\WreckfestWeb\\convert_tracks.ps1\")",
-      "Bash(php -r \"$config = include ''config/wreckfest.php''; $count = 0; foreach ($config[''tracks''] as $location) { $count += count($location[''variants'']); } echo \"\"Track variants in config: $count\\n\"\";\")",
-      "Bash(php -r \"\n$config = include ''config/wreckfest.php'';\n$count = 0;\nforeach ($config[''tracks''] as $location) {\n    $count += count($location[''variants'']);\n}\necho \"\"Track variants in config: $count\\n\"\";\n\")"
+      "WebSearch",
+      "Bash(composer test --filter=\"can_access_server_config_page_when_authenticated\")",
+      "Bash(composer test --filter=\"it_can_render_track_rotation_page\")",
+      "Bash(php -r \"echo class_exists(''Filament\\Forms\\Components\\Repeater'') ? ''FORMS EXISTS'' : ''NOT FOUND''; echo '' ''; echo class_exists(''Filament\\Schemas\\Components\\Repeater'') ? ''SCHEMAS EXISTS'' : ''NOT FOUND'';\")"
     ],
     "deny": [],
     "ask": []

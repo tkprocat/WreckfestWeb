@@ -7,10 +7,10 @@ use Filament\Pages\Page;
 
 class Players extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'Current Players';
     protected static ?int $navigationSort = 5;
-    protected static string $view = 'filament.pages.players';
+    protected string $view = 'filament.pages.players';
     protected static bool $shouldRegisterNavigation = false;
 
     public ?array $players = null;

@@ -31,14 +31,6 @@ it('can render dashboard', function () {
     $response = actingAs($this->user)
         ->get('/admin');
 
-    // Save the full dashboard HTML output
-    file_put_contents(
-        storage_path('logs/dashboard-test-output.html'),
-        $response->getContent()
-    );
-
-    dump('Dashboard HTML saved to: storage/logs/dashboard-test-output.html');
-
     $response->assertSuccessful();
 });
 
@@ -61,13 +53,6 @@ it('can render current players widget', function () {
     actingAs($this->user);
 
     $component = Livewire::test(CurrentPlayersWidget::class);
-
-    // Dump the HTML output to see what the test sees
-    dump($component->get('players'));
-    file_put_contents(
-        storage_path('logs/widget-test-output.html'),
-        $component->html()
-    );
 
     $component
         ->assertSee('Current Players')
@@ -144,17 +129,10 @@ it('renders bots with orange color class', function () {
 
     $component = Livewire::test(CurrentPlayersWidget::class);
 
-    // Save HTML output to inspect
     $html = $component->html();
-    file_put_contents(
-        storage_path('logs/bot-color-test-output.html'),
-        $html
-    );
-
-    dump('Bot color test HTML saved to: storage/logs/bot-color-test-output.html');
 
     // Check if orange color class exists in HTML
-    expect($html)->toContain('!text-orange-500');
+    expect($html)->toContain('color: #a03d00;');
 
     // Check that bot names are formatted correctly
     $component

@@ -34,9 +34,4 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
-    'wreckfest' => [
-        'api_url' => env('WRECKFEST_API_URL', 'https://localhost:5101/api'),
-    ],
-
 ];

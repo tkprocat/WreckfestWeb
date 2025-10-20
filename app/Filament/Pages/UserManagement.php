@@ -2,6 +2,10 @@
 
 namespace App\Filament\Pages;
 
+use Filament\Actions\DeleteAction;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\InvitationMail;
+use Exception;
 use App\Models\Invitation;
 use App\Models\User;
 use App\Notifications\InvitationEmail;
@@ -9,7 +13,6 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -20,10 +23,10 @@ class UserManagement extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'User Management';
     protected static ?int $navigationSort = 10;
-    protected static string $view = 'filament.pages.user-management';
+    protected string $view = 'filament.pages.user-management';
 
     public function table(Table $table): Table
     {
@@ -54,7 +57,7 @@ class UserManagement extends Page implements HasTable
             Action::make('sendInvite')
                 ->label('Send Invitation')
                 ->icon('heroicon-o-envelope')
-                ->form([
+                ->schema([
                     TextInput::make('email')
                         ->label('Email Address')
                         ->email()
@@ -97,15 +100,15 @@ class UserManagement extends Page implements HasTable
 
                     // Send email
                     try {
-                        \Illuminate\Support\Facades\Mail::to($invitation->email)
-                            ->send(new \App\Mail\InvitationMail($invitation));
+                        Mail::to($invitation->email)
+                            ->send(new InvitationMail($invitation));
 
                         Notification::make()
                             ->title('Invitation sent')
                             ->body("An invitation has been sent to {$data['email']}")
                             ->success()
                             ->send();
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                         $invitation->delete();
 
                         Notification::make()

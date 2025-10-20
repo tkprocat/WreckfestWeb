@@ -2,13 +2,13 @@
 
 namespace App\Filament\Pages;
 
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
 use App\Models\TrackCollection;
 use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -18,10 +18,10 @@ class ManageCollections extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationLabel = 'Track Collections';
     protected static ?int $navigationSort = 3;
-    protected static string $view = 'filament.pages.manage-collections';
+    protected string $view = 'filament.pages.manage-collections';
     protected static ?string $title = 'Track Collections';
 
     public function table(Table $table): Table
@@ -50,7 +50,7 @@ class ManageCollections extends Page implements HasTable
             ])
             ->actions([
                 EditAction::make()
-                    ->form([
+                    ->schema([
                         TextInput::make('name')
                             ->label('Collection Name')
                             ->required()
@@ -67,7 +67,7 @@ class ManageCollections extends Page implements HasTable
             Action::make('newCollection')
                 ->label('New Collection')
                 ->icon('heroicon-o-document-plus')
-                ->form([
+                ->schema([
                     TextInput::make('name')
                         ->label('Collection Name')
                         ->required()

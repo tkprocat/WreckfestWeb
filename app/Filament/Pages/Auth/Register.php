@@ -2,18 +2,17 @@
 
 namespace App\Filament\Pages\Auth;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Component;
 use App\Models\Invitation;
 use App\Models\User;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use Filament\Pages\Auth\Register as BaseRegister;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
-class Register extends BaseRegister
+class Register extends \Filament\Auth\Pages\Register
 {
     protected ?string $inviteToken = null;
 
@@ -57,10 +56,10 @@ class Register extends BaseRegister
         parent::mount();
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 $this->getNameFormComponent(),
                 $this->getEmailFormComponent()->disabled(),
                 $this->getPasswordFormComponent(),

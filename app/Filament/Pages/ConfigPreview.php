@@ -7,10 +7,10 @@ use Filament\Pages\Page;
 
 class ConfigPreview extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-eye';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-eye';
     protected static ?string $navigationLabel = 'Config Preview';
     protected static ?int $navigationSort = 3;
-    protected static string $view = 'filament.pages.config-preview';
+    protected string $view = 'filament.pages.config-preview';
 
     public array $serverConfig = [];
     public array $trackRotation = [];

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Exception;
 use App\Exceptions\WreckfestApiException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +14,7 @@ class WreckfestApiClient
 
     public function __construct()
     {
-        $this->baseUrl = config('wreckfest.api_url', config('services.wreckfest.api_url', 'https://localhost:5101/api'));
+        $this->baseUrl = config('wreckfest.api_url', 'https://localhost:5101/api');
     }
 
     /**
@@ -29,7 +30,7 @@ class WreckfestApiClient
         } catch (ConnectionException $e) {
             Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
             throw new WreckfestApiException();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to get server config: ' . $e->getMessage());
             throw new WreckfestApiException();
         }
@@ -54,7 +55,7 @@ class WreckfestApiClient
         } catch (ConnectionException $e) {
             Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
             throw new WreckfestApiException();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to update server config: ' . $e->getMessage());
             throw new WreckfestApiException();
         }
@@ -83,7 +84,7 @@ class WreckfestApiClient
         } catch (ConnectionException $e) {
             Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
             throw new WreckfestApiException();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to get tracks: ' . $e->getMessage());
             throw new WreckfestApiException();
         }
@@ -108,7 +109,7 @@ class WreckfestApiClient
         } catch (ConnectionException $e) {
             Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
             throw new WreckfestApiException();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to update tracks: ' . $e->getMessage());
             throw new WreckfestApiException();
         }
@@ -122,7 +123,7 @@ class WreckfestApiClient
         try {
             $response = Http::withoutVerifying()->post("{$this->baseUrl}/Config/tracks", $track);
             return $response->successful();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to add track: ' . $e->getMessage());
             return false;
         }
@@ -136,7 +137,7 @@ class WreckfestApiClient
         try {
             $response = Http::withoutVerifying()->put("{$this->baseUrl}/Config/tracks/{$index}", $track);
             return $response->successful();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to update track: ' . $e->getMessage());
             return false;
         }
@@ -150,7 +151,7 @@ class WreckfestApiClient
         try {
             $response = Http::withoutVerifying()->delete("{$this->baseUrl}/Config/tracks/{$index}");
             return $response->successful();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to delete track: ' . $e->getMessage());
             return false;
         }
@@ -169,7 +170,7 @@ class WreckfestApiClient
         } catch (ConnectionException $e) {
             Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
             throw new WreckfestApiException();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to get server status: ' . $e->getMessage());
             throw new WreckfestApiException();
         }
@@ -183,7 +184,7 @@ class WreckfestApiClient
         try {
             $response = Http::withoutVerifying()->post("{$this->baseUrl}/Server/start");
             return $response->successful();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to start server: ' . $e->getMessage());
             return false;
         }
@@ -197,7 +198,7 @@ class WreckfestApiClient
         try {
             $response = Http::withoutVerifying()->post("{$this->baseUrl}/Server/stop");
             return $response->successful();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to stop server: ' . $e->getMessage());
             return false;
         }
@@ -211,7 +212,7 @@ class WreckfestApiClient
         try {
             $response = Http::withoutVerifying()->post("{$this->baseUrl}/Server/restart");
             return $response->successful();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to restart server: ' . $e->getMessage());
             return false;
         }
@@ -225,7 +226,7 @@ class WreckfestApiClient
         try {
             $response = Http::withoutVerifying()->post("{$this->baseUrl}/Server/attach/{$pid}");
             return $response->successful();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to attach to server: ' . $e->getMessage());
             return false;
         }
@@ -254,7 +255,7 @@ class WreckfestApiClient
         } catch (ConnectionException $e) {
             Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
             throw new WreckfestApiException();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to get log file: ' . $e->getMessage());
             throw new WreckfestApiException();
         }
@@ -283,7 +284,7 @@ class WreckfestApiClient
         } catch (ConnectionException $e) {
             Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
             throw new WreckfestApiException();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to get players: ' . $e->getMessage());
             throw new WreckfestApiException();
         }

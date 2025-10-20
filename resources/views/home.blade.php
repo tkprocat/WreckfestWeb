@@ -114,7 +114,7 @@
 
                     <div class="space-y-3">
                         @if(is_array($players) && count($players) > 0)
-                            <div class="max-h-96 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+                            <div class="overflow-y-auto space-y-3 pr-2">
                                 @foreach($players as $player)
                                     @php
                                         $isBot = false;
@@ -133,9 +133,6 @@
 
                                     <div class="bg-black/30 rounded p-4 hover:bg-black/40 transition-colors border-l-4 border-wreckfest shadow-lg">
                                         <div class="flex items-center space-x-3">
-                                            <div class="w-10 h-10 rounded flex items-center justify-center text-white font-semibold shadow-lg button-text-shadow" style="background: linear-gradient(135deg, #a03d00 0%, #802f00 100%);">
-                                                {{ $firstLetter }}
-                                            </div>
                                             <span class="text-white font-bold">{{ $displayName }}</span>
                                         </div>
                                     </div>

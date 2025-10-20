@@ -9,10 +9,10 @@ use Filament\Pages\Page;
 
 class ServerControl extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-server';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-server';
     protected static ?string $navigationLabel = 'Server Control';
     protected static ?int $navigationSort = 3;
-    protected static string $view = 'filament.pages.server-control';
+    protected string $view = 'filament.pages.server-control';
 
     public ?array $status = null;
 

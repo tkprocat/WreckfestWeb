@@ -10,7 +10,7 @@ beforeEach(function () {
     $this->user = \App\Models\User::factory()->create();
 
     // Mock the API responses
-    config(['services.wreckfest.api_url' => 'https://localhost:5101/api']);
+    config(['wreckfest.api_url' => 'https://localhost:5101/api']);
 });
 
 describe('Server Config Page', function () {
@@ -83,6 +83,11 @@ describe('Track Rotation Page', function () {
 
     test('displays track rotation data', function () {
         Http::fake([
+            '*Config/basic*' => Http::response([
+                'serverName' => 'Test Server',
+                'maxPlayers' => 24,
+                'welcomeMessage' => 'Welcome!',
+            ], 200),
             '*/Config/tracks' => Http::response([
                 'count' => 2,
                 'tracks' => [

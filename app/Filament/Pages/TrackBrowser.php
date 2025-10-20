@@ -2,12 +2,12 @@
 
 namespace App\Filament\Pages;
 
+use Filament\Schemas\Schema;
 use App\Helpers\TrackHelper;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Illuminate\Support\Collection;
 
@@ -15,9 +15,9 @@ class TrackBrowser extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static ?string $navigationIcon = 'heroicon-o-magnifying-glass';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-magnifying-glass';
 
-    protected static string $view = 'filament.pages.track-browser';
+    protected string $view = 'filament.pages.track-browser';
 
     protected static ?string $navigationLabel = 'Track Browser';
 
@@ -35,10 +35,10 @@ class TrackBrowser extends Page implements HasForms
 
     public ?string $sortDirection = 'asc';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 TextInput::make('search')
                     ->label('Search Tracks')
                     ->placeholder('Search by track name or variant (e.g., "Oval", "Demolition Arena")')
@@ -51,6 +51,7 @@ class TrackBrowser extends Page implements HasForms
                         '' => 'All Game Modes',
                         ...config('wreckfest.gamemodes', []),
                     ])
+                    ->native(false)
                     ->live(),
 
                 Select::make('derbyFilter')
@@ -60,6 +61,7 @@ class TrackBrowser extends Page implements HasForms
                         'derby' => 'Derby Only',
                         'racing' => 'Racing Only',
                     ])
+                    ->native(false)
                     ->live(),
 
                 Select::make('weather')
@@ -68,6 +70,7 @@ class TrackBrowser extends Page implements HasForms
                         '' => 'Any Weather',
                         ...config('wreckfest.weather_conditions', []),
                     ])
+                    ->native(false)
                     ->live(),
             ])
             ->columns(4);

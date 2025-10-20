@@ -2,18 +2,18 @@
 
 namespace App\Filament\Pages;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
 use App\Exceptions\WreckfestApiException;
 use App\Helpers\TrackHelper;
 use App\Services\WreckfestApiClient;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 
@@ -21,10 +21,10 @@ class ServerConfig extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
     protected static ?string $navigationLabel = 'Server Config';
     protected static ?int $navigationSort = 1;
-    protected static string $view = 'filament.pages.server-config';
+    protected string $view = 'filament.pages.server-config';
 
     public ?array $data = [];
 
@@ -62,13 +62,14 @@ class ServerConfig extends Page implements HasForms
             }
         }
 
-        return $allTracks;
+        // Filter out any null or empty values to satisfy Filament 4's stricter Select validation
+        return array_filter($allTracks, fn($value) => is_string($value) && $value !== '');
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make('Basic Server Information')
                     ->schema([
                         Grid::make(2)->schema([
@@ -125,12 +126,12 @@ class ServerConfig extends Page implements HasForms
                                 ->label('Session Mode')
                                 ->options(config('wreckfest.session_modes'))
                                 ->searchable()
-                                ->placeholder('Select session mode'),
+                                ->native(false),
                             Select::make('gridOrder')
                                 ->label('Grid Order')
                                 ->options(config('wreckfest.grid_orders'))
                                 ->searchable()
-                                ->placeholder('Select grid order'),
+                                ->native(false),
                         ]),
                         Grid::make(3)->schema([
                             TextInput::make('lobbyCountdown')
@@ -148,12 +149,12 @@ class ServerConfig extends Page implements HasForms
                                 ->label('AI Difficulty')
                                 ->options(config('wreckfest.ai_difficulties'))
                                 ->searchable()
-                                ->placeholder('Select AI difficulty'),
+                                ->native(false),
                             Select::make('vehicleDamage')
                                 ->label('Vehicle Damage')
                                 ->options(config('wreckfest.vehicle_damages'))
                                 ->searchable()
-                                ->placeholder('Select vehicle damage'),
+                                ->native(false),
                         ]),
                     ]),
 
@@ -164,12 +165,12 @@ class ServerConfig extends Page implements HasForms
                                 ->label('Default Track')
                                 ->options(fn () => $this->getAllTracks())
                                 ->searchable()
-                                ->placeholder('Select a track'),
+                                ->native(false),
                             Select::make('gamemode')
                                 ->label('Default Game Mode')
                                 ->options(config('wreckfest.gamemodes'))
                                 ->searchable()
-                                ->placeholder('Select game mode'),
+                                ->native(false),
                         ]),
                         Grid::make(3)->schema([
                             TextInput::make('laps')
@@ -191,18 +192,18 @@ class ServerConfig extends Page implements HasForms
                                 ->label('Car Class Restriction')
                                 ->options(config('wreckfest.car_classes'))
                                 ->searchable()
-                                ->placeholder('No restriction'),
+                                ->native(false),
                             Select::make('carRestriction')
                                 ->label('Specific Car Restriction')
                                 ->options(config('wreckfest.cars'))
                                 ->searchable()
-                                ->placeholder('Leave empty for no restriction'),
+                                ->native(false),
                         ]),
                         Select::make('weather')
                             ->label('Weather Condition')
                             ->options(config('wreckfest.weather_conditions'))
                             ->searchable()
-                            ->placeholder('Random'),
+                            ->native(false),
                     ]),
 
                 Section::make('Advanced Settings')
@@ -248,7 +249,7 @@ class ServerConfig extends Page implements HasForms
                                 ->label('Server Update Frequency')
                                 ->options(config('wreckfest.frequencies'))
                                 ->searchable()
-                                ->placeholder('Select frequency'),
+                                ->native(false),
                             TextInput::make('log')
                                 ->label('Log File Path')
                                 ->placeholder('log.txt'),

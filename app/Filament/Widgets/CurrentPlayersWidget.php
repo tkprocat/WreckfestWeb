@@ -9,7 +9,7 @@ use Filament\Widgets\Widget;
 
 class CurrentPlayersWidget extends Widget
 {
-    protected static string $view = 'filament.widgets.current-players-widget';
+    protected string $view = 'filament.widgets.current-players-widget';
 
     protected int | string | array $columnSpan = 'full';
 

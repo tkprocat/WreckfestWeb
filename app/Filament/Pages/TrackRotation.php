@@ -2,6 +2,10 @@
 
 namespace App\Filament\Pages;
 
+use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use App\Exceptions\WreckfestApiException;
 use App\Models\TrackCollection;
 use App\Services\WreckfestApiClient;
@@ -11,10 +15,8 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 
@@ -22,10 +24,10 @@ class TrackRotation extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static ?string $navigationIcon = 'heroicon-o-map';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-map';
     protected static ?string $navigationLabel = 'Track Rotation';
     protected static ?int $navigationSort = 2;
-    protected static string $view = 'filament.pages.track-rotation';
+    protected string $view = 'filament.pages.track-rotation';
 
     public ?array $data = [];
     public ?string $defaultGamemode = null;
@@ -153,13 +155,14 @@ class TrackRotation extends Page implements HasForms
             }
         }
 
-        return $allTracks;
+        // Filter out any null or empty values to satisfy Filament 4's stricter Select validation
+        return array_filter($allTracks, fn($value) => is_string($value) && $value !== '');
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Repeater::make('tracks')
                     ->label('Track Rotation')
                     ->schema([
@@ -180,12 +183,12 @@ class TrackRotation extends Page implements HasForms
                                     }, ARRAY_FILTER_USE_BOTH);
                                 })
                                 ->required()
-                                ->placeholder('Select a track'),
+                                ->native(false),
                             Select::make('gamemode')
                                 ->label('Game Mode')
                                 ->options(config('wreckfest.gamemodes'))
                                 ->searchable()
-                                ->placeholder('Leave empty to use server default'),
+                                ->native(false),
                         ]),
                         Grid::make(3)->schema([
                             TextInput::make('laps')
@@ -211,19 +214,19 @@ class TrackRotation extends Page implements HasForms
                                 ->label('Car Class Restriction')
                                 ->options(config('wreckfest.car_classes'))
                                 ->searchable()
-                                ->placeholder('No restriction'),
+                                ->native(false),
                             Select::make('carRestriction')
                                 ->label('Specific Car Restriction')
                                 ->options(config('wreckfest.cars'))
                                 ->searchable()
-                                ->placeholder('Leave empty for no restriction'),
+                                ->native(false),
                         ]),
                         Grid::make(2)->schema([
                             Select::make('weather')
                                 ->label('Weather Condition')
                                 ->options(config('wreckfest.weather_conditions'))
                                 ->searchable()
-                                ->placeholder('Random'),
+                                ->native(false),
                             Toggle::make('carResetDisabled')
                                 ->label('Disable Car Reset')
                                 ->inline(false),
@@ -250,10 +253,10 @@ class TrackRotation extends Page implements HasForms
                     ->addActionLabel('Add Track to Rotation')
                     ->defaultItems(0)
                     ->columns(1),
-                \Filament\Forms\Components\Section::make()
+                Section::make()
                     ->schema([
-                        \Filament\Forms\Components\Actions::make([
-                            \Filament\Forms\Components\Actions\Action::make('randomizeOrder')
+                        Actions::make([
+                            Action::make('randomizeOrder')
                         ->label('Randomize Order')
                         ->icon('heroicon-o-arrow-path')
                         ->requiresConfirmation()
@@ -276,10 +279,10 @@ class TrackRotation extends Page implements HasForms
                             }
                         })
                         ->color('warning'),
-                    \Filament\Forms\Components\Actions\Action::make('saveCollection')
+                    Action::make('saveCollection')
                         ->label(fn () => $this->currentCollectionId ? 'Save Collection' : 'Save As New Collection')
                         ->icon('heroicon-o-bookmark')
-                        ->form(fn () => $this->currentCollectionId ? [] : [
+                        ->schema(fn () => $this->currentCollectionId ? [] : [
                             TextInput::make('name')
                                 ->label('Collection Name')
                                 ->required()
@@ -427,7 +430,7 @@ class TrackRotation extends Page implements HasForms
                 Action::make('newCollection')
                 ->label('New Collection')
                 ->icon('heroicon-o-document-plus')
-                ->form([
+                ->schema([
                     TextInput::make('name')
                         ->label('Collection Name')
                         ->required()
@@ -463,13 +466,13 @@ class TrackRotation extends Page implements HasForms
             Action::make('loadCollection')
                 ->label('Load Collection')
                 ->icon('heroicon-o-folder-open')
-                ->form([
+                ->schema([
                     Select::make('collection_id')
                         ->label('Select Collection')
                         ->options(TrackCollection::pluck('name', 'id'))
                         ->required()
                         ->searchable()
-                        ->placeholder('Choose a saved collection'),
+                        ->native(false),
                 ])
                 ->action(function (array $data): void {
                     $collection = TrackCollection::find($data['collection_id']);
@@ -494,7 +497,7 @@ class TrackRotation extends Page implements HasForms
             Action::make('saveCollection')
                 ->label(fn () => $this->currentCollectionId ? 'Save Collection' : 'Save As New Collection')
                 ->icon('heroicon-o-bookmark')
-                ->form(fn () => $this->currentCollectionId ? [] : [
+                ->schema(fn () => $this->currentCollectionId ? [] : [
                     TextInput::make('name')
                         ->label('Collection Name')
                         ->required()
@@ -546,7 +549,7 @@ class TrackRotation extends Page implements HasForms
                 ->label('Save as new collection')
                 ->icon('heroicon-o-document-duplicate')
                 ->visible(fn () => $this->currentCollectionId !== null)
-                ->form([
+                ->schema([
                     TextInput::make('name')
                         ->label('New Collection Name')
                         ->required()

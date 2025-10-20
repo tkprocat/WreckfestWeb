@@ -2,6 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\Register;
+use App\Filament\Resources\UserResource;
+use App\Filament\Pages\Dashboard;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -28,7 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->registration(\App\Filament\Pages\Auth\Register::class)
+            ->registration(Register::class)
             ->colors([
                 'primary' => Color::hex(config('wreckfest.brand.primary')),
                 'danger' => Color::Red,
@@ -44,13 +47,13 @@ class AdminPanelProvider extends PanelProvider
             ->userMenuItems([
                 'profile' => MenuItem::make()
                     ->label('Edit Profile')
-                    ->url(fn (): string => \App\Filament\Resources\UserResource::getUrl('edit', ['record' => auth()->id()]))
+                    ->url(fn (): string => UserResource::getUrl('edit', ['record' => auth()->id()]))
                     ->icon('heroicon-o-user-circle'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                \App\Filament\Pages\Dashboard::class,
+                Dashboard::class,
             ])
             ->widgets([
                 // All widgets are controlled by individual pages
@@ -68,6 +71,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }

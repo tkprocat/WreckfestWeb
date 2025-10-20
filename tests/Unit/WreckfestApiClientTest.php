@@ -1,10 +1,11 @@
 <?php
 
+use App\Exceptions\WreckfestApiException;
 use App\Services\WreckfestApiClient;
 use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
-    config(['services.wreckfest.api_url' => 'https://localhost:5101/api']);
+    config(['wreckfest.api_url' => 'https://localhost:5101/api']);
     $this->client = new WreckfestApiClient();
 });
 
@@ -337,13 +338,9 @@ describe('Error Handling', function () {
             throw new Exception('Network error');
         });
 
-        $config = $this->client->getServerConfig();
-        $tracks = $this->client->getTracks();
-        $status = $this->client->getServerStatus();
-
-        expect($config)->toBeArray()->and($config)->toBeEmpty();
-        expect($tracks)->toBeArray()->and($tracks)->toBeEmpty();
-        expect($status)->toBeArray()->and($status)->toBeEmpty();
+        expect(fn() => $this->client->getServerConfig())->toThrow(WreckfestApiException::class);
+        expect(fn() => $this->client->getTracks())->toThrow(WreckfestApiException::class);
+        expect(fn() => $this->client->getServerStatus())->toThrow(WreckfestApiException::class);
     });
 
     test('handles API errors gracefully', function () {
