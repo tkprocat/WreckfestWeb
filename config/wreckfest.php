@@ -8,825 +8,825 @@ return [
         'primary' => '#a03d00',
     ],
 
-        'tracks' => [
-    'madman_stadium' => [
-        'name' => 'Madman Stadium',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'bigstadium_demolition_arena' => [
-                'name' => 'Demolition Arena',
-                'derby' => true,
-            ],
-            'bigstadium_figure_8' => [
-                'name' => 'Figure 8',
-                'derby' => false,
-            ],
-        ],
-    ],
-    'fairfield_county' => [
-        'name' => 'Fairfield County',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-  2 => 'fog',
-),
-        'variants' => [
-            'smallstadium_demolition_arena' => [
-                'name' => 'Demolition Arena',
-                'derby' => true,
+    'tracks' => [
+        'madman_stadium' => [
+            'name' => 'Madman Stadium',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'bigstadium_demolition_arena' => [
+                    'name' => 'Demolition Arena',
+                    'derby' => true,
+                ],
+                'bigstadium_figure_8' => [
+                    'name' => 'Figure 8',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'fairfield_mudpit' => [
-        'name' => 'Fairfield Mud Pit',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-  2 => 'fog',
-),
-        'variants' => [
-            'mudpit_demolition_arena' => [
-                'name' => 'Demolition Arena',
-                'derby' => true,
+        'fairfield_county' => [
+            'name' => 'Fairfield County',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+                2 => 'fog',
+            ),
+            'variants' => [
+                'smallstadium_demolition_arena' => [
+                    'name' => 'Demolition Arena',
+                    'derby' => true,
+                ],
             ],
         ],
-    ],
-    'fairfield_grass_field' => [
-        'name' => 'Fairfield Grass Field',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-  2 => 'fog',
-),
-        'variants' => [
-            'grass_arena_demolition_arena' => [
-                'name' => 'Demolition Arena',
-                'derby' => true,
+        'fairfield_mudpit' => [
+            'name' => 'Fairfield Mud Pit',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+                2 => 'fog',
+            ),
+            'variants' => [
+                'mudpit_demolition_arena' => [
+                    'name' => 'Demolition Arena',
+                    'derby' => true,
+                ],
             ],
         ],
-    ],
-    'glendale_countryside' => [
-        'name' => 'Glendale Countryside',
-        'weather' => array (
-  0 => 'overcast',
-),
-        'variants' => [
-            'field_derby_arena' => [
-                'name' => 'Field Arena',
-                'derby' => true,
+        'fairfield_grass_field' => [
+            'name' => 'Fairfield Grass Field',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+                2 => 'fog',
+            ),
+            'variants' => [
+                'grass_arena_demolition_arena' => [
+                    'name' => 'Demolition Arena',
+                    'derby' => true,
+                ],
             ],
         ],
-    ],
-    'bloomfield_speedway' => [
-        'name' => 'Bloomfield Speedway',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'dirt_speedway_dirt_oval' => [
-                'name' => 'Dirt Oval',
-                'derby' => false,
-            ],
-            'dirt_speedway_figure_8' => [
-                'name' => 'Figure 8',
-                'derby' => false,
+        'glendale_countryside' => [
+            'name' => 'Glendale Countryside',
+            'weather' => array(
+                0 => 'overcast',
+            ),
+            'variants' => [
+                'field_derby_arena' => [
+                    'name' => 'Field Arena',
+                    'derby' => true,
+                ],
             ],
         ],
-    ],
-    'bonebreaker_valley' => [
-        'name' => 'Bonebreaker Valley',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'bonebreaker_valley_main_circuit' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
+        'bloomfield_speedway' => [
+            'name' => 'Bloomfield Speedway',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'dirt_speedway_dirt_oval' => [
+                    'name' => 'Dirt Oval',
+                    'derby' => false,
+                ],
+                'dirt_speedway_figure_8' => [
+                    'name' => 'Figure 8',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'crash_canyon' => [
-        'name' => 'Crash Canyon',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'crash_canyon_main_circuit' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
+        'bonebreaker_valley' => [
+            'name' => 'Bonebreaker Valley',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'bonebreaker_valley_main_circuit' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'midwest_motocenter' => [
-        'name' => 'Midwest Motocenter',
-        'weather' => array (
-  0 => 'overcast',
-),
-        'variants' => [
-            'gravel1_main_loop' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
-            ],
-            'gravel1_main_loop_rev' => [
-                'name' => 'Main Circuit Reverse',
-                'derby' => false,
+        'crash_canyon' => [
+            'name' => 'Crash Canyon',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'crash_canyon_main_circuit' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'hilltop_stadium' => [
-        'name' => 'Hilltop Stadium',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-  2 => 'fog',
-),
-        'variants' => [
-            'speedway1_figure_8' => [
-                'name' => 'Figure 8',
-                'derby' => false,
-            ],
-            'speedway1_oval' => [
-                'name' => 'Oval',
-                'derby' => false,
+        'midwest_motocenter' => [
+            'name' => 'Midwest Motocenter',
+            'weather' => array(
+                0 => 'overcast',
+            ),
+            'variants' => [
+                'gravel1_main_loop' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+                'gravel1_main_loop_rev' => [
+                    'name' => 'Main Circuit Reverse',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'big_valley_speedway' => [
-        'name' => 'Big Valley Speedway',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'speedway2_classic_arena' => [
-                'name' => 'Open Demolition Arena',
-                'derby' => true,
-            ],
-            'speedway2_demolition_arena' => [
-                'name' => 'Demolition Arena',
-                'derby' => true,
-            ],
-            'speedway2_figure_8' => [
-                'name' => 'Figure 8',
-                'derby' => false,
-            ],
-            'speedway2_inner_oval' => [
-                'name' => 'Inner Oval',
-                'derby' => false,
-            ],
-            'speedway2_outer_oval' => [
-                'name' => 'Outer Oval',
-                'derby' => false,
-            ],
-            'speedway2_oval_loop' => [
-                'name' => 'Outer Oval Loop',
-                'derby' => false,
+        'hilltop_stadium' => [
+            'name' => 'Hilltop Stadium',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+                2 => 'fog',
+            ),
+            'variants' => [
+                'speedway1_figure_8' => [
+                    'name' => 'Figure 8',
+                    'derby' => false,
+                ],
+                'speedway1_oval' => [
+                    'name' => 'Oval',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'sandstone_raceway' => [
-        'name' => 'Sandstone Raceway',
-        'weather' => array (
-  0 => 'clear',
-),
-        'variants' => [
-            'sandpit1_long_loop' => [
-                'name' => 'Main Route',
-                'derby' => false,
-            ],
-            'sandpit1_long_loop_rev' => [
-                'name' => 'Main Route Reverse',
-                'derby' => false,
-            ],
-            'sandpit1_short_loop' => [
-                'name' => 'Short Route',
-                'derby' => false,
-            ],
-            'sandpit1_short_loop_rev' => [
-                'name' => 'Short Route Reverse',
-                'derby' => false,
-            ],
-            'sandpit1_alt_loop' => [
-                'name' => 'Alt Route',
-                'derby' => false,
-            ],
-            'sandpit1_alt_loop_rev' => [
-                'name' => 'Alt Route Reverse',
-                'derby' => false,
-            ],
-        ],
-    ],
-    'savolax_sandpit' => [
-        'name' => 'Savolax Sandpit',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'sandpit2_full_circuit' => [
-                'name' => 'Main Route',
-                'derby' => false,
-            ],
-            'sandpit2_full_circuit_rev' => [
-                'name' => 'Main Route Reverse',
-                'derby' => false,
-            ],
-            'sandpit2_2' => [
-                'name' => 'Short Route',
-                'derby' => false,
-            ],
-            'sandpit2_2_rev' => [
-                'name' => 'Short Route Reverse',
-                'derby' => false,
+        'big_valley_speedway' => [
+            'name' => 'Big Valley Speedway',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'speedway2_classic_arena' => [
+                    'name' => 'Open Demolition Arena',
+                    'derby' => true,
+                ],
+                'speedway2_demolition_arena' => [
+                    'name' => 'Demolition Arena',
+                    'derby' => true,
+                ],
+                'speedway2_figure_8' => [
+                    'name' => 'Figure 8',
+                    'derby' => false,
+                ],
+                'speedway2_inner_oval' => [
+                    'name' => 'Inner Oval',
+                    'derby' => false,
+                ],
+                'speedway2_outer_oval' => [
+                    'name' => 'Outer Oval',
+                    'derby' => false,
+                ],
+                'speedway2_oval_loop' => [
+                    'name' => 'Outer Oval Loop',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'boulder_bank_circuit' => [
-        'name' => 'Boulder Bank Circuit',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-  2 => 'fog',
-),
-        'variants' => [
-            'sandpit3_long_loop' => [
-                'name' => 'Main Route',
-                'derby' => false,
-            ],
-            'sandpit3_long_loop_rev' => [
-                'name' => 'Main Route Reverse',
-                'derby' => false,
-            ],
-            'sandpit3_short_loop' => [
-                'name' => 'Short Route',
-                'derby' => false,
-            ],
-            'sandpit3_short_loop_rev' => [
-                'name' => 'Short Route Reverse',
-                'derby' => false,
-            ],
-        ],
-    ],
-    'fire_rock_raceway' => [
-        'name' => 'Fire Rock Raceway',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'tarmac1_main_circuit' => [
-                'name' => 'Full Circuit',
-                'derby' => false,
-            ],
-            'tarmac1_main_circuit_rev' => [
-                'name' => 'Full Circuit Reverse',
-                'derby' => false,
-            ],
-            'tarmac1_short_circuit' => [
-                'name' => 'Short Circuit',
-                'derby' => false,
-            ],
-            'tarmac1_short_circuit_rev' => [
-                'name' => 'Short Circuit Reverse',
-                'derby' => false,
+        'sandstone_raceway' => [
+            'name' => 'Sandstone Raceway',
+            'weather' => array(
+                0 => 'clear',
+            ),
+            'variants' => [
+                'sandpit1_long_loop' => [
+                    'name' => 'Main Route',
+                    'derby' => false,
+                ],
+                'sandpit1_long_loop_rev' => [
+                    'name' => 'Main Route Reverse',
+                    'derby' => false,
+                ],
+                'sandpit1_short_loop' => [
+                    'name' => 'Short Route',
+                    'derby' => false,
+                ],
+                'sandpit1_short_loop_rev' => [
+                    'name' => 'Short Route Reverse',
+                    'derby' => false,
+                ],
+                'sandpit1_alt_loop' => [
+                    'name' => 'Alt Route',
+                    'derby' => false,
+                ],
+                'sandpit1_alt_loop_rev' => [
+                    'name' => 'Alt Route Reverse',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'motorcity_circuit' => [
-        'name' => 'Motorcity Circuit',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'tarmac2_main_circuit' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
-            ],
-            'tarmac2_main_circuit_rev' => [
-                'name' => 'Main Circuit Reverse',
-                'derby' => false,
-            ],
-            'tarmac2_main_circuit_tourney' => [
-                'name' => 'Trophy Circuit',
-                'derby' => false,
-            ],
-        ],
-    ],
-    'espedalen_raceway' => [
-        'name' => 'Espedalen Raceway',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'tarmac3_main_circuit' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
-            ],
-            'tarmac3_main_circuit_rev' => [
-                'name' => 'Main Circuit Reverse',
-                'derby' => false,
-            ],
-            'tarmac3_short_circuit' => [
-                'name' => 'Short Circuit',
-                'derby' => false,
-            ],
-            'tarmac3_short_circuit_rev' => [
-                'name' => 'Short Circuit Reverse',
-                'derby' => false,
+        'savolax_sandpit' => [
+            'name' => 'Savolax Sandpit',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'sandpit2_full_circuit' => [
+                    'name' => 'Main Route',
+                    'derby' => false,
+                ],
+                'sandpit2_full_circuit_rev' => [
+                    'name' => 'Main Route Reverse',
+                    'derby' => false,
+                ],
+                'sandpit2_2' => [
+                    'name' => 'Short Route',
+                    'derby' => false,
+                ],
+                'sandpit2_2_rev' => [
+                    'name' => 'Short Route Reverse',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'finncross_circuit' => [
-        'name' => 'Finncross Circuit',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'mixed1_main_circuit' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
-            ],
-            'mixed1_main_circuit_rev' => [
-                'name' => 'Main Circuit Reverse',
-                'derby' => false,
-            ],
-        ],
-    ],
-    'maasten_motocenter' => [
-        'name' => 'Maasten Motocenter',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'mixed2_main_circuit' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
-            ],
-            'mixed2_main_circuit_rev' => [
-                'name' => 'Main Circuit Reverse',
-                'derby' => false,
+        'boulder_bank_circuit' => [
+            'name' => 'Boulder Bank Circuit',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+                2 => 'fog',
+            ),
+            'variants' => [
+                'sandpit3_long_loop' => [
+                    'name' => 'Main Route',
+                    'derby' => false,
+                ],
+                'sandpit3_long_loop_rev' => [
+                    'name' => 'Main Route Reverse',
+                    'derby' => false,
+                ],
+                'sandpit3_short_loop' => [
+                    'name' => 'Short Route',
+                    'derby' => false,
+                ],
+                'sandpit3_short_loop_rev' => [
+                    'name' => 'Short Route Reverse',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'pinehills_raceway' => [
-        'name' => 'Pinehills Raceway',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'mixed3_long_loop' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
-            ],
-            'mixed3_long_loop_rev' => [
-                'name' => 'Main Circuit Reverse',
-                'derby' => false,
-            ],
-            'mixed3_r3' => [
-                'name' => 'Rally Circuit',
-                'derby' => false,
-            ],
-            'mixed3_r3_rev' => [
-                'name' => 'Rally Circuit Reverse',
-                'derby' => false,
-            ],
-            'mixed3_short_loop' => [
-                'name' => 'Short Circuit',
-                'derby' => false,
-            ],
-            'mixed3_short_loop_rev' => [
-                'name' => 'Short Circuit Reverse',
-                'derby' => false,
+        'fire_rock_raceway' => [
+            'name' => 'Fire Rock Raceway',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'tarmac1_main_circuit' => [
+                    'name' => 'Full Circuit',
+                    'derby' => false,
+                ],
+                'tarmac1_main_circuit_rev' => [
+                    'name' => 'Full Circuit Reverse',
+                    'derby' => false,
+                ],
+                'tarmac1_short_circuit' => [
+                    'name' => 'Short Circuit',
+                    'derby' => false,
+                ],
+                'tarmac1_short_circuit_rev' => [
+                    'name' => 'Short Circuit Reverse',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'rosenheim_raceway' => [
-        'name' => 'Rosenheim Raceway',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'mixed4_main_circuit' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
-            ],
-            'mixed4_main_circuit_rev' => [
-                'name' => 'Main Circuit Reverse',
-                'derby' => false,
-            ],
-        ],
-    ],
-    'northland_raceway' => [
-        'name' => 'Northland Raceway',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'mixed5_outer_loop' => [
-                'name' => 'Outer Route',
-                'derby' => false,
-            ],
-            'mixed5_outer_loop_rev' => [
-                'name' => 'Outer Route Reverse',
-                'derby' => false,
-            ],
-            'mixed5_inner_loop' => [
-                'name' => 'Inner Route',
-                'derby' => false,
-            ],
-            'mixed5_inner_loop_rev' => [
-                'name' => 'Inner Route Reverse',
-                'derby' => false,
-            ],
-            'mixed5_free_route' => [
-                'name' => 'Free Route',
-                'derby' => false,
+        'motorcity_circuit' => [
+            'name' => 'Motorcity Circuit',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'tarmac2_main_circuit' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+                'tarmac2_main_circuit_rev' => [
+                    'name' => 'Main Circuit Reverse',
+                    'derby' => false,
+                ],
+                'tarmac2_main_circuit_tourney' => [
+                    'name' => 'Trophy Circuit',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'firwood_motocenter' => [
-        'name' => 'Firwood Motocenter',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-  2 => 'fog',
-),
-        'variants' => [
-            'mixed7_r1' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
-            ],
-            'mixed7_r1_rev' => [
-                'name' => 'Main Circuit Reverse',
-                'derby' => false,
-            ],
-            'mixed7_r2' => [
-                'name' => 'Rally Circuit',
-                'derby' => false,
-            ],
-            'mixed7_r2_rev' => [
-                'name' => 'Rally Circuit Reverse',
-                'derby' => false,
-            ],
-            'mixed7_r3' => [
-                'name' => 'Short Circuit',
-                'derby' => false,
-            ],
-            'mixed7_r3_rev' => [
-                'name' => 'Short Circuit Reverse',
-                'derby' => false,
+        'espedalen_raceway' => [
+            'name' => 'Espedalen Raceway',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'tarmac3_main_circuit' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+                'tarmac3_main_circuit_rev' => [
+                    'name' => 'Main Circuit Reverse',
+                    'derby' => false,
+                ],
+                'tarmac3_short_circuit' => [
+                    'name' => 'Short Circuit',
+                    'derby' => false,
+                ],
+                'tarmac3_short_circuit_rev' => [
+                    'name' => 'Short Circuit Reverse',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'northfolk_ring' => [
-        'name' => 'Northfolk Ring',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-  2 => 'fog',
-),
-        'variants' => [
-            'mixed8_r1' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
-            ],
-            'mixed8_r2' => [
-                'name' => 'Open Circuit',
-                'derby' => false,
-            ],
-            'mixed8_r3_rev' => [
-                'name' => 'Main Circuit Reverse',
-                'derby' => false,
+        'finncross_circuit' => [
+            'name' => 'Finncross Circuit',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'mixed1_main_circuit' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+                'mixed1_main_circuit_rev' => [
+                    'name' => 'Main Circuit Reverse',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'clayridge_circuit' => [
-        'name' => 'Clayridge Circuit',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'mixed9_r1' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
-            ],
-            'mixed9_r1_rev' => [
-                'name' => 'Main Circuit Reverse',
-                'derby' => false,
-            ],
-        ],
-    ],
-    'deathloop' => [
-        'name' => 'Deathloop',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'loop' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
+        'maasten_motocenter' => [
+            'name' => 'Maasten Motocenter',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'mixed2_main_circuit' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+                'mixed2_main_circuit_rev' => [
+                    'name' => 'Main Circuit Reverse',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'dirt_devil_stadium' => [
-        'name' => 'Dirt Devil Stadium',
-        'weather' => array (
-  0 => 'clear',
-  1 => 'overcast',
-),
-        'variants' => [
-            'triangle_r1' => [
-                'name' => 'Dirt Speedway',
-                'derby' => false,
-            ],
-            'triangle_r2' => [
-                'name' => 'Demolition Arena',
-                'derby' => true,
-            ],
-        ],
-    ],
-    'bleak_city' => [
-        'name' => 'Bleak City',
-        'weather' => NULL,
-        'variants' => [
-            'crm01_1' => [
-                'name' => 'Race Track',
-                'derby' => false,
-            ],
-            'crm01_2' => [
-                'name' => 'Free Roam',
-                'derby' => true,
-            ],
-            'crm01_3' => [
-                'name' => 'Demolition Arena',
-                'derby' => true,
-            ],
-            'crm01_5' => [
-                'name' => 'Race Track Reverse',
-                'derby' => false,
+        'pinehills_raceway' => [
+            'name' => 'Pinehills Raceway',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'mixed3_long_loop' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+                'mixed3_long_loop_rev' => [
+                    'name' => 'Main Circuit Reverse',
+                    'derby' => false,
+                ],
+                'mixed3_r3' => [
+                    'name' => 'Rally Circuit',
+                    'derby' => false,
+                ],
+                'mixed3_r3_rev' => [
+                    'name' => 'Rally Circuit Reverse',
+                    'derby' => false,
+                ],
+                'mixed3_short_loop' => [
+                    'name' => 'Short Circuit',
+                    'derby' => false,
+                ],
+                'mixed3_short_loop_rev' => [
+                    'name' => 'Short Circuit Reverse',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'devils_canyon' => [
-        'name' => 'Devil\'s Canyon',
-        'weather' => NULL,
-        'variants' => [
-            'crm02_1' => [
-                'name' => 'Race Track',
-                'derby' => false,
-            ],
-            'crm02_2' => [
-                'name' => 'Free Roam',
-                'derby' => true,
-            ],
-        ],
-    ],
-    'drytown_desert_circuit' => [
-        'name' => 'Drytown Desert Circuit',
-        'weather' => NULL,
-        'variants' => [
-            'fields08_1' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
-            ],
-            'fields08_1_rev' => [
-                'name' => 'Main Circuit Reverse',
-                'derby' => false,
+        'rosenheim_raceway' => [
+            'name' => 'Rosenheim Raceway',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'mixed4_main_circuit' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+                'mixed4_main_circuit_rev' => [
+                    'name' => 'Main Circuit Reverse',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'rockfield_roughspot' => [
-        'name' => 'Rockfield Roughspot',
-        'weather' => NULL,
-        'variants' => [
-            'fields09_1' => [
-                'name' => 'Dirt Oval',
-                'derby' => false,
+        'northland_raceway' => [
+            'name' => 'Northland Raceway',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'mixed5_outer_loop' => [
+                    'name' => 'Outer Route',
+                    'derby' => false,
+                ],
+                'mixed5_outer_loop_rev' => [
+                    'name' => 'Outer Route Reverse',
+                    'derby' => false,
+                ],
+                'mixed5_inner_loop' => [
+                    'name' => 'Inner Route',
+                    'derby' => false,
+                ],
+                'mixed5_inner_loop_rev' => [
+                    'name' => 'Inner Route Reverse',
+                    'derby' => false,
+                ],
+                'mixed5_free_route' => [
+                    'name' => 'Free Route',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'mudford_motorpark' => [
-        'name' => 'Mudford Motorpark',
-        'weather' => NULL,
-        'variants' => [
-            'fields10_1' => [
-                'name' => 'Mud Oval',
-                'derby' => false,
-            ],
-            'fields10_2' => [
-                'name' => 'Mud Pit',
-                'derby' => true,
-            ],
-        ],
-    ],
-    'the_maw' => [
-        'name' => 'The Maw',
-        'weather' => NULL,
-        'variants' => [
-            'fields11_1' => [
-                'name' => 'Demolition Arena',
-                'derby' => true,
-            ],
-        ],
-    ],
-    'kingston_raceway' => [
-        'name' => 'Kingston Raceway',
-        'weather' => NULL,
-        'variants' => [
-            'fields12_1' => [
-                'name' => 'Asphalt Oval',
-                'derby' => false,
-            ],
-            'fields12_1_rev' => [
-                'name' => 'Asphalt Oval Reverse',
-                'derby' => false,
-            ],
-            'fields12_2' => [
-                'name' => 'Figure 8',
-                'derby' => false,
+        'firwood_motocenter' => [
+            'name' => 'Firwood Motocenter',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+                2 => 'fog',
+            ),
+            'variants' => [
+                'mixed7_r1' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+                'mixed7_r1_rev' => [
+                    'name' => 'Main Circuit Reverse',
+                    'derby' => false,
+                ],
+                'mixed7_r2' => [
+                    'name' => 'Rally Circuit',
+                    'derby' => false,
+                ],
+                'mixed7_r2_rev' => [
+                    'name' => 'Rally Circuit Reverse',
+                    'derby' => false,
+                ],
+                'mixed7_r3' => [
+                    'name' => 'Short Circuit',
+                    'derby' => false,
+                ],
+                'mixed7_r3_rev' => [
+                    'name' => 'Short Circuit Reverse',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'eagles_peak_motorpark' => [
-        'name' => 'Eagles Peak Motorpark',
-        'weather' => NULL,
-        'variants' => [
-            'fields13_1' => [
-                'name' => 'Racing Track',
-                'derby' => false,
-            ],
-            'fields13_1_rev' => [
-                'name' => 'Racing Track Reverse',
-                'derby' => false,
-            ],
-            'fields13_2' => [
-                'name' => 'Demolition Arena',
-                'derby' => true,
-            ],
-        ],
-    ],
-    'rattlesnake_racepark' => [
-        'name' => 'Rattlesnake Racepark',
-        'weather' => NULL,
-        'variants' => [
-            'fields14_1' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
-            ],
-            'fields14_2' => [
-                'name' => 'Main Circuit Reverse',
-                'derby' => false,
+        'northfolk_ring' => [
+            'name' => 'Northfolk Ring',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+                2 => 'fog',
+            ),
+            'variants' => [
+                'mixed8_r1' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+                'mixed8_r2' => [
+                    'name' => 'Open Circuit',
+                    'derby' => false,
+                ],
+                'mixed8_r3_rev' => [
+                    'name' => 'Main Circuit Reverse',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'vale_falls_circuit' => [
-        'name' => 'Vale Falls Circuit',
-        'weather' => NULL,
-        'variants' => [
-            'forest11_1' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
-            ],
-            'forest11_1_rev' => [
-                'name' => 'Main Circuit Reverse',
-                'derby' => false,
-            ],
-            'forest11_2' => [
-                'name' => 'Short Circuit',
-                'derby' => false,
-            ],
-            'forest11_2_rev' => [
-                'name' => 'Short Circuit Reverse',
-                'derby' => false,
+        'clayridge_circuit' => [
+            'name' => 'Clayridge Circuit',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'mixed9_r1' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+                'mixed9_r1_rev' => [
+                    'name' => 'Main Circuit Reverse',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'tribend_speedway' => [
-        'name' => 'Tribend Speedway',
-        'weather' => NULL,
-        'variants' => [
-            'forest12_1' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
-            ],
-            'forest12_1_rev' => [
-                'name' => 'Reverse Circuit',
-                'derby' => false,
-            ],
-            'forest12_2' => [
-                'name' => 'Wild Circuit',
-                'derby' => false,
+        'deathloop' => [
+            'name' => 'Deathloop',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'loop' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'torsdalen_circuit' => [
-        'name' => 'Torsdalen Circuit',
-        'weather' => NULL,
-        'variants' => [
-            'forest13_1' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
-            ],
-            'forest13_1_rev' => [
-                'name' => 'Main Circuit Reverse',
-                'derby' => false,
-            ],
-            'forest13_2' => [
-                'name' => 'Short Circuit',
-                'derby' => false,
-            ],
-            'forest13_2_rev' => [
-                'name' => 'Short Circuit Reverse',
-                'derby' => false,
+        'dirt_devil_stadium' => [
+            'name' => 'Dirt Devil Stadium',
+            'weather' => array(
+                0 => 'clear',
+                1 => 'overcast',
+            ),
+            'variants' => [
+                'triangle_r1' => [
+                    'name' => 'Dirt Speedway',
+                    'derby' => false,
+                ],
+                'triangle_r2' => [
+                    'name' => 'Demolition Arena',
+                    'derby' => true,
+                ],
             ],
         ],
-    ],
-    'rally_trophy' => [
-        'name' => 'Rally Trophy',
-        'weather' => NULL,
-        'variants' => [
-            'rt01_1' => [
-                'name' => 'Special Stage',
-                'derby' => false,
+        'bleak_city' => [
+            'name' => 'Bleak City',
+            'weather' => NULL,
+            'variants' => [
+                'crm01_1' => [
+                    'name' => 'Race Track',
+                    'derby' => false,
+                ],
+                'crm01_2' => [
+                    'name' => 'Free Roam',
+                    'derby' => true,
+                ],
+                'crm01_3' => [
+                    'name' => 'Demolition Arena',
+                    'derby' => true,
+                ],
+                'crm01_5' => [
+                    'name' => 'Race Track Reverse',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'hellride' => [
-        'name' => 'Hellride',
-        'weather' => NULL,
-        'variants' => [
-            'urban06' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
+        'devils_canyon' => [
+            'name' => 'Devil\'s Canyon',
+            'weather' => NULL,
+            'variants' => [
+                'crm02_1' => [
+                    'name' => 'Race Track',
+                    'derby' => false,
+                ],
+                'crm02_2' => [
+                    'name' => 'Free Roam',
+                    'derby' => true,
+                ],
             ],
         ],
-    ],
-    'thunderbowl' => [
-        'name' => 'Thunderbowl',
-        'weather' => NULL,
-        'variants' => [
-            'urban07' => [
-                'name' => 'Demolition Arena',
-                'derby' => true,
+        'drytown_desert_circuit' => [
+            'name' => 'Drytown Desert Circuit',
+            'weather' => NULL,
+            'variants' => [
+                'fields08_1' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+                'fields08_1_rev' => [
+                    'name' => 'Main Circuit Reverse',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'hillstreet_circuit' => [
-        'name' => 'Hillstreet Circuit',
-        'weather' => NULL,
-        'variants' => [
-            'urban08_1' => [
-                'name' => 'Race Track',
-                'derby' => false,
-            ],
-            'urban08_1_rev' => [
-                'name' => 'Race Track Reverse',
-                'derby' => false,
+        'rockfield_roughspot' => [
+            'name' => 'Rockfield Roughspot',
+            'weather' => NULL,
+            'variants' => [
+                'fields09_1' => [
+                    'name' => 'Dirt Oval',
+                    'derby' => false,
+                ],
             ],
         ],
-    ],
-    'wrecknado' => [
-        'name' => 'Wrecknado',
-        'weather' => NULL,
-        'variants' => [
-            'urban09_1' => [
-                'name' => 'Main Circuit',
-                'derby' => false,
-            ],
-            'urban09_2' => [
-                'name' => 'Demolition Arena',
-                'derby' => true,
-            ],
-        ],
-    ],
-    'wrecking_playground' => [
-        'name' => 'Wrecking Playground',
-        'weather' => NULL,
-        'variants' => [
-            'wrecker01_1' => [
-                'name' => 'Main Area',
-                'derby' => true,
+        'mudford_motorpark' => [
+            'name' => 'Mudford Motorpark',
+            'weather' => NULL,
+            'variants' => [
+                'fields10_1' => [
+                    'name' => 'Mud Oval',
+                    'derby' => false,
+                ],
+                'fields10_2' => [
+                    'name' => 'Mud Pit',
+                    'derby' => true,
+                ],
             ],
         ],
-    ],
+        'the_maw' => [
+            'name' => 'The Maw',
+            'weather' => NULL,
+            'variants' => [
+                'fields11_1' => [
+                    'name' => 'Demolition Arena',
+                    'derby' => true,
+                ],
+            ],
+        ],
+        'kingston_raceway' => [
+            'name' => 'Kingston Raceway',
+            'weather' => NULL,
+            'variants' => [
+                'fields12_1' => [
+                    'name' => 'Asphalt Oval',
+                    'derby' => false,
+                ],
+                'fields12_1_rev' => [
+                    'name' => 'Asphalt Oval Reverse',
+                    'derby' => false,
+                ],
+                'fields12_2' => [
+                    'name' => 'Figure 8',
+                    'derby' => false,
+                ],
+            ],
+        ],
+        'eagles_peak_motorpark' => [
+            'name' => 'Eagles Peak Motorpark',
+            'weather' => NULL,
+            'variants' => [
+                'fields13_1' => [
+                    'name' => 'Racing Track',
+                    'derby' => false,
+                ],
+                'fields13_1_rev' => [
+                    'name' => 'Racing Track Reverse',
+                    'derby' => false,
+                ],
+                'fields13_2' => [
+                    'name' => 'Demolition Arena',
+                    'derby' => true,
+                ],
+            ],
+        ],
+        'rattlesnake_racepark' => [
+            'name' => 'Rattlesnake Racepark',
+            'weather' => NULL,
+            'variants' => [
+                'fields14_1' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+                'fields14_2' => [
+                    'name' => 'Main Circuit Reverse',
+                    'derby' => false,
+                ],
+            ],
+        ],
+        'vale_falls_circuit' => [
+            'name' => 'Vale Falls Circuit',
+            'weather' => NULL,
+            'variants' => [
+                'forest11_1' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+                'forest11_1_rev' => [
+                    'name' => 'Main Circuit Reverse',
+                    'derby' => false,
+                ],
+                'forest11_2' => [
+                    'name' => 'Short Circuit',
+                    'derby' => false,
+                ],
+                'forest11_2_rev' => [
+                    'name' => 'Short Circuit Reverse',
+                    'derby' => false,
+                ],
+            ],
+        ],
+        'tribend_speedway' => [
+            'name' => 'Tribend Speedway',
+            'weather' => NULL,
+            'variants' => [
+                'forest12_1' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+                'forest12_1_rev' => [
+                    'name' => 'Reverse Circuit',
+                    'derby' => false,
+                ],
+                'forest12_2' => [
+                    'name' => 'Wild Circuit',
+                    'derby' => false,
+                ],
+            ],
+        ],
+        'torsdalen_circuit' => [
+            'name' => 'Torsdalen Circuit',
+            'weather' => NULL,
+            'variants' => [
+                'forest13_1' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+                'forest13_1_rev' => [
+                    'name' => 'Main Circuit Reverse',
+                    'derby' => false,
+                ],
+                'forest13_2' => [
+                    'name' => 'Short Circuit',
+                    'derby' => false,
+                ],
+                'forest13_2_rev' => [
+                    'name' => 'Short Circuit Reverse',
+                    'derby' => false,
+                ],
+            ],
+        ],
+        'rally_trophy' => [
+            'name' => 'Rally Trophy',
+            'weather' => NULL,
+            'variants' => [
+                'rt01_1' => [
+                    'name' => 'Special Stage',
+                    'derby' => false,
+                ],
+            ],
+        ],
+        'hellride' => [
+            'name' => 'Hellride',
+            'weather' => NULL,
+            'variants' => [
+                'urban06' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+            ],
+        ],
+        'thunderbowl' => [
+            'name' => 'Thunderbowl',
+            'weather' => NULL,
+            'variants' => [
+                'urban07' => [
+                    'name' => 'Demolition Arena',
+                    'derby' => true,
+                ],
+            ],
+        ],
+        'hillstreet_circuit' => [
+            'name' => 'Hillstreet Circuit',
+            'weather' => NULL,
+            'variants' => [
+                'urban08_1' => [
+                    'name' => 'Race Track',
+                    'derby' => false,
+                ],
+                'urban08_1_rev' => [
+                    'name' => 'Race Track Reverse',
+                    'derby' => false,
+                ],
+            ],
+        ],
+        'wrecknado' => [
+            'name' => 'Wrecknado',
+            'weather' => NULL,
+            'variants' => [
+                'urban09_1' => [
+                    'name' => 'Main Circuit',
+                    'derby' => false,
+                ],
+                'urban09_2' => [
+                    'name' => 'Demolition Arena',
+                    'derby' => true,
+                ],
+            ],
+        ],
+        'wrecking_playground' => [
+            'name' => 'Wrecking Playground',
+            'weather' => NULL,
+            'variants' => [
+                'wrecker01_1' => [
+                    'name' => 'Main Area',
+                    'derby' => true,
+                ],
+            ],
+        ],
     ],
 
-'gamemodes' => [
+    'gamemodes' => [
         'racing' => 'Racing',
         'derby' => 'Last Man Standing',
         'derby deathmatch' => 'Deathmatch',
