@@ -23,6 +23,7 @@ class ManageCollections extends Page implements HasTable
     protected static ?int $navigationSort = 3;
     protected string $view = 'filament.pages.manage-collections';
     protected static ?string $title = 'Track Collections';
+   // protected static bool $isDiscovered = false;
 
     public function table(Table $table): Table
     {
