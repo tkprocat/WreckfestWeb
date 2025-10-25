@@ -25,7 +25,7 @@ class WreckfestApiClient
     public function getServerConfig(): array
     {
         try {
-            $response = Http::withoutVerifying()->timeout(5)->get("{$this->baseUrl}/Config/basic");
+            $response = Http::withoutVerifying()->timeout(2)->get("{$this->baseUrl}/Config/basic");
             return $response->successful() ? $response->json() : [];
         } catch (ConnectionException $e) {
             Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
@@ -44,7 +44,7 @@ class WreckfestApiClient
     public function updateServerConfig(array $config): bool
     {
         try {
-            $response = Http::withoutVerifying()->timeout(5)->put("{$this->baseUrl}/Config/basic", $config);
+            $response = Http::withoutVerifying()->timeout(2)->put("{$this->baseUrl}/Config/basic", $config);
 
             if (!$response->successful()) {
                 Log::error('Failed to update server config - API returned status: ' . $response->status());
@@ -69,7 +69,7 @@ class WreckfestApiClient
     public function getTrackCollectionName(): ?string
     {
         try {
-            $response = Http::withoutVerifying()->timeout(5)->get("{$this->baseUrl}/Config/tracks/collection-name");
+            $response = Http::withoutVerifying()->timeout(2)->get("{$this->baseUrl}/Config/tracks/collection-name");
             if ($response->successful()) {
                 $data = $response->json();
                 // Return the collection name if it exists
@@ -93,7 +93,7 @@ class WreckfestApiClient
     public function getTracks(): array
     {
         try {
-            $response = Http::withoutVerifying()->timeout(5)->get("{$this->baseUrl}/Config/tracks");
+            $response = Http::withoutVerifying()->timeout(2)->get("{$this->baseUrl}/Config/tracks");
             if ($response->successful()) {
                 $data = $response->json();
                 // API returns structure: {"count":30,"tracks":[...]}
@@ -122,7 +122,7 @@ class WreckfestApiClient
     public function updateTracks(array $tracks): bool
     {
         try {
-            $response = Http::withoutVerifying()->timeout(5)->put("{$this->baseUrl}/Config/tracks", $tracks);
+            $response = Http::withoutVerifying()->timeout(2)->put("{$this->baseUrl}/Config/tracks", $tracks);
 
             if (!$response->successful()) {
                 Log::error('Failed to update tracks - API returned status: ' . $response->status());
@@ -189,7 +189,7 @@ class WreckfestApiClient
     public function getServerStatus(): array
     {
         try {
-            $response = Http::withoutVerifying()->timeout(5)->get("{$this->baseUrl}/Server/status");
+            $response = Http::withoutVerifying()->timeout(2)->get("{$this->baseUrl}/Server/status");
             return $response->successful() ? $response->json() : [];
         } catch (ConnectionException $e) {
             Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
@@ -264,7 +264,7 @@ class WreckfestApiClient
     public function getLogFile(int $lines = 100): array
     {
         try {
-            $response = Http::withoutVerifying()->timeout(5)->get("{$this->baseUrl}/Server/logfile", ['lines' => $lines]);
+            $response = Http::withoutVerifying()->timeout(2)->get("{$this->baseUrl}/Server/logfile", ['lines' => $lines]);
             if ($response->successful()) {
                 $data = $response->json();
                 // API returns nested structure: {"lines":100,"source":"logfile","logFilePath":"...","output":[...]}
@@ -293,7 +293,7 @@ class WreckfestApiClient
     public function getPlayers(): array
     {
         try {
-            $response = Http::withoutVerifying()->timeout(5)->get("{$this->baseUrl}/Server/players");
+            $response = Http::withoutVerifying()->timeout(2)->get("{$this->baseUrl}/Server/players");
             if ($response->successful()) {
                 $data = $response->json();
                 // API returns nested structure: {"totalPlayers":0,"maxPlayers":24,"players":[],"lastUpdated":"..."}
@@ -311,6 +311,42 @@ class WreckfestApiClient
         } catch (Exception $e) {
             Log::error('Failed to get players: ' . $e->getMessage());
             throw new WreckfestApiException();
+        }
+    }
+
+    /**
+     * Get track rotation list (alias for getTracks)
+     *
+     * @throws WreckfestApiException
+     */
+    public function getTrackRotation(): array
+    {
+        return $this->getTracks();
+    }
+
+    /**
+     * Get collection name (alias for getTrackCollectionName)
+     *
+     * @throws WreckfestApiException
+     */
+    public function getCollectionName(): ?string
+    {
+        return $this->getTrackCollectionName();
+    }
+
+    /**
+     * Get current track from server status
+     *
+     * @throws WreckfestApiException
+     */
+    public function getCurrentTrack(): ?string
+    {
+        try {
+            $status = $this->getServerStatus();
+            return $status['currentTrack'] ?? null;
+        } catch (Exception $e) {
+            Log::error('Failed to get current track: ' . $e->getMessage());
+            return null;
         }
     }
 }

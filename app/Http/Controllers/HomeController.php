@@ -18,45 +18,8 @@ class HomeController extends Controller
 
     public function index()
     {
-        try {
-            $serverConfig = $this->apiClient->getServerConfig();
-            $serverStatus = $this->apiClient->getServerStatus();
-            $players = $this->apiClient->getPlayers();
-            $trackRotation = $this->apiClient->getTracks();
-            $collectionName = $this->apiClient->getTrackCollectionName();
-
-            $serverName = $serverConfig['serverName'] ?? 'Wreckfest Server';
-            $currentTrack = $serverStatus['currentTrack'] ?? null;
-
-            // Get track details for display
-            $trackRotationWithDetails = $this->enrichTracksWithDetails($trackRotation);
-
-            return view('home', [
-                'serverName' => $serverName,
-                'serverNamePlain' => $this->stripColorCodes($serverName),
-                'serverNameHtml' => $this->formatColorCodes($serverName),
-                'serverStatus' => $serverStatus,
-                'players' => $players,
-                'maxPlayers' => $serverConfig['maxPlayers'] ?? 24,
-                'apiError' => false,
-                'currentTrack' => $currentTrack,
-                'trackRotation' => $trackRotationWithDetails,
-                'collectionName' => $collectionName,
-            ]);
-        } catch (WreckfestApiException $e) {
-            return view('home', [
-                'serverName' => 'Wreckfest Server',
-                'serverNamePlain' => 'Wreckfest Server',
-                'serverNameHtml' => 'Wreckfest Server',
-                'serverStatus' => [],
-                'players' => [],
-                'maxPlayers' => 24,
-                'apiError' => true,
-                'currentTrack' => null,
-                'trackRotation' => [],
-                'collectionName' => null,
-            ]);
-        }
+        // No API calls - everything loads asynchronously via Livewire
+        return view('home');
     }
 
     /**
