@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
     config(['wreckfest.api_url' => 'https://localhost:5101/api']);
-    $this->client = new WreckfestApiClient();
+    $this->client = new WreckfestApiClient;
 });
 
 describe('Server Configuration', function () {
@@ -338,9 +338,9 @@ describe('Error Handling', function () {
             throw new Exception('Network error');
         });
 
-        expect(fn() => $this->client->getServerConfig())->toThrow(WreckfestApiException::class);
-        expect(fn() => $this->client->getTracks())->toThrow(WreckfestApiException::class);
-        expect(fn() => $this->client->getServerStatus())->toThrow(WreckfestApiException::class);
+        expect(fn () => $this->client->getServerConfig())->toThrow(WreckfestApiException::class);
+        expect(fn () => $this->client->getTracks())->toThrow(WreckfestApiException::class);
+        expect(fn () => $this->client->getServerStatus())->toThrow(WreckfestApiException::class);
     });
 
     test('handles API errors gracefully', function () {

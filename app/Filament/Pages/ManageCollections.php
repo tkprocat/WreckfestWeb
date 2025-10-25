@@ -2,10 +2,10 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
 use App\Models\TrackCollection;
 use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -19,11 +19,15 @@ class ManageCollections extends Page implements HasTable
     use InteractsWithTable;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
+
     protected static ?string $navigationLabel = 'Track Collections';
+
     protected static ?int $navigationSort = 3;
+
     protected string $view = 'filament.pages.manage-collections';
+
     protected static ?string $title = 'Track Collections';
-   // protected static bool $isDiscovered = false;
+    // protected static bool $isDiscovered = false;
 
     public function table(Table $table): Table
     {
@@ -38,7 +42,7 @@ class ManageCollections extends Page implements HasTable
                     ->label('Number of Tracks')
                     ->formatStateUsing(fn ($state) => is_array($state) ? count($state) : 0)
                     ->sortable(query: function ($query, $direction) {
-                        return $query->orderByRaw('JSON_LENGTH(tracks) ' . $direction);
+                        return $query->orderByRaw('JSON_LENGTH(tracks) '.$direction);
                     }),
                 TextColumn::make('created_at')
                     ->label('Created')

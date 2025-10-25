@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\WreckfestApiException;
 use App\Helpers\TrackHelper;
 use App\Services\WreckfestApiClient;
-use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -99,7 +97,7 @@ class HomeController extends Controller
                 // Set new color
                 $currentColor = $matches[1];
                 if (isset($colors[$currentColor])) {
-                    $result .= '<span style="color: ' . $colors[$currentColor] . '">';
+                    $result .= '<span style="color: '.$colors[$currentColor].'">';
                 }
             } elseif ($part !== '') {
                 // Regular text

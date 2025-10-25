@@ -2,10 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Schemas\Components\Actions;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use App\Exceptions\WreckfestApiException;
 use App\Models\TrackCollection;
 use App\Services\WreckfestApiClient;
@@ -19,19 +15,29 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class TrackRotation extends Page implements HasForms
 {
     use InteractsWithForms;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-map';
+
     protected static ?string $navigationLabel = 'Track Rotation';
+
     protected static ?int $navigationSort = 2;
+
     protected string $view = 'filament.pages.track-rotation';
 
     public ?array $data = [];
+
     public ?string $defaultGamemode = null;
+
     public ?int $currentCollectionId = null;
+
     public ?string $currentCollectionName = null;
 
     public function updatedCurrentCollectionId($value): void
@@ -39,6 +45,7 @@ class TrackRotation extends Page implements HasForms
         if ($value === null || $value === '') {
             // User selected "Loaded from server"
             $this->loadFromServer();
+
             return;
         }
 
@@ -87,7 +94,7 @@ class TrackRotation extends Page implements HasForms
 
             Notification::make()
                 ->title('Loaded from server')
-                ->body(count($tracks) . ' tracks loaded')
+                ->body(count($tracks).' tracks loaded')
                 ->success()
                 ->send();
         } catch (WreckfestApiException $e) {
@@ -118,6 +125,7 @@ class TrackRotation extends Page implements HasForms
                     $this->currentCollectionName = $collection->name;
                     $this->form->fill(['tracks' => $collection->tracks]);
                     $this->dispatch('collection-loaded', tracks: $collection->tracks);
+
                     return;
                 }
             }
@@ -151,12 +159,12 @@ class TrackRotation extends Page implements HasForms
 
             foreach ($variants as $variantId => $variant) {
                 $variantName = is_array($variant) ? ($variant['name'] ?? $variantId) : $variant;
-                $allTracks[$variantId] = $locationName . ' - ' . $variantName;
+                $allTracks[$variantId] = $locationName.' - '.$variantName;
             }
         }
 
         // Filter out any null or empty values to satisfy Filament 4's stricter Select validation
-        return array_filter($allTracks, fn($value) => is_string($value) && $value !== '');
+        return array_filter($allTracks, fn ($value) => is_string($value) && $value !== '');
     }
 
     public function form(Schema $schema): Schema
@@ -239,16 +247,16 @@ class TrackRotation extends Page implements HasForms
                     ->collapsible()
                     ->collapsed(true)
                     ->itemLabel(function (array $state): ?string {
-                        if (!isset($state['track'])) {
+                        if (! isset($state['track'])) {
                             return 'New Track';
                         }
 
                         $tracks = $this->getAllTracks();
                         $trackName = $tracks[$state['track']] ?? $state['track'];
-                        $gamemodeName = config('wreckfest.gamemodes.' . ($state['gamemode'] ?? $this->defaultGamemode), ucfirst($state['gamemode'] ?? $this->defaultGamemode));
-                        $lapsText = isset($state['laps']) ? ' - ' . $state['laps'] . ' laps' : '';
+                        $gamemodeName = config('wreckfest.gamemodes.'.($state['gamemode'] ?? $this->defaultGamemode), ucfirst($state['gamemode'] ?? $this->defaultGamemode));
+                        $lapsText = isset($state['laps']) ? ' - '.$state['laps'].' laps' : '';
 
-                        return $trackName . ' (' . $gamemodeName . $lapsText . ')';
+                        return $trackName.' ('.$gamemodeName.$lapsText.')';
                     })
                     ->addActionLabel('Add Track to Rotation')
                     ->defaultItems(0)
@@ -257,81 +265,81 @@ class TrackRotation extends Page implements HasForms
                     ->schema([
                         Actions::make([
                             Action::make('randomizeOrder')
-                        ->label('Randomize Order')
-                        ->icon('heroicon-o-arrow-path')
-                        ->requiresConfirmation()
-                        ->modalHeading('Randomize Track Order')
-                        ->modalDescription('This will shuffle the current track rotation order. Are you sure?')
-                        ->action(function (): void {
-                            $formData = $this->form->getState();
-                            $tracks = $formData['tracks'] ?? [];
+                                ->label('Randomize Order')
+                                ->icon('heroicon-o-arrow-path')
+                                ->requiresConfirmation()
+                                ->modalHeading('Randomize Track Order')
+                                ->modalDescription('This will shuffle the current track rotation order. Are you sure?')
+                                ->action(function (): void {
+                                    $formData = $this->form->getState();
+                                    $tracks = $formData['tracks'] ?? [];
 
-                            if (!empty($tracks)) {
-                                shuffle($tracks);
-                                $this->form->fill(['tracks' => $tracks]);
+                                    if (! empty($tracks)) {
+                                        shuffle($tracks);
+                                        $this->form->fill(['tracks' => $tracks]);
 
-                                // Don't update originalTracks - this is an unsaved change
+                                        // Don't update originalTracks - this is an unsaved change
 
-                                Notification::make()
-                                    ->title('Track order randomized')
-                                    ->success()
-                                    ->send();
-                            }
-                        })
-                        ->color('warning'),
-                    Action::make('saveCollection')
-                        ->label(fn () => $this->currentCollectionId ? 'Save Collection' : 'Save As New Collection')
-                        ->icon('heroicon-o-bookmark')
-                        ->schema(fn () => $this->currentCollectionId ? [] : [
-                            TextInput::make('name')
-                                ->label('Collection Name')
-                                ->required()
-                                ->placeholder('e.g., Racing Only, Mixed Modes, etc.')
-                                ->maxLength(255),
+                                        Notification::make()
+                                            ->title('Track order randomized')
+                                            ->success()
+                                            ->send();
+                                    }
+                                })
+                                ->color('warning'),
+                            Action::make('saveCollection')
+                                ->label(fn () => $this->currentCollectionId ? 'Save Collection' : 'Save As New Collection')
+                                ->icon('heroicon-o-bookmark')
+                                ->schema(fn () => $this->currentCollectionId ? [] : [
+                                    TextInput::make('name')
+                                        ->label('Collection Name')
+                                        ->required()
+                                        ->placeholder('e.g., Racing Only, Mixed Modes, etc.')
+                                        ->maxLength(255),
+                                ])
+                                ->action(function (array $data): void {
+                                    $formData = $this->form->getState();
+                                    $tracks = $formData['tracks'] ?? [];
+
+                                    if ($this->currentCollectionId) {
+                                        // Update existing collection
+                                        $collection = TrackCollection::find($this->currentCollectionId);
+                                        if ($collection) {
+                                            $collection->update(['tracks' => $tracks]);
+
+                                            $this->dispatch('collection-saved', tracks: $tracks);
+
+                                            Notification::make()
+                                                ->title('Collection saved')
+                                                ->body("Saved: {$collection->name}")
+                                                ->success()
+                                                ->send();
+                                        }
+                                    } else {
+                                        // Create new collection
+                                        $collection = TrackCollection::create([
+                                            'name' => $data['name'],
+                                            'tracks' => $tracks,
+                                        ]);
+
+                                        // Set as current collection
+                                        $this->currentCollectionId = $collection->id;
+                                        $this->currentCollectionName = $collection->name;
+                                        session(['track_rotation.current_collection_id' => $collection->id]);
+
+                                        $this->dispatch('collection-saved', tracks: $tracks);
+
+                                        Notification::make()
+                                            ->title('Collection saved')
+                                            ->body("Working on: {$collection->name}")
+                                            ->success()
+                                            ->send();
+                                    }
+                                })
+                                ->color('primary'),
                         ])
-                        ->action(function (array $data): void {
-                            $formData = $this->form->getState();
-                            $tracks = $formData['tracks'] ?? [];
-
-                            if ($this->currentCollectionId) {
-                                // Update existing collection
-                                $collection = TrackCollection::find($this->currentCollectionId);
-                                if ($collection) {
-                                    $collection->update(['tracks' => $tracks]);
-
-                                    $this->dispatch('collection-saved', tracks: $tracks);
-
-                                    Notification::make()
-                                        ->title('Collection saved')
-                                        ->body("Saved: {$collection->name}")
-                                        ->success()
-                                        ->send();
-                                }
-                            } else {
-                                // Create new collection
-                                $collection = TrackCollection::create([
-                                    'name' => $data['name'],
-                                    'tracks' => $tracks,
-                                ]);
-
-                                // Set as current collection
-                                $this->currentCollectionId = $collection->id;
-                                $this->currentCollectionName = $collection->name;
-                                session(['track_rotation.current_collection_id' => $collection->id]);
-
-                                $this->dispatch('collection-saved', tracks: $tracks);
-
-                                Notification::make()
-                                    ->title('Collection saved')
-                                    ->body("Working on: {$collection->name}")
-                                    ->success()
-                                    ->send();
-                            }
-                        })
-                        ->color('primary'),
-                        ])
-                        ->alignEnd()
-                        ->fullWidth(),
+                            ->alignEnd()
+                            ->fullWidth(),
                     ]),
             ])
             ->statePath('data');
@@ -413,7 +421,7 @@ class TrackRotation extends Page implements HasForms
 
                         Notification::make()
                             ->title('Tracks refreshed from server')
-                            ->body(count($tracks) . ' tracks loaded')
+                            ->body(count($tracks).' tracks loaded')
                             ->success()
                             ->send();
                     } catch (WreckfestApiException $e) {
@@ -428,101 +436,138 @@ class TrackRotation extends Page implements HasForms
 
             ActionGroup::make([
                 Action::make('newCollection')
-                ->label('New Collection')
-                ->icon('heroicon-o-document-plus')
-                ->schema([
-                    TextInput::make('name')
-                        ->label('Collection Name')
-                        ->required()
-                        ->placeholder('e.g., New Track Rotation')
-                        ->maxLength(255)
-                        ->default('New Collection'),
-                ])
-                ->action(function (array $data): void {
-                    // Create a new empty collection
-                    $collection = TrackCollection::create([
-                        'name' => $data['name'],
-                        'tracks' => [],
-                    ]);
+                    ->label('New Collection')
+                    ->icon('heroicon-o-document-plus')
+                    ->schema([
+                        TextInput::make('name')
+                            ->label('Collection Name')
+                            ->required()
+                            ->placeholder('e.g., New Track Rotation')
+                            ->maxLength(255)
+                            ->default('New Collection'),
+                    ])
+                    ->action(function (array $data): void {
+                        // Create a new empty collection
+                        $collection = TrackCollection::create([
+                            'name' => $data['name'],
+                            'tracks' => [],
+                        ]);
 
-                    // Set as current collection
-                    $this->currentCollectionId = $collection->id;
-                    $this->currentCollectionName = $collection->name;
-                    session(['track_rotation.current_collection_id' => $collection->id]);
-
-                    // Clear the form
-                    $this->form->fill(['tracks' => []]);
-
-                    $this->dispatch('collection-loaded', tracks: []);
-
-                    Notification::make()
-                        ->title('New collection created')
-                        ->body("Working on: {$collection->name}")
-                        ->success()
-                        ->send();
-                })
-                ->color('gray'),
-
-            Action::make('loadCollection')
-                ->label('Load Collection')
-                ->icon('heroicon-o-folder-open')
-                ->schema([
-                    Select::make('collection_id')
-                        ->label('Select Collection')
-                        ->options(TrackCollection::pluck('name', 'id'))
-                        ->required()
-                        ->searchable()
-                        ->native(false),
-                ])
-                ->action(function (array $data): void {
-                    $collection = TrackCollection::find($data['collection_id']);
-
-                    if ($collection) {
                         // Set as current collection
                         $this->currentCollectionId = $collection->id;
                         $this->currentCollectionName = $collection->name;
                         session(['track_rotation.current_collection_id' => $collection->id]);
 
-                        $this->form->fill(['tracks' => $collection->tracks]);
+                        // Clear the form
+                        $this->form->fill(['tracks' => []]);
+
+                        $this->dispatch('collection-loaded', tracks: []);
 
                         Notification::make()
-                            ->title('Collection loaded')
+                            ->title('New collection created')
                             ->body("Working on: {$collection->name}")
                             ->success()
                             ->send();
-                    }
-                })
-                ->color('info'),
+                    })
+                    ->color('gray'),
 
-            Action::make('saveCollection')
-                ->label(fn () => $this->currentCollectionId ? 'Save Collection' : 'Save As New Collection')
-                ->icon('heroicon-o-bookmark')
-                ->schema(fn () => $this->currentCollectionId ? [] : [
-                    TextInput::make('name')
-                        ->label('Collection Name')
-                        ->required()
-                        ->placeholder('e.g., Racing Only, Mixed Modes, etc.')
-                        ->maxLength(255),
-                ])
-                ->action(function (array $data): void {
-                    $formData = $this->form->getState();
-                    $tracks = $formData['tracks'] ?? [];
+                Action::make('loadCollection')
+                    ->label('Load Collection')
+                    ->icon('heroicon-o-folder-open')
+                    ->schema([
+                        Select::make('collection_id')
+                            ->label('Select Collection')
+                            ->options(TrackCollection::pluck('name', 'id'))
+                            ->required()
+                            ->searchable()
+                            ->native(false),
+                    ])
+                    ->action(function (array $data): void {
+                        $collection = TrackCollection::find($data['collection_id']);
 
-                    if ($this->currentCollectionId) {
-                        // Update existing collection
-                        $collection = TrackCollection::find($this->currentCollectionId);
                         if ($collection) {
-                            $collection->update(['tracks' => $tracks]);
+                            // Set as current collection
+                            $this->currentCollectionId = $collection->id;
+                            $this->currentCollectionName = $collection->name;
+                            session(['track_rotation.current_collection_id' => $collection->id]);
+
+                            $this->form->fill(['tracks' => $collection->tracks]);
+
+                            Notification::make()
+                                ->title('Collection loaded')
+                                ->body("Working on: {$collection->name}")
+                                ->success()
+                                ->send();
+                        }
+                    })
+                    ->color('info'),
+
+                Action::make('saveCollection')
+                    ->label(fn () => $this->currentCollectionId ? 'Save Collection' : 'Save As New Collection')
+                    ->icon('heroicon-o-bookmark')
+                    ->schema(fn () => $this->currentCollectionId ? [] : [
+                        TextInput::make('name')
+                            ->label('Collection Name')
+                            ->required()
+                            ->placeholder('e.g., Racing Only, Mixed Modes, etc.')
+                            ->maxLength(255),
+                    ])
+                    ->action(function (array $data): void {
+                        $formData = $this->form->getState();
+                        $tracks = $formData['tracks'] ?? [];
+
+                        if ($this->currentCollectionId) {
+                            // Update existing collection
+                            $collection = TrackCollection::find($this->currentCollectionId);
+                            if ($collection) {
+                                $collection->update(['tracks' => $tracks]);
+
+                                $this->dispatch('collection-saved', tracks: $tracks);
+
+                                Notification::make()
+                                    ->title('Collection saved')
+                                    ->body("Saved: {$collection->name}")
+                                    ->success()
+                                    ->send();
+                            }
+                        } else {
+                            // Create new collection
+                            $collection = TrackCollection::create([
+                                'name' => $data['name'],
+                                'tracks' => $tracks,
+                            ]);
+
+                            // Set as current collection
+                            $this->currentCollectionId = $collection->id;
+                            $this->currentCollectionName = $collection->name;
+                            session(['track_rotation.current_collection_id' => $collection->id]);
 
                             $this->dispatch('collection-saved', tracks: $tracks);
 
                             Notification::make()
                                 ->title('Collection saved')
-                                ->body("Saved: {$collection->name}")
+                                ->body("Working on: {$collection->name}")
                                 ->success()
                                 ->send();
                         }
-                    } else {
+                    })
+                    ->color('primary'),
+
+                Action::make('saveAsCollection')
+                    ->label('Save as new collection')
+                    ->icon('heroicon-o-document-duplicate')
+                    ->visible(fn () => $this->currentCollectionId !== null)
+                    ->schema([
+                        TextInput::make('name')
+                            ->label('New Collection Name')
+                            ->required()
+                            ->placeholder('e.g., Copy of '.($this->currentCollectionName ?? 'Collection'))
+                            ->maxLength(255),
+                    ])
+                    ->action(function (array $data): void {
+                        $formData = $this->form->getState();
+                        $tracks = $formData['tracks'] ?? [];
+
                         // Create new collection
                         $collection = TrackCollection::create([
                             'name' => $data['name'],
@@ -537,49 +582,12 @@ class TrackRotation extends Page implements HasForms
                         $this->dispatch('collection-saved', tracks: $tracks);
 
                         Notification::make()
-                            ->title('Collection saved')
+                            ->title('Collection saved as new')
                             ->body("Working on: {$collection->name}")
                             ->success()
                             ->send();
-                    }
-                })
-                ->color('primary'),
-
-            Action::make('saveAsCollection')
-                ->label('Save as new collection')
-                ->icon('heroicon-o-document-duplicate')
-                ->visible(fn () => $this->currentCollectionId !== null)
-                ->schema([
-                    TextInput::make('name')
-                        ->label('New Collection Name')
-                        ->required()
-                        ->placeholder('e.g., Copy of ' . ($this->currentCollectionName ?? 'Collection'))
-                        ->maxLength(255),
-                ])
-                ->action(function (array $data): void {
-                    $formData = $this->form->getState();
-                    $tracks = $formData['tracks'] ?? [];
-
-                    // Create new collection
-                    $collection = TrackCollection::create([
-                        'name' => $data['name'],
-                        'tracks' => $tracks,
-                    ]);
-
-                    // Set as current collection
-                    $this->currentCollectionId = $collection->id;
-                    $this->currentCollectionName = $collection->name;
-                    session(['track_rotation.current_collection_id' => $collection->id]);
-
-                    $this->dispatch('collection-saved', tracks: $tracks);
-
-                    Notification::make()
-                        ->title('Collection saved as new')
-                        ->body("Working on: {$collection->name}")
-                        ->success()
-                        ->send();
-                })
-                ->color('primary'),
+                    })
+                    ->color('primary'),
             ])
                 ->label('Collections')
                 ->icon('heroicon-o-rectangle-stack')

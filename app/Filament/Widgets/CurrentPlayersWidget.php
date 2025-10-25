@@ -11,7 +11,7 @@ class CurrentPlayersWidget extends Widget
 {
     protected string $view = 'filament.widgets.current-players-widget';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public ?array $players = null;
 
@@ -57,7 +57,7 @@ class CurrentPlayersWidget extends Widget
             $playerName = $player;
         }
 
-        return $isBot ? '(BOT) ' . $playerName : $playerName;
+        return $isBot ? '(BOT) '.$playerName : $playerName;
     }
 
     public function isBot($player): bool

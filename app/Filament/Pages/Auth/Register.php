@@ -2,12 +2,12 @@
 
 namespace App\Filament\Pages\Auth;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Component;
 use App\Models\Invitation;
 use App\Models\User;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -20,7 +20,7 @@ class Register extends \Filament\Auth\Pages\Register
     {
         $this->inviteToken = request()->query('invite');
 
-        if (!$this->inviteToken) {
+        if (! $this->inviteToken) {
             Notification::make()
                 ->title('Invitation required')
                 ->body('You need an invitation to register.')
@@ -28,6 +28,7 @@ class Register extends \Filament\Auth\Pages\Register
                 ->send();
 
             $this->redirect('/admin/login');
+
             return;
         }
 
@@ -37,7 +38,7 @@ class Register extends \Filament\Auth\Pages\Register
             ->where('expires_at', '>', now())
             ->first();
 
-        if (!$invitation) {
+        if (! $invitation) {
             Notification::make()
                 ->title('Invalid invitation')
                 ->body('This invitation is invalid or has expired.')
@@ -45,6 +46,7 @@ class Register extends \Filament\Auth\Pages\Register
                 ->send();
 
             $this->redirect('/admin/login');
+
             return;
         }
 
@@ -87,7 +89,7 @@ class Register extends \Filament\Auth\Pages\Register
             ->where('expires_at', '>', now())
             ->first();
 
-        if (!$invitation) {
+        if (! $invitation) {
             throw ValidationException::withMessages([
                 'email' => 'This invitation is no longer valid.',
             ]);
@@ -108,13 +110,13 @@ class Register extends \Filament\Auth\Pages\Register
         return $user;
     }
 
-    public function getHeading(): string | Htmlable
+    public function getHeading(): string|Htmlable
     {
         return 'Create your account';
     }
 
-    public function getSubHeading(): string | Htmlable | null
+    public function getSubHeading(): string|Htmlable|null
     {
-        return 'You\'ve been invited to join ' . config('app.name');
+        return 'You\'ve been invited to join '.config('app.name');
     }
 }

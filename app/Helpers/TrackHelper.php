@@ -7,14 +7,14 @@ class TrackHelper
     /**
      * Convert a track ID to human-readable track details
      *
-     * @param string $trackId The track variant ID (e.g., "speedway2_inner_oval")
+     * @param  string  $trackId  The track variant ID (e.g., "speedway2_inner_oval")
      * @return array Array containing track details:
-     *   - fullName: "Location - Variant" (e.g., "Speedway 2 - Inner Oval")
-     *   - location: Location name (e.g., "Speedway 2")
-     *   - variant: Variant name (e.g., "Inner Oval")
-     *   - trackId: Original track ID
-     *   - isDerby: Whether this is a derby-only track
-     *   - weather: Array of supported weather conditions
+     *               - fullName: "Location - Variant" (e.g., "Speedway 2 - Inner Oval")
+     *               - location: Location name (e.g., "Speedway 2")
+     *               - variant: Variant name (e.g., "Inner Oval")
+     *               - trackId: Original track ID
+     *               - isDerby: Whether this is a derby-only track
+     *               - weather: Array of supported weather conditions
      */
     public static function getTrackDetails(string $trackId): array
     {
@@ -32,7 +32,7 @@ class TrackHelper
                         : $variantData;
 
                     // Build full name
-                    $fullName = $locationName . ' - ' . $variantName;
+                    $fullName = $locationName.' - '.$variantName;
 
                     return [
                         'fullName' => $fullName,
@@ -61,7 +61,7 @@ class TrackHelper
      * Get just the human-readable name for a track ID
      * Convenience method for when you only need the name
      *
-     * @param string $trackId The track variant ID
+     * @param  string  $trackId  The track variant ID
      * @return string The full track name (e.g., "Speedway 2 - Inner Oval")
      */
     public static function getTrackName(string $trackId): string
@@ -102,7 +102,7 @@ class TrackHelper
             foreach ($variants as $variantId => $variant) {
                 if (self::isTrackCompatibleWithGamemode($variantId, $gamemode)) {
                     $variantName = is_array($variant) ? ($variant['name'] ?? $variantId) : $variant;
-                    $compatibleTracks[$variantId] = $locationName . ' - ' . $variantName;
+                    $compatibleTracks[$variantId] = $locationName.' - '.$variantName;
                 }
             }
         }
@@ -142,6 +142,7 @@ class TrackHelper
                     if (is_array($variant)) {
                         return $variant['derby'] ?? false;
                     }
+
                     // If variant is a string, it's not derby-only
                     return false;
                 }
@@ -191,6 +192,7 @@ class TrackHelper
         }
 
         $supportedWeather = self::getSupportedWeatherForTrack($trackId);
+
         return in_array($weather, $supportedWeather);
     }
 

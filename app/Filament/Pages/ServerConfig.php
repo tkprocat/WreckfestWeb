@@ -2,28 +2,30 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Grid;
 use App\Exceptions\WreckfestApiException;
-use App\Helpers\TrackHelper;
 use App\Services\WreckfestApiClient;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class ServerConfig extends Page implements HasForms
 {
     use InteractsWithForms;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+
     protected static ?string $navigationLabel = 'Server Config';
+
     protected static ?int $navigationSort = 1;
+
     protected string $view = 'filament.pages.server-config';
 
     public ?array $data = [];
@@ -58,12 +60,12 @@ class ServerConfig extends Page implements HasForms
 
             foreach ($variants as $variantId => $variant) {
                 $variantName = is_array($variant) ? ($variant['name'] ?? $variantId) : $variant;
-                $allTracks[$variantId] = $locationName . ' - ' . $variantName;
+                $allTracks[$variantId] = $locationName.' - '.$variantName;
             }
         }
 
         // Filter out any null or empty values to satisfy Filament 4's stricter Select validation
-        return array_filter($allTracks, fn($value) => is_string($value) && $value !== '');
+        return array_filter($allTracks, fn ($value) => is_string($value) && $value !== '');
     }
 
     public function form(Schema $schema): Schema
@@ -277,7 +279,7 @@ class ServerConfig extends Page implements HasForms
             $booleanFields = [
                 'lan', 'excludeFromQuickplay', 'enableTrackVote',
                 'disableIdleKick', 'specialVehiclesDisabled', 'carResetDisabled',
-                'wrongWayLimiterDisabled', 'clearUsers', 'ownerDisabled', 'adminControl'
+                'wrongWayLimiterDisabled', 'clearUsers', 'ownerDisabled', 'adminControl',
             ];
 
             foreach ($booleanFields as $field) {
@@ -289,11 +291,11 @@ class ServerConfig extends Page implements HasForms
             // API requires these fields to be present even if empty
             $requiredFields = [
                 'mods', 'weather', 'password', 'carRestriction',
-                'welcomeMessage', 'carClassRestriction'
+                'welcomeMessage', 'carClassRestriction',
             ];
 
             foreach ($requiredFields as $field) {
-                if (!isset($data[$field]) || $data[$field] === null) {
+                if (! isset($data[$field]) || $data[$field] === null) {
                     $data[$field] = '';
                 }
             }

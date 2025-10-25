@@ -2,14 +2,12 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Actions\DeleteAction;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\InvitationMail;
-use Exception;
 use App\Models\Invitation;
 use App\Models\User;
-use App\Notifications\InvitationEmail;
+use Exception;
 use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -18,14 +16,18 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class UserManagement extends Page implements HasTable
 {
     use InteractsWithTable;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';
+
     protected static ?string $navigationLabel = 'User Management';
+
     protected static ?int $navigationSort = 10;
+
     protected string $view = 'filament.pages.user-management';
 
     public function table(Table $table): Table
@@ -72,6 +74,7 @@ class UserManagement extends Page implements HasTable
                             ->body('A user with this email address is already registered.')
                             ->danger()
                             ->send();
+
                         return;
                     }
 
@@ -87,6 +90,7 @@ class UserManagement extends Page implements HasTable
                             ->body('This email already has a pending invitation.')
                             ->warning()
                             ->send();
+
                         return;
                     }
 

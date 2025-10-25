@@ -11,7 +11,9 @@ use Livewire\Component;
 class ServerName extends Component
 {
     public string $serverName = 'Wreckfest Web';
+
     public string $serverNamePlain = 'Wreckfest Web';
+
     public string $serverNameHtml = 'Wreckfest Web';
 
     public function mount(WreckfestApiClient $apiClient)
@@ -39,7 +41,7 @@ class ServerName extends Component
             ], now()->addMinutes(5));
         } catch (\Exception $e) {
             // If no cache and API fails, use default with gray styling
-            if (!$cached) {
+            if (! $cached) {
                 $this->serverName = 'Wreckfest Web';
                 $this->serverNamePlain = 'Wreckfest Web';
                 $this->serverNameHtml = '<span class="text-gray-400">Wreckfest Web</span>';
@@ -87,7 +89,7 @@ class ServerName extends Component
                 // Set new color
                 $currentColor = $matches[1];
                 if (isset($colors[$currentColor])) {
-                    $result .= '<span style="color: ' . $colors[$currentColor] . '">';
+                    $result .= '<span style="color: '.$colors[$currentColor].'">';
                 }
             } elseif ($part !== '') {
                 // Regular text

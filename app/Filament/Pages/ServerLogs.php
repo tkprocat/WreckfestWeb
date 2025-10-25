@@ -10,8 +10,11 @@ use Filament\Pages\Page;
 class ServerLogs extends Page
 {
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+
     protected static ?string $navigationLabel = 'Server Logs';
+
     protected static ?int $navigationSort = 4;
+
     protected string $view = 'filament.pages.server-logs';
 
     public ?array $logs = null;

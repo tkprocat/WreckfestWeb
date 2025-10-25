@@ -12,7 +12,9 @@ use Livewire\Component;
 class TrackRotation extends Component
 {
     public $trackRotation = [];
+
     public $currentTrack = '';
+
     public $collectionName = '';
 
     public function mount(WreckfestApiClient $apiClient)

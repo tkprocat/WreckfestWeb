@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Laravel\get;
 
 beforeEach(function () {
     $this->user = User::factory()->create();

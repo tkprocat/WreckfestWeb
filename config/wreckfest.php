@@ -12,10 +12,10 @@ return [
     'tracks' => [
         'madman_stadium' => [
             'name' => 'Madman Stadium',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'bigstadium_demolition_arena' => [
                     'name' => 'Demolition Arena',
@@ -29,11 +29,11 @@ return [
         ],
         'fairfield_county' => [
             'name' => 'Fairfield County',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
                 2 => 'fog',
-            ),
+            ],
             'variants' => [
                 'smallstadium_demolition_arena' => [
                     'name' => 'Demolition Arena',
@@ -43,11 +43,11 @@ return [
         ],
         'fairfield_mudpit' => [
             'name' => 'Fairfield Mud Pit',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
                 2 => 'fog',
-            ),
+            ],
             'variants' => [
                 'mudpit_demolition_arena' => [
                     'name' => 'Demolition Arena',
@@ -57,11 +57,11 @@ return [
         ],
         'fairfield_grass_field' => [
             'name' => 'Fairfield Grass Field',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
                 2 => 'fog',
-            ),
+            ],
             'variants' => [
                 'grass_arena_demolition_arena' => [
                     'name' => 'Demolition Arena',
@@ -71,9 +71,9 @@ return [
         ],
         'glendale_countryside' => [
             'name' => 'Glendale Countryside',
-            'weather' => array(
+            'weather' => [
                 0 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'field_derby_arena' => [
                     'name' => 'Field Arena',
@@ -83,10 +83,10 @@ return [
         ],
         'bloomfield_speedway' => [
             'name' => 'Bloomfield Speedway',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'dirt_speedway_dirt_oval' => [
                     'name' => 'Dirt Oval',
@@ -100,10 +100,10 @@ return [
         ],
         'bonebreaker_valley' => [
             'name' => 'Bonebreaker Valley',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'bonebreaker_valley_main_circuit' => [
                     'name' => 'Main Circuit',
@@ -113,10 +113,10 @@ return [
         ],
         'crash_canyon' => [
             'name' => 'Crash Canyon',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'crash_canyon_main_circuit' => [
                     'name' => 'Main Circuit',
@@ -126,9 +126,9 @@ return [
         ],
         'midwest_motocenter' => [
             'name' => 'Midwest Motocenter',
-            'weather' => array(
+            'weather' => [
                 0 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'gravel1_main_loop' => [
                     'name' => 'Main Circuit',
@@ -142,11 +142,11 @@ return [
         ],
         'hilltop_stadium' => [
             'name' => 'Hilltop Stadium',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
                 2 => 'fog',
-            ),
+            ],
             'variants' => [
                 'speedway1_figure_8' => [
                     'name' => 'Figure 8',
@@ -160,10 +160,10 @@ return [
         ],
         'big_valley_speedway' => [
             'name' => 'Big Valley Speedway',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'speedway2_classic_arena' => [
                     'name' => 'Open Demolition Arena',
@@ -193,9 +193,9 @@ return [
         ],
         'sandstone_raceway' => [
             'name' => 'Sandstone Raceway',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
-            ),
+            ],
             'variants' => [
                 'sandpit1_long_loop' => [
                     'name' => 'Main Route',
@@ -225,10 +225,10 @@ return [
         ],
         'savolax_sandpit' => [
             'name' => 'Savolax Sandpit',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'sandpit2_full_circuit' => [
                     'name' => 'Main Route',
@@ -250,11 +250,11 @@ return [
         ],
         'boulder_bank_circuit' => [
             'name' => 'Boulder Bank Circuit',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
                 2 => 'fog',
-            ),
+            ],
             'variants' => [
                 'sandpit3_long_loop' => [
                     'name' => 'Main Route',
@@ -276,10 +276,10 @@ return [
         ],
         'fire_rock_raceway' => [
             'name' => 'Fire Rock Raceway',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'tarmac1_main_circuit' => [
                     'name' => 'Full Circuit',
@@ -301,10 +301,10 @@ return [
         ],
         'motorcity_circuit' => [
             'name' => 'Motorcity Circuit',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'tarmac2_main_circuit' => [
                     'name' => 'Main Circuit',
@@ -322,10 +322,10 @@ return [
         ],
         'espedalen_raceway' => [
             'name' => 'Espedalen Raceway',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'tarmac3_main_circuit' => [
                     'name' => 'Main Circuit',
@@ -347,10 +347,10 @@ return [
         ],
         'finncross_circuit' => [
             'name' => 'Finncross Circuit',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'mixed1_main_circuit' => [
                     'name' => 'Main Circuit',
@@ -364,10 +364,10 @@ return [
         ],
         'maasten_motocenter' => [
             'name' => 'Maasten Motocenter',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'mixed2_main_circuit' => [
                     'name' => 'Main Circuit',
@@ -381,10 +381,10 @@ return [
         ],
         'pinehills_raceway' => [
             'name' => 'Pinehills Raceway',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'mixed3_long_loop' => [
                     'name' => 'Main Circuit',
@@ -414,10 +414,10 @@ return [
         ],
         'rosenheim_raceway' => [
             'name' => 'Rosenheim Raceway',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'mixed4_main_circuit' => [
                     'name' => 'Main Circuit',
@@ -431,10 +431,10 @@ return [
         ],
         'northland_raceway' => [
             'name' => 'Northland Raceway',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'mixed5_outer_loop' => [
                     'name' => 'Outer Route',
@@ -460,11 +460,11 @@ return [
         ],
         'firwood_motocenter' => [
             'name' => 'Firwood Motocenter',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
                 2 => 'fog',
-            ),
+            ],
             'variants' => [
                 'mixed7_r1' => [
                     'name' => 'Main Circuit',
@@ -494,11 +494,11 @@ return [
         ],
         'northfolk_ring' => [
             'name' => 'Northfolk Ring',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
                 2 => 'fog',
-            ),
+            ],
             'variants' => [
                 'mixed8_r1' => [
                     'name' => 'Main Circuit',
@@ -516,10 +516,10 @@ return [
         ],
         'clayridge_circuit' => [
             'name' => 'Clayridge Circuit',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'mixed9_r1' => [
                     'name' => 'Main Circuit',
@@ -533,10 +533,10 @@ return [
         ],
         'deathloop' => [
             'name' => 'Deathloop',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'loop' => [
                     'name' => 'Main Circuit',
@@ -546,10 +546,10 @@ return [
         ],
         'dirt_devil_stadium' => [
             'name' => 'Dirt Devil Stadium',
-            'weather' => array(
+            'weather' => [
                 0 => 'clear',
                 1 => 'overcast',
-            ),
+            ],
             'variants' => [
                 'triangle_r1' => [
                     'name' => 'Dirt Speedway',
@@ -563,7 +563,7 @@ return [
         ],
         'bleak_city' => [
             'name' => 'Bleak City',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'crm01_1' => [
                     'name' => 'Race Track',
@@ -585,7 +585,7 @@ return [
         ],
         'devils_canyon' => [
             'name' => 'Devil\'s Canyon',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'crm02_1' => [
                     'name' => 'Race Track',
@@ -599,7 +599,7 @@ return [
         ],
         'drytown_desert_circuit' => [
             'name' => 'Drytown Desert Circuit',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'fields08_1' => [
                     'name' => 'Main Circuit',
@@ -613,7 +613,7 @@ return [
         ],
         'rockfield_roughspot' => [
             'name' => 'Rockfield Roughspot',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'fields09_1' => [
                     'name' => 'Dirt Oval',
@@ -623,7 +623,7 @@ return [
         ],
         'mudford_motorpark' => [
             'name' => 'Mudford Motorpark',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'fields10_1' => [
                     'name' => 'Mud Oval',
@@ -637,7 +637,7 @@ return [
         ],
         'the_maw' => [
             'name' => 'The Maw',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'fields11_1' => [
                     'name' => 'Demolition Arena',
@@ -647,7 +647,7 @@ return [
         ],
         'kingston_raceway' => [
             'name' => 'Kingston Raceway',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'fields12_1' => [
                     'name' => 'Asphalt Oval',
@@ -665,7 +665,7 @@ return [
         ],
         'eagles_peak_motorpark' => [
             'name' => 'Eagles Peak Motorpark',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'fields13_1' => [
                     'name' => 'Racing Track',
@@ -683,7 +683,7 @@ return [
         ],
         'rattlesnake_racepark' => [
             'name' => 'Rattlesnake Racepark',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'fields14_1' => [
                     'name' => 'Main Circuit',
@@ -697,7 +697,7 @@ return [
         ],
         'vale_falls_circuit' => [
             'name' => 'Vale Falls Circuit',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'forest11_1' => [
                     'name' => 'Main Circuit',
@@ -719,7 +719,7 @@ return [
         ],
         'tribend_speedway' => [
             'name' => 'Tribend Speedway',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'forest12_1' => [
                     'name' => 'Main Circuit',
@@ -737,7 +737,7 @@ return [
         ],
         'torsdalen_circuit' => [
             'name' => 'Torsdalen Circuit',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'forest13_1' => [
                     'name' => 'Main Circuit',
@@ -759,7 +759,7 @@ return [
         ],
         'rally_trophy' => [
             'name' => 'Rally Trophy',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'rt01_1' => [
                     'name' => 'Special Stage',
@@ -769,7 +769,7 @@ return [
         ],
         'hellride' => [
             'name' => 'Hellride',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'urban06' => [
                     'name' => 'Main Circuit',
@@ -779,7 +779,7 @@ return [
         ],
         'thunderbowl' => [
             'name' => 'Thunderbowl',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'urban07' => [
                     'name' => 'Demolition Arena',
@@ -789,7 +789,7 @@ return [
         ],
         'hillstreet_circuit' => [
             'name' => 'Hillstreet Circuit',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'urban08_1' => [
                     'name' => 'Race Track',
@@ -803,7 +803,7 @@ return [
         ],
         'wrecknado' => [
             'name' => 'Wrecknado',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'urban09_1' => [
                     'name' => 'Main Circuit',
@@ -817,7 +817,7 @@ return [
         ],
         'wrecking_playground' => [
             'name' => 'Wrecking Playground',
-            'weather' => NULL,
+            'weather' => null,
             'variants' => [
                 'wrecker01_1' => [
                     'name' => 'Main Area',

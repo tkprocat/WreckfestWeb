@@ -2,7 +2,6 @@
 
 use App\Models\Invitation;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 
 beforeEach(function () {
     $this->admin = User::factory()->create();
@@ -103,7 +102,7 @@ describe('Registration with Invitation', function () {
             'expires_at' => now()->addDays(7),
         ]);
 
-        $this->get('/admin/register?invite=' . $invitation->token)
+        $this->get('/admin/register?invite='.$invitation->token)
             ->assertSuccessful();
     });
 
@@ -115,7 +114,7 @@ describe('Registration with Invitation', function () {
             'expires_at' => now()->subDay(),
         ]);
 
-        $this->get('/admin/register?invite=' . $invitation->token)
+        $this->get('/admin/register?invite='.$invitation->token)
             ->assertRedirect('/admin/login');
     });
 
@@ -128,7 +127,7 @@ describe('Registration with Invitation', function () {
             'accepted_at' => now(),
         ]);
 
-        $this->get('/admin/register?invite=' . $invitation->token)
+        $this->get('/admin/register?invite='.$invitation->token)
             ->assertRedirect('/admin/login');
     });
 });
