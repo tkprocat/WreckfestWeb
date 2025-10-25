@@ -5,6 +5,71 @@ namespace App\Helpers;
 class TrackHelper
 {
     /**
+     * Convert a track ID to human-readable track details
+     *
+     * @param string $trackId The track variant ID (e.g., "speedway2_inner_oval")
+     * @return array Array containing track details:
+     *   - fullName: "Location - Variant" (e.g., "Speedway 2 - Inner Oval")
+     *   - location: Location name (e.g., "Speedway 2")
+     *   - variant: Variant name (e.g., "Inner Oval")
+     *   - trackId: Original track ID
+     *   - isDerby: Whether this is a derby-only track
+     *   - weather: Array of supported weather conditions
+     */
+    public static function getTrackDetails(string $trackId): array
+    {
+        $trackLocations = config('wreckfest.tracks', []);
+
+        foreach ($trackLocations as $locationKey => $locationData) {
+            $locationName = $locationData['name'] ?? $locationKey;
+            $variants = $locationData['variants'] ?? [];
+
+            foreach ($variants as $variantId => $variantData) {
+                if ($variantId === $trackId) {
+                    // Extract variant name
+                    $variantName = is_array($variantData)
+                        ? ($variantData['name'] ?? $variantId)
+                        : $variantData;
+
+                    // Build full name
+                    $fullName = $locationName . ' - ' . $variantName;
+
+                    return [
+                        'fullName' => $fullName,
+                        'location' => $locationName,
+                        'variant' => $variantName,
+                        'trackId' => $trackId,
+                        'isDerby' => self::isDerbyOnlyTrack($trackId),
+                        'weather' => self::getSupportedWeatherForTrack($trackId),
+                    ];
+                }
+            }
+        }
+
+        // Track not found, return defaults
+        return [
+            'fullName' => $trackId,
+            'location' => 'Unknown',
+            'variant' => $trackId,
+            'trackId' => $trackId,
+            'isDerby' => false,
+            'weather' => [],
+        ];
+    }
+
+    /**
+     * Get just the human-readable name for a track ID
+     * Convenience method for when you only need the name
+     *
+     * @param string $trackId The track variant ID
+     * @return string The full track name (e.g., "Speedway 2 - Inner Oval")
+     */
+    public static function getTrackName(string $trackId): string
+    {
+        return self::getTrackDetails($trackId)['fullName'];
+    }
+
+    /**
      * Check if a track is compatible with a given gamemode
      */
     public static function isTrackCompatibleWithGamemode(string $trackId, string $gamemode): bool

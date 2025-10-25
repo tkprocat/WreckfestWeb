@@ -22,7 +22,9 @@ it('can render server config page', function () {
 
     actingAs($this->user)
         ->get(ServerConfig::getUrl())
-        ->assertSuccessful();
+        ->assertSuccessful()
+        ->assertSee('Test Server')
+        ->assertSee('24');
 });
 
 it('displays server configuration', function () {

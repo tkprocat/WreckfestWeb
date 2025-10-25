@@ -62,6 +62,30 @@ class WreckfestApiClient
     }
 
     /**
+     * Get track collection name
+     *
+     * @throws WreckfestApiException
+     */
+    public function getTrackCollectionName(): ?string
+    {
+        try {
+            $response = Http::withoutVerifying()->timeout(5)->get("{$this->baseUrl}/Config/tracks/collection-name");
+            if ($response->successful()) {
+                $data = $response->json();
+                // Return the collection name if it exists
+                return $data['collectionName'] ?? $data['collection_name'] ?? null;
+            }
+            return null;
+        } catch (ConnectionException $e) {
+            Log::error('Failed to connect to Wreckfest API: ' . $e->getMessage());
+            throw new WreckfestApiException();
+        } catch (Exception $e) {
+            Log::error('Failed to get track collection name: ' . $e->getMessage());
+            throw new WreckfestApiException();
+        }
+    }
+
+    /**
      * Get track rotation list
      *
      * @throws WreckfestApiException

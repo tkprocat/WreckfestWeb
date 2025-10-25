@@ -6,6 +6,8 @@ use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 
 beforeEach(function () {
+    Http::preventStrayRequests();
+
     // Create a test user for authentication
     $this->user = \App\Models\User::factory()->create();
 

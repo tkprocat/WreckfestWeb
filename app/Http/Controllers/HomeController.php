@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\WreckfestApiException;
+use App\Helpers\TrackHelper;
 use App\Services\WreckfestApiClient;
 use Illuminate\Http\Request;
 
@@ -21,8 +22,14 @@ class HomeController extends Controller
             $serverConfig = $this->apiClient->getServerConfig();
             $serverStatus = $this->apiClient->getServerStatus();
             $players = $this->apiClient->getPlayers();
+            $trackRotation = $this->apiClient->getTracks();
+            $collectionName = $this->apiClient->getTrackCollectionName();
 
             $serverName = $serverConfig['serverName'] ?? 'Wreckfest Server';
+            $currentTrack = $serverStatus['currentTrack'] ?? null;
+
+            // Get track details for display
+            $trackRotationWithDetails = $this->enrichTracksWithDetails($trackRotation);
 
             return view('home', [
                 'serverName' => $serverName,
@@ -32,6 +39,9 @@ class HomeController extends Controller
                 'players' => $players,
                 'maxPlayers' => $serverConfig['maxPlayers'] ?? 24,
                 'apiError' => false,
+                'currentTrack' => $currentTrack,
+                'trackRotation' => $trackRotationWithDetails,
+                'collectionName' => $collectionName,
             ]);
         } catch (WreckfestApiException $e) {
             return view('home', [
@@ -42,8 +52,49 @@ class HomeController extends Controller
                 'players' => [],
                 'maxPlayers' => 24,
                 'apiError' => true,
+                'currentTrack' => null,
+                'trackRotation' => [],
+                'collectionName' => null,
             ]);
         }
+    }
+
+    /**
+     * Enrich track data with human-readable information from config
+     */
+    private function enrichTracksWithDetails(array $tracks): array
+    {
+        return array_map(function ($track) {
+            $trackId = $track['track'] ?? '';
+            $gamemode = $track['gamemode'] ?? '';
+
+            // Get track details using TrackHelper
+            $trackDetails = TrackHelper::getTrackDetails($trackId);
+
+            return array_merge($track, [
+                'trackName' => $trackDetails['variant'],
+                'locationName' => $trackDetails['location'],
+                'fullTrackName' => $trackDetails['fullName'],
+                'gamemodeName' => $this->getGamemodeName($gamemode),
+            ]);
+        }, $tracks);
+    }
+
+    /**
+     * Get human-readable gamemode name
+     */
+    private function getGamemodeName(string $gamemode): string
+    {
+        $gamemodes = [
+            'racing' => 'Racing',
+            'derby' => 'Derby',
+            'derbydeathmatch' => 'Derby Deathmatch',
+            'teamdeathmatch' => 'Team Deathmatch',
+            'teamrace' => 'Team Race',
+            'eliminationrace' => 'Elimination Race',
+        ];
+
+        return $gamemodes[strtolower($gamemode)] ?? $gamemode;
     }
 
     /**
