@@ -13,14 +13,19 @@ class PlayerList extends Component
 
     public $maxPlayers = 24;
 
+    public bool $ocrEnabled = false;
+
     public function mount(WreckfestApiClient $apiClient)
     {
         try {
             $serverConfig = $apiClient->getServerConfig();
+            $serverStatus = $apiClient->getServerStatus();
             $this->players = $apiClient->getPlayers() ?? [];
             $this->maxPlayers = $serverConfig['maxPlayers'] ?? 24;
+            $this->ocrEnabled = $serverStatus['ocrEnabled'] ?? false;
         } catch (\Exception $e) {
             $this->players = [];
+            $this->ocrEnabled = false;
         }
     }
 

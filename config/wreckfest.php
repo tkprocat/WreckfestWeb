@@ -3,6 +3,7 @@
 return [
     'api_url' => env('WRECKFEST_API_URL', 'https://localhost:5101/api'),
     'ws_url' => env('WRECKFEST_WS_URL', 'wss://localhost:5101/ws'),
+    'ocr_enabled' => env('WRECKFEST_OCR_ENABLED', false),
 
     // Brand colors used across the application (both frontend and admin panel)
     'brand' => [

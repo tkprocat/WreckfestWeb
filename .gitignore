@@ -55,3 +55,4 @@ Thumbs.db
 !/storage/framework/views/.gitkeep
 /storage/logs/*
 !/storage/logs/.gitkeep
+.aider*

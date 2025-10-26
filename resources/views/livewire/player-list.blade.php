@@ -13,12 +13,34 @@
                 @php
                     $isBot = $player['isBot'] ?? false;
                     $playerName = $player['name'] ?? 'Unknown Player';
+                    $playerId = $player['playerId'] ?? null;
+                    $score = $player['score'] ?? null;
+                    $vehicle = $player['vehicle'] ?? null;
                     $displayName = $isBot ? '(BOT) ' . $playerName : $playerName;
                 @endphp
 
                 <div class="bg-black/30 rounded p-4 hover:bg-black/40 transition-colors border-l-4 border-wreckfest shadow-lg">
-                    <div class="flex items-center space-x-3">
-                        <span class="text-white font-bold">{{ $displayName }}</span>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            @if($ocrEnabled && $playerId !== null)
+                                <span class="bg-wreckfest/20 text-wreckfest font-bold px-3 py-1 rounded text-sm border border-wreckfest/30">
+                                    #{{ $playerId }}
+                                </span>
+                            @endif
+                            <span class="text-white font-bold">{{ $displayName }}</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            @if($ocrEnabled && $vehicle !== null)
+                                <span class="text-gray-300 text-sm font-medium">
+                                    🏎️ {{ $vehicle }}
+                                </span>
+                            @endif
+                            @if($ocrEnabled && $score !== null)
+                                <span class="bg-yellow-600/20 text-yellow-400 font-bold px-3 py-1 rounded text-sm border border-yellow-600/30">
+                                    {{ $score }} pts
+                                </span>
+                            @endif
+                        </div>
                     </div>
                 </div>
             @endforeach

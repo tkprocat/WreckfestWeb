@@ -10,14 +10,20 @@ use Livewire\Component;
 class ServerStatus extends Component
 {
     public bool $isRunning = false;
+    public bool $controllerOnline = false;
+    public bool $ocrEnabled = false;
 
     public function mount(WreckfestApiClient $apiClient)
     {
         try {
             $status = $apiClient->getServerStatus();
             $this->isRunning = $status['isRunning'] ?? false;
+            $this->ocrEnabled = $status['ocrEnabled'] ?? false;
+            $this->controllerOnline = true;
         } catch (\Exception $e) {
             $this->isRunning = false;
+            $this->ocrEnabled = false;
+            $this->controllerOnline = false;
         }
     }
 

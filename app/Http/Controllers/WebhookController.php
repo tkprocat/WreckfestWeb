@@ -21,6 +21,9 @@ class WebhookController extends Controller
             'players' => 'required|array',
             'players.*.name' => 'required|string',
             'players.*.isBot' => 'required|boolean',
+            'players.*.playerId' => 'nullable|integer',
+            'players.*.score' => 'nullable|integer',
+            'players.*.vehicle' => 'nullable|string',
         ]);
 
         // Broadcast the event to all connected clients
