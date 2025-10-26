@@ -1,0 +1,12 @@
+@post('/api/Config/{pid}/update?command={action}')   # Assuming action parameter in URL path and body as 'track', etc...
+def update_config(request, pid):   
+     command = request.args['command']      // Get the provided command from url parameters or json payload 
+                                           (assumed to be sent via POST)
+         
+     if not validateCommand(pid, command):   # Validate that this is a valid action and PID exists in our system...   
+         return "Invalid Command", HTTPStatus.BAD_REQUEST      // Return an error response 
+                                                            (assumed to be done by your server's logic)    
+         
+     updateServerConfig(pid, command);   // Update the configuration on Server side using provided action and PID...   
+                                          ((Assuming you have a function `update_server` in place))     
+         return "Success", HTTPStatus.OK  // Return success response if everything is fine.. (assumed to be done by your server's logic)    
