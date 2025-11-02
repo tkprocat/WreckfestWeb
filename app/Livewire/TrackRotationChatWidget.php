@@ -48,14 +48,26 @@ class TrackRotationChatWidget extends Component
             $response = $agent->respond($userMessage);
 
             // Add assistant response
-            $this->messages[] = [
+            $assistantMessage = [
                 'role' => 'assistant',
                 'content' => $response,
                 'timestamp' => now()->toDateTimeString(),
             ];
 
+            $this->messages[] = $assistantMessage;
+
+            // Force Livewire to detect the array change by reassigning
+            $this->messages = array_values($this->messages);
+
             // Save to session
             session(['track_rotation_chat_messages' => $this->messages]);
+
+            // Log for debugging in production
+            logger()->info('AI response added', [
+                'message_count' => count($this->messages),
+                'last_message_role' => $this->messages[count($this->messages) - 1]['role'] ?? 'unknown',
+                'response_length' => strlen($response),
+            ]);
 
             // Check if a new collection was created and auto-select it
             $newCollectionLoaded = $this->checkForNewCollection();
@@ -65,6 +77,11 @@ class TrackRotationChatWidget extends Component
                 $this->dispatch('refresh-track-rotation');
             }
         } catch (\Exception $e) {
+            logger()->error('AI response error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
             Notification::make()
                 ->title('Error')
                 ->body('Failed to get AI response: '.$e->getMessage())
@@ -73,6 +90,7 @@ class TrackRotationChatWidget extends Component
 
             // Remove the user message if there was an error
             array_pop($this->messages);
+            $this->messages = array_values($this->messages);
         }
     }
 
