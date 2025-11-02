@@ -104,7 +104,7 @@ return [
     'mcp_servers' => [
         'wreckfest' => [
             'type' => \Redberry\MCPClient\Enums\Transporters::HTTP,
-            'base_url' => 'http://wreckfestweb.test/mcp/wreckfest', // Use http:// to avoid SSL issues in dev
+            'base_url' => env('APP_URL', '').'/mcp/wreckfest',
             'timeout' => 30,
         ],
         'github' => [
