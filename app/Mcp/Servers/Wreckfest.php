@@ -5,7 +5,9 @@ namespace App\Mcp\Servers;
 use App\Mcp\Tools\AddTracksToCollection;
 use App\Mcp\Tools\CreateTrackCollection;
 use App\Mcp\Tools\DeleteTrackCollection;
+use App\Mcp\Tools\FilterTracksByTags;
 use App\Mcp\Tools\GetTrackCollections;
+use App\Mcp\Tools\ListTags;
 use App\Mcp\Tools\ListTracks;
 use App\Mcp\Tools\RemoveTracksFromCollection;
 use App\Mcp\Tools\UpdateTrackCollection;
@@ -21,12 +23,12 @@ class Wreckfest extends Server
     /**
      * The MCP server's version.
      */
-    protected string $version = '0.0.2';
+    protected string $version = '0.0.3';
 
     /**
      * The MCP server's instructions for the LLM.
      */
-    protected string $instructions = "This server allows you to manage Wreckfest game server track collections. You can list available tracks with detailed metadata, retrieve track collections, create new collections, modify them, and delete them. Available operations: ListTracks (view all tracks), GetTrackCollections (view collections), CreateTrackCollection (create new collection), UpdateTrackCollection (replace all tracks in a collection), AddTracksToCollection (append tracks to a collection), RemoveTracksFromCollection (remove tracks by ID or index), DeleteTrackCollection (permanently delete a collection).";
+    protected string $instructions = "This server allows you to manage Wreckfest game server track collections. You can list available tracks with detailed metadata including tags, retrieve track collections, create new collections, modify them, and delete them. All tracks are tagged with characteristics like surface type (Tarmac, Gravel, Mud), layout (Oval, Figure 8, Circuit), and features (Jump, Stadium, Forest). Available operations: ListTracks (view all tracks with tags), ListTags (view all available tags), FilterTracksByTags (find tracks matching specific tags), GetTrackCollections (view collections), CreateTrackCollection (create new collection), UpdateTrackCollection (replace all tracks in a collection), AddTracksToCollection (append tracks to a collection), RemoveTracksFromCollection (remove tracks by ID or index), DeleteTrackCollection (permanently delete a collection).";
 
     /**
      * The tools registered with this MCP server.
@@ -35,6 +37,8 @@ class Wreckfest extends Server
      */
     protected array $tools = [
         ListTracks::class,
+        ListTags::class,
+        FilterTracksByTags::class,
         GetTrackCollections::class,
         CreateTrackCollection::class,
         UpdateTrackCollection::class,
