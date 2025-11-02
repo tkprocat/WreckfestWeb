@@ -39,8 +39,9 @@ class FilterTracksByTags extends Tool
             // Match ALL tags (AND logic)
             foreach ($tagNames as $tagName) {
                 $query->whereHas('tags', function ($q) use ($tagName) {
-                    $q->where('name', 'LIKE', $tagName)
-                      ->orWhere('slug', 'LIKE', strtolower(str_replace(' ', '-', $tagName)));
+                    $normalizedTag = $this->normalizeTagName($tagName);
+                    $q->where('name', 'LIKE', "%{$normalizedTag}%")
+                      ->orWhere('slug', 'LIKE', "%{$normalizedTag}%");
                 });
             }
         } else {
@@ -48,8 +49,9 @@ class FilterTracksByTags extends Tool
             $query->whereHas('tags', function ($q) use ($tagNames) {
                 $q->where(function($subQuery) use ($tagNames) {
                     foreach ($tagNames as $tagName) {
-                        $subQuery->orWhere('name', 'LIKE', $tagName)
-                                ->orWhere('slug', 'LIKE', strtolower(str_replace(' ', '-', $tagName)));
+                        $normalizedTag = $this->normalizeTagName($tagName);
+                        $subQuery->orWhere('name', 'LIKE', "%{$normalizedTag}%")
+                                ->orWhere('slug', 'LIKE', "%{$normalizedTag}%");
                     }
                 });
             });
@@ -100,6 +102,25 @@ class FilterTracksByTags extends Tool
     }
 
     /**
+     * Normalize tag name for flexible matching
+     * Handles plurals, case, and common variations
+     */
+    protected function normalizeTagName(string $tagName): string
+    {
+        // Convert to lowercase for case-insensitive matching
+        $normalized = strtolower(trim($tagName));
+
+        // Remove common plural suffixes to match singular forms
+        // "bumps" -> "bump", "jumps" -> "jump", etc.
+        $normalized = preg_replace('/s$/', '', $normalized);
+
+        // Handle "es" plurals: "intersections" -> "intersection"
+        $normalized = preg_replace('/es$/', '', $normalized);
+
+        return $normalized;
+    }
+
+    /**
      * Get the tool's input schema.
      *
      * @return array<string, \Illuminate\JsonSchema\JsonSchema>
@@ -109,7 +130,7 @@ class FilterTracksByTags extends Tool
         return [
             'tags' => $schema->array()
                 ->items($schema->string())
-                ->description('Array of tag names to filter by (e.g., ["Oval", "Tarmac"]). Case-insensitive.'),
+                ->description('Array of tag names to filter by (e.g., ["Oval", "Tarmac"]). Case-insensitive and handles plurals (e.g., "bumps" matches "Bump").'),
             'match_all' => $schema->boolean()
                 ->description('If true (default), tracks must have ALL specified tags. If false, tracks with ANY of the tags will be returned.'),
         ];
