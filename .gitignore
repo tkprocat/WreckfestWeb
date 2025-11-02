@@ -56,3 +56,10 @@ Thumbs.db
 /storage/logs/*
 !/storage/logs/.gitkeep
 .aider*
+
+# Deployment and certificates
+cacert.pem
+deploy.php
+
+# Claude Code settings (may contain sensitive approved commands)
+.claude/settings.local.json

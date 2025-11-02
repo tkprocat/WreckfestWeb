@@ -38,9 +38,9 @@ class ManageCollections extends Page implements HasTable
                     ->label('Collection Name')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('tracks')
+                TextColumn::make('tracks_count')
                     ->label('Number of Tracks')
-                    ->formatStateUsing(fn ($state) => is_array($state) ? count($state) : 0)
+                    ->getStateUsing(fn ($record) => count($record->tracks))
                     ->sortable(query: function ($query, $direction) {
                         return $query->orderByRaw('JSON_LENGTH(tracks) '.$direction);
                     }),
@@ -55,6 +55,7 @@ class ManageCollections extends Page implements HasTable
             ])
             ->actions([
                 EditAction::make()
+                    ->label('Rename')
                     ->schema([
                         TextInput::make('name')
                             ->label('Collection Name')

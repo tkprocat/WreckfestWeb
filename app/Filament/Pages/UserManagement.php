@@ -8,6 +8,8 @@ use App\Models\User;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -16,6 +18,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
 class UserManagement extends Page implements HasTable
@@ -41,12 +44,70 @@ class UserManagement extends Page implements HasTable
                 TextColumn::make('email')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('email_verified_at')
+                    ->label('Verified')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->label('Joined')
                     ->dateTime()
                     ->sortable(),
+                TextColumn::make('updated_at')
+                    ->label('Updated')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->actions([
+                ViewAction::make()
+                    ->schema([
+                        TextInput::make('name')
+                            ->disabled(),
+                        TextInput::make('email')
+                            ->disabled(),
+                        TextInput::make('email_verified_at')
+                            ->label('Email Verified At')
+                            ->disabled(),
+                        TextInput::make('created_at')
+                            ->label('Created At')
+                            ->disabled(),
+                    ]),
+                EditAction::make()
+                    ->schema([
+                        TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->unique(User::class, 'email', ignoreRecord: true)
+                            ->maxLength(255),
+                        TextInput::make('password')
+                            ->password()
+                            ->dehydrated(fn ($state) => filled($state))
+                            ->revealable()
+                            ->confirmed()
+                            ->minLength(8)
+                            ->maxLength(255)
+                            ->helperText('Leave blank to keep current password'),
+                        TextInput::make('password_confirmation')
+                            ->password()
+                            ->dehydrated(false)
+                            ->revealable()
+                            ->maxLength(255),
+                    ])
+                    ->mutateRecordDataUsing(function (array $data): array {
+                        // Hash password if provided
+                        if (!empty($data['password'])) {
+                            $data['password'] = Hash::make($data['password']);
+                        } else {
+                            unset($data['password']);
+                        }
+                        unset($data['password_confirmation']);
+
+                        return $data;
+                    }),
                 DeleteAction::make()
                     ->requiresConfirmation()
                     ->visible(fn (User $record) => $record->id !== Auth::id()),
@@ -56,6 +117,47 @@ class UserManagement extends Page implements HasTable
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('createUser')
+                ->label('New User')
+                ->icon('heroicon-o-user-plus')
+                ->schema([
+                    TextInput::make('name')
+                        ->required()
+                        ->maxLength(255),
+                    TextInput::make('email')
+                        ->email()
+                        ->required()
+                        ->unique(User::class, 'email')
+                        ->maxLength(255),
+                    TextInput::make('password')
+                        ->password()
+                        ->required()
+                        ->revealable()
+                        ->confirmed()
+                        ->minLength(8)
+                        ->maxLength(255),
+                    TextInput::make('password_confirmation')
+                        ->password()
+                        ->required()
+                        ->dehydrated(false)
+                        ->revealable()
+                        ->maxLength(255),
+                ])
+                ->action(function (array $data): void {
+                    User::create([
+                        'name' => $data['name'],
+                        'email' => $data['email'],
+                        'password' => Hash::make($data['password']),
+                        'email_verified_at' => now(), // Auto-verify manually created users
+                    ]);
+
+                    Notification::make()
+                        ->title('User created')
+                        ->body("User {$data['name']} has been created successfully.")
+                        ->success()
+                        ->send();
+                })
+                ->color('primary'),
             Action::make('sendInvite')
                 ->label('Send Invitation')
                 ->icon('heroicon-o-envelope')

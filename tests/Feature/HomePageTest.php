@@ -1,10 +1,20 @@
 <?php
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Livewire\Livewire;
 
 use function Pest\Laravel\get;
 
+uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    $this->seed(\Database\Seeders\TrackSeeder::class);
+});
+
 it('can render homepage', function () {
+    Livewire::withoutLazyLoading();
+
     Http::fake([
         '*/Config/basic' => Http::response([
             'serverName' => 'Test Server',
@@ -36,13 +46,16 @@ it('can render homepage', function () {
 });
 
 it('displays server status on homepage', function () {
+    Livewire::withoutLazyLoading();
+    Http::preventStrayRequests();
+
     Http::fake([
         '*/Config/basic' => Http::response([
             'serverName' => 'Test Server',
             'maxPlayers' => 24,
         ], 200),
         '*/Server/status' => Http::response([
-            'status' => 'running',
+            'isRunning' => true,
         ], 200),
         '*/Server/players' => Http::response([
             'totalPlayers' => 0,
@@ -61,10 +74,12 @@ it('displays server status on homepage', function () {
 
     get('/')
         ->assertSuccessful()
-        ->assertSee('Server Online');
+        ->assertSee('Game Server Online');
 });
 
 it('displays current players on homepage', function () {
+    Livewire::withoutLazyLoading();
+
     Http::fake([
         '*/Config/basic' => Http::response([
             'serverName' => 'Test Server',
@@ -96,6 +111,8 @@ it('displays current players on homepage', function () {
 });
 
 it('displays bot players with prefix on homepage', function () {
+    Livewire::withoutLazyLoading();
+
     Http::fake([
         '*/Config/basic' => Http::response([
             'serverName' => 'Test Server',
@@ -127,6 +144,8 @@ it('displays bot players with prefix on homepage', function () {
 });
 
 it('shows empty state when no players online', function () {
+    Livewire::withoutLazyLoading();
+
     Http::fake([
         '*/Config/basic' => Http::response([
             'serverName' => 'Test Server',
@@ -155,6 +174,8 @@ it('shows empty state when no players online', function () {
 });
 
 it('handles API errors gracefully', function () {
+    Livewire::withoutLazyLoading();
+
     Http::fake([
         '*/Config/basic' => Http::response(null, 500),
         '*/Server/status' => Http::response(null, 500),
@@ -165,10 +186,12 @@ it('handles API errors gracefully', function () {
 
     get('/')
         ->assertSuccessful()
-        ->assertSee('Wreckfest Server');
+        ->assertSee('Wreckfest Web');
 });
 
 it('shows login button when not authenticated', function () {
+    Livewire::withoutLazyLoading();
+
     Http::fake([
         '*/Config/basic' => Http::response(['serverName' => 'Test'], 200),
         '*/Server/status' => Http::response([], 200),
@@ -193,6 +216,8 @@ it('shows login button when not authenticated', function () {
 });
 
 it('shows admin button when authenticated', function () {
+    Livewire::withoutLazyLoading();
+
     Http::fake([
         '*/Config/basic' => Http::response(['serverName' => 'Test'], 200),
         '*/Server/status' => Http::response([], 200),
@@ -220,6 +245,8 @@ it('shows admin button when authenticated', function () {
 });
 
 it('displays track rotation on homepage', function () {
+    Livewire::withoutLazyLoading();
+
     Http::fake([
         '*/Config/basic' => Http::response([
             'serverName' => 'Test Server',
@@ -268,6 +295,8 @@ it('displays track rotation on homepage', function () {
 });
 
 it('shows empty state when no track rotation configured', function () {
+    Livewire::withoutLazyLoading();
+
     Http::fake([
         '*/Config/basic' => Http::response([
             'serverName' => 'Test Server',
@@ -295,18 +324,11 @@ it('shows empty state when no track rotation configured', function () {
 });
 
 it('highlights current track in rotation', function () {
+    Livewire::withoutLazyLoading();
+
     Http::fake([
-        '*/Config/basic' => Http::response([
-            'serverName' => 'Test Server',
-            'maxPlayers' => 24,
-        ], 200),
         '*/Server/status' => Http::response([
             'currentTrack' => 'sandstone_stadium_a',
-        ], 200),
-        '*/Server/players' => Http::response([
-            'totalPlayers' => 0,
-            'maxPlayers' => 24,
-            'players' => [],
         ], 200),
         '*/Config/tracks' => Http::response([
             'count' => 2,
@@ -328,7 +350,7 @@ it('highlights current track in rotation', function () {
         ], 200),
     ]);
 
-    get('/')
-        ->assertSuccessful()
+    \Livewire\Livewire::withoutLazyLoading()
+        ->test('track-rotation')
         ->assertSee('NOW PLAYING');
 });

@@ -1,4 +1,10 @@
-<x-filament-panels::page>
+<x-filament-panels::page
+    x-data
+    @track-list-updated.window="$wire.$refresh()"
+>
+    <!-- AI Chat Widget -->
+    @livewire('track-rotation-chat-widget')
+
     <div class="mb-4"
         x-data="{
             originalTracks: null,
@@ -32,13 +38,28 @@
                 this.originalTracks = await @this.get('data.tracks');
             }
         }"
-        @collection-loaded.window="originalTracks = $event.detail.tracks"
+        @collection-loaded.window="async (event) => {
+            // Update the dropdown to reflect the newly loaded collection
+            await new Promise(resolve => setTimeout(resolve, 100));
+            const collectionId = await @this.get('currentCollectionId');
+            $refs.collectionSelect.value = collectionId || '';
+
+            // Update the baseline for comparison
+            originalTracks = await @this.get('data.tracks');
+        }"
         @collection-saved.window="originalTracks = $event.detail.tracks"
+        @refresh-track-rotation.window="async () => {
+            // Reload the currently selected collection
+            if (@js($this->currentCollectionId)) {
+                await @this.call('loadCollectionById', @js($this->currentCollectionId));
+            }
+        }"
     >
         <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
             Working on:
         </label>
         <select
+            x-ref="collectionSelect"
             @change="confirmSwitch($event)"
             value="{{ $this->currentCollectionId }}"
             class="mt-1 block w-full max-w-md rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500"

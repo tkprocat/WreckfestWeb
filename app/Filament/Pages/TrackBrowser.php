@@ -2,10 +2,13 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\Tag;
+use App\Models\TrackVariant;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Collection;
@@ -94,39 +97,32 @@ class TrackBrowser extends Page implements HasForms
 
     protected function getFilteredTracks(): Collection
     {
-        $trackLocations = config('wreckfest.tracks', []);
+        $variants = TrackVariant::with(['track', 'tags'])->get();
         $allTracks = collect();
 
-        foreach ($trackLocations as $locationKey => $location) {
-            $locationName = $location['name'] ?? $locationKey;
-            $variants = $location['variants'] ?? [];
-            $locationWeather = $location['weather'] ?? null;
+        foreach ($variants as $variant) {
+            // Get supported weather for this variant
+            $supportedWeather = $variant->weather_conditions ?? array_keys(config('wreckfest.weather_conditions', []));
 
-            foreach ($variants as $variantId => $variant) {
-                $variantName = is_array($variant) ? ($variant['name'] ?? $variantId) : $variant;
-                $isDerby = is_array($variant) ? ($variant['derby'] ?? false) : false;
+            // Get compatible game modes
+            $compatibleGamemodes = $variant->game_mode === 'Derby'
+                ? config('wreckfest.derby_gamemodes', [])
+                : config('wreckfest.racing_gamemodes', []);
 
-                // Get supported weather for this variant
-                $supportedWeather = $locationWeather ?? array_keys(config('wreckfest.weather_conditions', []));
+            $track = (object) [
+                'id' => $variant->id,
+                'location' => $variant->track->name,
+                'variant' => $variant->name,
+                'variant_id' => $variant->variant_id,
+                'derby' => $variant->game_mode === 'Derby',
+                'weather' => $supportedWeather,
+                'compatible_gamemodes' => $compatibleGamemodes,
+                'tags' => $variant->tags,
+            ];
 
-                // Get compatible game modes
-                $compatibleGamemodes = $isDerby
-                    ? config('wreckfest.derby_gamemodes', [])
-                    : config('wreckfest.racing_gamemodes', []);
-
-                $track = (object) [
-                    'location' => $locationName,
-                    'variant' => $variantName,
-                    'variant_id' => $variantId,
-                    'derby' => $isDerby,
-                    'weather' => $supportedWeather,
-                    'compatible_gamemodes' => $compatibleGamemodes,
-                ];
-
-                // Apply filters
-                if ($this->shouldIncludeTrack($track)) {
-                    $allTracks->push($track);
-                }
+            // Apply filters
+            if ($this->shouldIncludeTrack($track)) {
+                $allTracks->push($track);
             }
         }
 
@@ -187,5 +183,22 @@ class TrackBrowser extends Page implements HasForms
         }
 
         return true;
+    }
+
+    public function updateTags(int $variantId, array $tagIds): void
+    {
+        $variant = TrackVariant::findOrFail($variantId);
+        $variant->tags()->sync($tagIds);
+
+        Notification::make()
+            ->title('Tags updated')
+            ->body("Updated tags for {$variant->full_name}")
+            ->success()
+            ->send();
+    }
+
+    public function getAvailableTagsProperty(): Collection
+    {
+        return Tag::orderBy('name')->get();
     }
 }

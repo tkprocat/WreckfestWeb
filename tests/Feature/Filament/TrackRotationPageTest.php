@@ -2,11 +2,15 @@
 
 use App\Filament\Pages\TrackRotation;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 
 use function Pest\Laravel\actingAs;
 
+uses(RefreshDatabase::class);
+
 beforeEach(function () {
+    $this->seed(\Database\Seeders\TrackSeeder::class);
     $this->user = User::factory()->create();
 });
 
