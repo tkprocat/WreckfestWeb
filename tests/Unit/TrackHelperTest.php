@@ -1,6 +1,13 @@
 <?php
 
 use App\Helpers\TrackHelper;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    $this->seed(\Database\Seeders\TrackSeeder::class);
+});
 
 it('identifies derby gamemodes correctly', function () {
     expect(TrackHelper::isDerbyGamemode('derby'))->toBeTrue();

@@ -51,21 +51,14 @@ class ServerConfig extends Page implements HasForms
 
     protected function getAllTracks(): array
     {
-        $trackLocations = config('wreckfest.tracks', []);
+        $variants = \App\Models\TrackVariant::with('track')->get();
         $allTracks = [];
 
-        foreach ($trackLocations as $locationKey => $location) {
-            $locationName = $location['name'] ?? $locationKey;
-            $variants = $location['variants'] ?? [];
-
-            foreach ($variants as $variantId => $variant) {
-                $variantName = is_array($variant) ? ($variant['name'] ?? $variantId) : $variant;
-                $allTracks[$variantId] = $locationName.' - '.$variantName;
-            }
+        foreach ($variants as $variant) {
+            $allTracks[$variant->variant_id] = $variant->full_name;
         }
 
-        // Filter out any null or empty values to satisfy Filament 4's stricter Select validation
-        return array_filter($allTracks, fn ($value) => is_string($value) && $value !== '');
+        return $allTracks;
     }
 
     public function form(Schema $schema): Schema

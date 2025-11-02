@@ -56,3 +56,7 @@ Thumbs.db
 /storage/logs/*
 !/storage/logs/.gitkeep
 .aider*
+
+# Deployment and certificates
+cacert.pem
+deploy.php

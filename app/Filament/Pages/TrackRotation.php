@@ -19,6 +19,7 @@ use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Livewire\Attributes\On;
 
 class TrackRotation extends Page implements HasForms
 {
@@ -52,7 +53,7 @@ class TrackRotation extends Page implements HasForms
         $this->loadCollectionById($value);
     }
 
-    public function loadCollectionById(int $id): void
+    public function loadCollectionById(int $id, bool $skipNotification = false): void
     {
         $collection = TrackCollection::find($id);
 
@@ -61,16 +62,58 @@ class TrackRotation extends Page implements HasForms
             $this->currentCollectionName = $collection->name;
             session(['track_rotation.current_collection_id' => $collection->id]);
 
-            $this->form->fill(['tracks' => $collection->tracks]);
+            // Update the track list
+            $this->updateTrackList($collection->tracks);
 
-            $this->dispatch('collection-loaded', tracks: $collection->tracks);
-
-            Notification::make()
-                ->title('Collection loaded')
-                ->body("Working on: {$collection->name}")
-                ->success()
-                ->send();
+            // Only send notification if not skipped (to avoid duplicates from AI widget)
+            if (!$skipNotification) {
+                Notification::make()
+                    ->title('Collection loaded')
+                    ->body("Working on: {$collection->name}")
+                    ->success()
+                    ->send();
+            }
         }
+    }
+
+    /**
+     * Update the track list and force a re-render
+     */
+    public function updateTrackList(array $tracks): void
+    {
+        // Directly update the data property that the form is bound to
+        $this->data['tracks'] = $tracks;
+
+        // Also fill the form to ensure Filament's state is synced
+        $this->form->fill(['tracks' => $tracks]);
+
+        // Dispatch event for frontend listeners
+        $this->dispatch('collection-loaded', tracks: $tracks);
+    }
+
+    #[On('refresh-track-rotation')]
+    public function refreshFromAI(): void
+    {
+        // Reload the current collection if one is selected
+        if ($this->currentCollectionId) {
+            $this->loadCollectionById($this->currentCollectionId);
+        }
+    }
+
+    #[On('load-collection')]
+    public function loadCollectionFromAI(int $collectionId): void
+    {
+        logger()->info('TrackRotation: Received load-collection event', [
+            'collection_id' => $collectionId,
+            'current_id' => $this->currentCollectionId
+        ]);
+
+        $this->loadCollectionById($collectionId, $skipNotification = true);
+
+        logger()->info('TrackRotation: After loadCollectionById', [
+            'new_current_id' => $this->currentCollectionId,
+            'data_tracks_count' => count($this->data['tracks'] ?? [])
+        ]);
     }
 
     public function loadFromServer(): void
@@ -150,21 +193,14 @@ class TrackRotation extends Page implements HasForms
 
     protected function getAllTracks(): array
     {
-        $trackLocations = config('wreckfest.tracks', []);
+        $variants = \App\Models\TrackVariant::with('track')->get();
         $allTracks = [];
 
-        foreach ($trackLocations as $locationKey => $location) {
-            $locationName = $location['name'] ?? $locationKey;
-            $variants = $location['variants'] ?? [];
-
-            foreach ($variants as $variantId => $variant) {
-                $variantName = is_array($variant) ? ($variant['name'] ?? $variantId) : $variant;
-                $allTracks[$variantId] = $locationName.' - '.$variantName;
-            }
+        foreach ($variants as $variant) {
+            $allTracks[$variant->variant_id] = $variant->full_name;
         }
 
-        // Filter out any null or empty values to satisfy Filament 4's stricter Select validation
-        return array_filter($allTracks, fn ($value) => is_string($value) && $value !== '');
+        return $allTracks;
     }
 
     public function form(Schema $schema): Schema

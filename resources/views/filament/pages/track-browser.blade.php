@@ -87,7 +87,7 @@
                             </div>
 
                             <!-- Game Modes -->
-                            <div>
+                            <div class="mb-2">
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Game Modes:</p>
                                 <div class="flex flex-wrap gap-1">
                                     @foreach($track->compatible_gamemodes as $gamemode)
@@ -95,6 +95,57 @@
                                             {{ config("wreckfest.gamemodes.$gamemode", ucfirst($gamemode)) }}
                                         </span>
                                     @endforeach
+                                </div>
+                            </div>
+
+                            <!-- Tags -->
+                            <div x-data="{ editing: false, selectedTags: {{ json_encode($track->tags->pluck('id')->toArray()) }} }">
+                                <div class="flex items-center justify-between mb-1">
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Tags:</p>
+                                    <button
+                                        @click="editing = !editing"
+                                        class="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
+                                        type="button"
+                                    >
+                                        <span x-show="!editing">Edit</span>
+                                        <span x-show="editing">Done</span>
+                                    </button>
+                                </div>
+
+                                <!-- Display Mode -->
+                                <div x-show="!editing" class="flex flex-wrap gap-1 min-h-[24px]">
+                                    @forelse($track->tags as $tag)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200"
+                                              style="background-color: {{ $tag->color ? $tag->color.'20' : '' }}; color: {{ $tag->color ?? '' }};">
+                                            {{ $tag->name }}
+                                        </span>
+                                    @empty
+                                        <span class="text-xs text-gray-400 dark:text-gray-600 italic">No tags</span>
+                                    @endforelse
+                                </div>
+
+                                <!-- Edit Mode -->
+                                <div x-show="editing" class="space-y-2">
+                                    <div class="max-h-32 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-md p-2 space-y-1">
+                                        @foreach($this->availableTags as $tag)
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-1 rounded">
+                                                <input
+                                                    type="checkbox"
+                                                    value="{{ $tag->id }}"
+                                                    x-model="selectedTags"
+                                                    class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500"
+                                                >
+                                                <span class="text-gray-700 dark:text-gray-300">{{ $tag->name }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                    <button
+                                        @click="$wire.updateTags({{ $track->id }}, selectedTags); editing = false;"
+                                        class="w-full px-3 py-1.5 text-xs font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md"
+                                        type="button"
+                                    >
+                                        Save Tags
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -173,6 +224,9 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 Compatible Game Modes
                             </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                Tags
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
@@ -224,10 +278,65 @@
                                         @endforeach
                                     </div>
                                 </td>
+                                <td class="px-6 py-4 text-sm">
+                                    <div x-data="{ editing: false, selectedTags: {{ json_encode($track->tags->pluck('id')->toArray()) }} }">
+                                        <!-- Display Mode -->
+                                        <div x-show="!editing" class="flex flex-wrap gap-1 items-center min-h-[28px]">
+                                            @forelse($track->tags as $tag)
+                                                <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200"
+                                                      style="background-color: {{ $tag->color ? $tag->color.'20' : '' }}; color: {{ $tag->color ?? '' }};">
+                                                    {{ $tag->name }}
+                                                </span>
+                                            @empty
+                                                <span class="text-xs text-gray-400 dark:text-gray-600 italic">No tags</span>
+                                            @endforelse
+                                            <button
+                                                @click="editing = true"
+                                                class="ml-2 text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
+                                                type="button"
+                                            >
+                                                Edit
+                                            </button>
+                                        </div>
+
+                                        <!-- Edit Mode -->
+                                        <div x-show="editing" class="space-y-2">
+                                            <div class="max-h-40 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-md p-2 space-y-1 bg-white dark:bg-gray-800">
+                                                @foreach($this->availableTags as $tag)
+                                                    <label class="flex items-center gap-2 text-xs cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded">
+                                                        <input
+                                                            type="checkbox"
+                                                            value="{{ $tag->id }}"
+                                                            x-model="selectedTags"
+                                                            class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500"
+                                                        >
+                                                        <span class="text-gray-700 dark:text-gray-300">{{ $tag->name }}</span>
+                                                    </label>
+                                                @endforeach
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <button
+                                                    @click="$wire.updateTags({{ $track->id }}, selectedTags); editing = false;"
+                                                    class="px-3 py-1 text-xs font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md"
+                                                    type="button"
+                                                >
+                                                    Save
+                                                </button>
+                                                <button
+                                                    @click="editing = false; selectedTags = {{ json_encode($track->tags->pluck('id')->toArray()) }}"
+                                                    class="px-3 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md"
+                                                    type="button"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                <td colspan="7" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                                     <div class="flex flex-col items-center space-y-2">
                                         <x-filament::icon
                                             icon="heroicon-o-magnifying-glass"
