@@ -83,7 +83,7 @@
             @forelse($messages as $msg)
                 <div class="flex {{ $msg['role'] === 'user' ? 'justify-end' : 'justify-start' }}">
                     <div class="max-w-[80%]">
-                        <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm">
+                        <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                             <div class="text-sm whitespace-pre-wrap">{{ $msg['content'] }}</div>
                         </div>
                         <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 {{ $msg['role'] === 'user' ? 'text-right' : 'text-left' }}">
@@ -106,7 +106,7 @@
             <!-- Pending user message (shown immediately before backend processes) -->
             <div x-show="pendingMessage" class="flex justify-end">
                 <div class="max-w-[80%]">
-                    <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm">
+                    <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                         <div class="text-sm whitespace-pre-wrap" x-text="pendingMessage"></div>
                     </div>
                     <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 text-right">
@@ -116,20 +116,18 @@
             </div>
 
             <!-- Loading indicator -->
-            @if($isLoading)
-                <div class="flex justify-start">
-                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm">
-                        <div class="flex items-center gap-2">
-                            <div class="flex gap-1">
-                                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-                                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-                                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
-                            </div>
-                            <span class="text-xs text-gray-500">AI is thinking...</span>
+            <div wire:loading wire:target="sendMessage" class="flex justify-start">
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
+                    <div class="flex items-center gap-2">
+                        <div class="flex gap-1">
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
                         </div>
+                        <span class="text-xs text-gray-500">AI is thinking...</span>
                     </div>
                 </div>
-            @endif
+            </div>
         </div>
 
         <!-- Input Area -->
@@ -156,23 +154,22 @@
                     type="text"
                     placeholder="Ask about tracks, collections..."
                     class="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                    :disabled="$wire.isLoading"
+                    wire:loading.attr="disabled"
+                    wire:target="sendMessage"
                 />
                 <button
                     type="submit"
                     class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                    :disabled="$wire.isLoading"
+                    wire:loading.attr="disabled"
+                    wire:target="sendMessage"
                 >
-                    @if($isLoading)
-                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                    @else
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                        </svg>
-                    @endif
+                    <svg wire:loading.remove wire:target="sendMessage" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                    <svg wire:loading wire:target="sendMessage" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
                 </button>
             </form>
         </div>

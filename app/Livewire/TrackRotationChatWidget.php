@@ -12,8 +12,6 @@ class TrackRotationChatWidget extends Component
 
     public array $messages = [];
 
-    public bool $isLoading = false;
-
     public bool $isMinimized = false;
 
     public function mount(): void
@@ -27,19 +25,6 @@ class TrackRotationChatWidget extends Component
             return;
         }
 
-        // Disable output buffering for streaming to work properly in production
-        if (function_exists('apache_setenv')) {
-            @apache_setenv('no-gzip', '1');
-        }
-        @ini_set('output_buffering', 'off');
-        @ini_set('zlib.output_compression', 0);
-
-        // Send headers to disable proxy buffering (nginx, HAProxy, etc.)
-        if (!headers_sent()) {
-            header('X-Accel-Buffering: no'); // Disable nginx buffering
-            header('Cache-Control: no-cache'); // Disable caching
-        }
-
         // Store user message
         $userMessage = $this->message;
 
@@ -50,52 +35,26 @@ class TrackRotationChatWidget extends Component
             'timestamp' => now()->toDateTimeString(),
         ];
 
-        // Clear input and set loading state
+        // Clear input
         $this->message = '';
-        $this->isLoading = true;
 
-        // Save messages to session so user message persists
+        // Save messages to session
         session(['track_rotation_chat_messages' => $this->messages]);
 
-        // Force Livewire to update the DOM and show the user message before AI responds
-        $this->dispatch('message-sending');
-        $this->stream(to: 'messages', content: $this->messages, replace: true);
-
         try {
-            // Get AI response using streaming
+            // Get AI response - this will block until complete
             $chatKey = session()->getId();
             $agent = new TrackCollectionAgent($chatKey);
+            $response = $agent->respond($userMessage);
 
-            // Add empty assistant message placeholder
-            $assistantMessageIndex = count($this->messages);
+            // Add assistant response
             $this->messages[] = [
                 'role' => 'assistant',
-                'content' => '',
+                'content' => $response,
                 'timestamp' => now()->toDateTimeString(),
             ];
 
-            // Stream the response
-            $fullResponse = '';
-            $stream = $agent->respondStreamed($userMessage);
-
-            foreach ($stream as $chunk) {
-                // Skip tool call messages
-                if ($chunk instanceof \LarAgent\Messages\ToolCallMessage) {
-                    continue;
-                }
-
-                // Get the new chunk content
-                $newChunk = $chunk->getLastChunk();
-                $fullResponse .= $newChunk;
-
-                // Update the assistant message
-                $this->messages[$assistantMessageIndex]['content'] = $fullResponse;
-
-                // Stream to frontend
-                $this->stream(to: 'messages', content: $this->messages, replace: true);
-            }
-
-            // Save final state to session
+            // Save to session
             session(['track_rotation_chat_messages' => $this->messages]);
 
             // Check if a new collection was created and auto-select it
@@ -114,8 +73,6 @@ class TrackRotationChatWidget extends Component
 
             // Remove the user message if there was an error
             array_pop($this->messages);
-        } finally {
-            $this->isLoading = false;
         }
     }
 
