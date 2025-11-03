@@ -127,18 +127,17 @@ class UpdateTrackMetadata extends Tool
             'track_ids' => $schema->array()
                 ->items($schema->string())
                 ->description('Optional: Array of track IDs to update. If not provided, all tracks in the collection will be updated.'),
-            'metadata' => $schema->object()
-                ->properties([
-                    'laps' => $schema->integer()->description('Number of laps for the race'),
-                    'gamemode' => $schema->string()->description('Game mode (e.g., "racing", "derby")'),
-                    'bots' => $schema->integer()->description('Number of AI bots'),
-                    'numTeams' => $schema->integer()->description('Number of teams'),
-                    'carResetDisabled' => $schema->boolean()->description('Whether car reset is disabled'),
-                    'wrongWayLimiterDisabled' => $schema->boolean()->description('Whether wrong way limiter is disabled'),
-                    'carClassRestriction' => $schema->string()->description('Car class restriction'),
-                    'carRestriction' => $schema->string()->description('Specific car restriction'),
-                    'weather' => $schema->string()->description('Weather setting'),
-                ])
+            'metadata' => $schema->object(fn($s) => [
+                'laps' => $s->integer()->description('Number of laps for the race'),
+                'gamemode' => $s->string()->description('Game mode (e.g., "racing", "derby")'),
+                'bots' => $s->integer()->description('Number of AI bots'),
+                'numTeams' => $s->integer()->description('Number of teams'),
+                'carResetDisabled' => $s->boolean()->description('Whether car reset is disabled'),
+                'wrongWayLimiterDisabled' => $s->boolean()->description('Whether wrong way limiter is disabled'),
+                'carClassRestriction' => $s->string()->description('Car class restriction'),
+                'carRestriction' => $s->string()->description('Specific car restriction'),
+                'weather' => $s->string()->description('Weather setting'),
+            ])
                 ->description('Metadata fields to update. Provide only the fields you want to change.'),
         ];
     }
