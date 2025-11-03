@@ -5,12 +5,19 @@ namespace App\Mcp\Servers;
 use App\Mcp\Tools\AddTracksToCollection;
 use App\Mcp\Tools\CreateTrackCollection;
 use App\Mcp\Tools\DeleteTrackCollection;
+use App\Mcp\Tools\DuplicateTrackCollection;
 use App\Mcp\Tools\FilterTracksByTags;
+use App\Mcp\Tools\GetCollectionStatistics;
 use App\Mcp\Tools\GetTrackCollections;
 use App\Mcp\Tools\ListTags;
 use App\Mcp\Tools\ListTracks;
 use App\Mcp\Tools\RemoveTracksFromCollection;
+use App\Mcp\Tools\RenameTrackCollection;
+use App\Mcp\Tools\ReorderTracksInCollection;
+use App\Mcp\Tools\ShuffleTracksInCollection;
 use App\Mcp\Tools\UpdateTrackCollection;
+use App\Mcp\Tools\UpdateTrackMetadata;
+use App\Mcp\Tools\ValidateTrackCollection;
 use Laravel\Mcp\Server;
 
 class Wreckfest extends Server
@@ -23,12 +30,12 @@ class Wreckfest extends Server
     /**
      * The MCP server's version.
      */
-    protected string $version = '0.0.3';
+    protected string $version = '0.0.5';
 
     /**
      * The MCP server's instructions for the LLM.
      */
-    protected string $instructions = "This server allows you to manage Wreckfest game server track collections. You can list available tracks with detailed metadata including tags, retrieve track collections, create new collections, modify them, and delete them. All tracks are tagged with characteristics like surface type (Tarmac, Gravel, Mud), layout (Oval, Figure 8, Circuit), and features (Jump, Stadium, Forest). Available operations: ListTracks (view all tracks with tags), ListTags (view all available tags), FilterTracksByTags (find tracks matching specific tags), GetTrackCollections (view collections), CreateTrackCollection (create new collection), UpdateTrackCollection (replace all tracks in a collection), AddTracksToCollection (append tracks to a collection), RemoveTracksFromCollection (remove tracks by ID or index), DeleteTrackCollection (permanently delete a collection).";
+    protected string $instructions = "This server allows you to manage Wreckfest game server track collections comprehensively. DISCOVERY: ListTracks (view all tracks with metadata and tags), ListTags (view all available tags), FilterTracksByTags (find tracks by characteristics like Oval, Tarmac, Stadium). COLLECTION MANAGEMENT: GetTrackCollections (view collections), CreateTrackCollection (create new), DuplicateTrackCollection (copy existing), RenameTrackCollection (rename), DeleteTrackCollection (delete). TRACK MANIPULATION: UpdateTrackCollection (replace all tracks), AddTracksToCollection (append tracks), RemoveTracksFromCollection (remove by ID or index), ReorderTracksInCollection (move tracks to specific positions), ShuffleTracksInCollection (randomize order). METADATA & VALIDATION: UpdateTrackMetadata (set laps, gamemode, bots, weather, etc.), ValidateTrackCollection (check compatibility issues), GetCollectionStatistics (analyze variety and distribution).";
 
     /**
      * The tools registered with this MCP server.
@@ -36,15 +43,29 @@ class Wreckfest extends Server
      * @var array<int, class-string<\Laravel\Mcp\Server\Tool>>
      */
     protected array $tools = [
+        // Discovery & Search
         ListTracks::class,
         ListTags::class,
         FilterTracksByTags::class,
+
+        // Collection Management
         GetTrackCollections::class,
         CreateTrackCollection::class,
+        DuplicateTrackCollection::class,
+        RenameTrackCollection::class,
+        DeleteTrackCollection::class,
+
+        // Track Manipulation
         UpdateTrackCollection::class,
         AddTracksToCollection::class,
         RemoveTracksFromCollection::class,
-        DeleteTrackCollection::class,
+        ReorderTracksInCollection::class,
+        ShuffleTracksInCollection::class,
+
+        // Metadata & Validation
+        UpdateTrackMetadata::class,
+        ValidateTrackCollection::class,
+        GetCollectionStatistics::class,
     ];
 
     /**
