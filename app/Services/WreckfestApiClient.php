@@ -124,10 +124,16 @@ class WreckfestApiClient
      *
      * @throws WreckfestApiException
      */
-    public function updateTracks(array $tracks): bool
+    public function updateTracks(array $tracks, ?string $collectionName = null): bool
     {
         try {
-            $response = Http::withoutVerifying()->timeout(2)->put("{$this->baseUrl}/Config/tracks", $tracks);
+            // API expects Tracks array and CollectionName (empty string if not provided)
+            $payload = [
+                'Tracks' => $tracks,
+                'CollectionName' => $collectionName ?? '', // C# API expects string, not null
+            ];
+
+            $response = Http::withoutVerifying()->timeout(2)->put("{$this->baseUrl}/Config/tracks", $payload);
 
             if (! $response->successful()) {
                 Log::error('Failed to update tracks - API returned status: '.$response->status());
