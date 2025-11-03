@@ -60,6 +60,27 @@ return [
             'report' => false,
         ],
 
+        'backup-sftp' => [
+            'driver' => 'sftp',
+            'host' => env('BACKUP_SFTP_HOST'),
+            'username' => env('BACKUP_SFTP_USERNAME'),
+
+            // Use either password or private key authentication
+            'password' => env('BACKUP_SFTP_PASSWORD'),
+
+            // For private key authentication (recommended for production)
+            // 'privateKey' => env('BACKUP_SFTP_PRIVATE_KEY'),
+            // 'passphrase' => env('BACKUP_SFTP_PASSPHRASE'), // Optional, only if key has passphrase
+
+            'root' => env('BACKUP_SFTP_ROOT', '/backups'),
+            'port' => (int) env('BACKUP_SFTP_PORT', 22),
+            'timeout' => (int) env('BACKUP_SFTP_TIMEOUT', 30),
+            'directoryPerm' => 0755,
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*
