@@ -16,7 +16,9 @@ class TrackRotationChatWidget extends Component
 
     public function mount(): void
     {
-        $this->messages = session('track_rotation_chat_messages', []);
+        // Store chat messages per authenticated user
+        $sessionKey = 'track_rotation_chat_messages_' . auth()->id();
+        $this->messages = session($sessionKey, []);
     }
 
     public function sendMessage(): void
@@ -38,12 +40,14 @@ class TrackRotationChatWidget extends Component
         // Clear input
         $this->message = '';
 
-        // Save messages to session
-        session(['track_rotation_chat_messages' => $this->messages]);
+        // Save messages to session (per user)
+        $sessionKey = 'track_rotation_chat_messages_' . auth()->id();
+        session([$sessionKey => $this->messages]);
 
         try {
             // Get AI response - this will block until complete
-            $chatKey = session()->getId();
+            // Use authenticated user ID for proper memory isolation per user
+            $chatKey = 'user_' . auth()->id();
             $agent = new TrackCollectionAgent($chatKey);
             $response = $agent->respond($userMessage);
 
@@ -60,8 +64,9 @@ class TrackRotationChatWidget extends Component
                 $assistantMessage
             ];
 
-            // Save to session
-            session(['track_rotation_chat_messages' => $this->messages]);
+            // Save to session (per user)
+            $sessionKey = 'track_rotation_chat_messages_' . auth()->id();
+            session([$sessionKey => $this->messages]);
 
             // Force a fresh component state by dispatching a browser event
             $this->dispatch('messages-updated', count: count($this->messages));
@@ -101,7 +106,8 @@ class TrackRotationChatWidget extends Component
     public function clearChat(): void
     {
         $this->messages = [];
-        session()->forget('track_rotation_chat_messages');
+        $sessionKey = 'track_rotation_chat_messages_' . auth()->id();
+        session()->forget($sessionKey);
     }
 
     public function toggleMinimize(): void

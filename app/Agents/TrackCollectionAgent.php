@@ -9,12 +9,44 @@ class TrackCollectionAgent extends Agent
     /**
      * The AI model to use
      */
-    protected $model = 'gpt-4o';
+    protected $model;
 
     /**
      * The provider to use (default, claude, gemini, groq, ollama)
      */
     protected $provider = 'default';
+
+    /**
+     * Constructor - set model from config
+     */
+    public function __construct($chatKey = null)
+    {
+        $this->model = config('wreckfest.ai_model', 'gpt-4o-mini');
+
+        // Only enable memory if npx is available (requires Node.js)
+        if ($this->isNpxAvailable()) {
+            $this->mcpServers[] = 'mcp_server_memory:*';
+        }
+
+        parent::__construct($chatKey);
+    }
+
+    /**
+     * Check if npx is available in the environment
+     */
+    protected function isNpxAvailable(): bool
+    {
+        // Check if npx command exists
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            // Windows
+            exec('where npx 2>NUL', $output, $returnCode);
+        } else {
+            // Unix/Linux/Mac
+            exec('which npx 2>/dev/null', $output, $returnCode);
+        }
+
+        return $returnCode === 0;
+    }
 
     /**
      * Chat history strategy - using session to persist across requests
@@ -23,8 +55,11 @@ class TrackCollectionAgent extends Agent
 
     /**
      * MCP servers this agent can use
+     * Note: mcp_server_memory is conditionally added in constructor if npx is available
      */
-    protected $mcpServers = ['wreckfest:tools'];
+    protected $mcpServers = [
+        'wreckfest:tools',
+    ];
 
     /**
      * Agent instructions - the system prompt
@@ -65,6 +100,12 @@ METADATA & VALIDATION:
 - UpdateTrackMetadata: Update race settings for tracks (laps, gamemode, bots, numTeams, weather, etc.)
 - ValidateTrackCollection: Check for compatibility issues (gamemode conflicts, unsupported weather, etc.)
 - GetCollectionStatistics: Analyze collection diversity (track types, tag distribution, locations, etc.)
+
+MEMORY USAGE:
+- You have access to persistent memory to remember user preferences and context across conversations
+- Store important facts like: user's favorite track types, collection goals, preferences (lap counts, game modes, etc.)
+- Use memory to provide personalized recommendations based on past interactions
+- Remember what collections the user is working on and their goals
 
 Guidelines:
 - When suggesting track collections, consider variety (different locations, mix of racing/derby, diverse tags)

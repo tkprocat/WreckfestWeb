@@ -5,6 +5,10 @@ return [
     'ws_url' => env('WRECKFEST_WS_URL', 'wss://localhost:5101/ws'),
     'ocr_enabled' => env('WRECKFEST_OCR_ENABLED', false),
 
+    // AI model for track collection assistant
+    // Options: gpt-4o, gpt-4o-mini, gpt-4-turbo, gpt-3.5-turbo
+    'ai_model' => env('WRECKFEST_AI_MODEL', 'gpt-4o-mini'),
+
     // Brand colors used across the application (both frontend and admin panel)
     'brand' => [
         'primary' => '#a03d00',
