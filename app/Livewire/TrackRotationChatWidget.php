@@ -54,13 +54,17 @@ class TrackRotationChatWidget extends Component
                 'timestamp' => now()->toDateTimeString(),
             ];
 
-            $this->messages[] = $assistantMessage;
-
-            // Force Livewire to detect the array change by reassigning
-            $this->messages = array_values($this->messages);
+            // Force Livewire to detect the array change by creating a new array
+            $this->messages = [
+                ...$this->messages,
+                $assistantMessage
+            ];
 
             // Save to session
             session(['track_rotation_chat_messages' => $this->messages]);
+
+            // Force a fresh component state by dispatching a browser event
+            $this->dispatch('messages-updated', count: count($this->messages));
 
             // Log for debugging in production
             logger()->info('AI response added', [
