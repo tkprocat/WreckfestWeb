@@ -82,6 +82,11 @@
         </div>
         <!-- End Players and Track Rotation Grid -->
 
+        <!-- Upcoming Events -->
+        <div class="max-w-7xl mx-auto mt-6">
+            @livewire('upcoming-events')
+        </div>
+
         <!-- Refresh Notice -->
         <div class="mt-8 text-center">
             <p class="text-gray-500 text-sm font-semibold uppercase tracking-wide">

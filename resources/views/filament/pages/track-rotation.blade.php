@@ -11,6 +11,12 @@
             async init() {
                 // Initialize with current form state from Livewire
                 this.originalTracks = await @this.get('data.tracks');
+
+                // Sync dropdown with Livewire property
+                const collectionId = await @this.get('currentCollectionId');
+                if ($refs.collectionSelect) {
+                    $refs.collectionSelect.value = collectionId || '';
+                }
             },
             async confirmSwitch(event) {
                 const newValue = event.target.value;
@@ -61,7 +67,6 @@
         <select
             x-ref="collectionSelect"
             @change="confirmSwitch($event)"
-            value="{{ $this->currentCollectionId }}"
             class="mt-1 block w-full max-w-md rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500"
         >
             <option value="">Loaded from server (unsaved)</option>

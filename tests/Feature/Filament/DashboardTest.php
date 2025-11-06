@@ -8,6 +8,8 @@ use Livewire\Livewire;
 use function Pest\Laravel\actingAs;
 
 beforeEach(function () {
+    Http::preventStrayRequests();
+
     $this->user = User::factory()->create();
 });
 

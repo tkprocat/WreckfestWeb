@@ -4,6 +4,7 @@
         position: { x: window.innerWidth - 450, y: 100 },
         offset: { x: 0, y: 0 },
         pendingMessage: null,
+        pollingInterval: null,
 
         startDrag(e) {
             this.isDragging = true;
@@ -20,6 +21,23 @@
 
         stopDrag() {
             this.isDragging = false;
+        },
+
+        startPolling() {
+            console.log('🔄 Starting poll for pending AI response');
+            // Poll every 2 seconds
+            this.pollingInterval = setInterval(() => {
+                console.log('📡 Polling for response...');
+                $wire.checkPendingResponse();
+            }, 2000);
+        },
+
+        stopPolling() {
+            if (this.pollingInterval) {
+                console.log('⏹️ Stopping poll');
+                clearInterval(this.pollingInterval);
+                this.pollingInterval = null;
+            }
         }
     }"
     @mousemove.window="drag($event)"
@@ -78,6 +96,16 @@
                     // Clear pending message when real messages update
                     pendingMessage = null;
                     setTimeout(() => $refs.messagesContainer.scrollTop = $refs.messagesContainer.scrollHeight, 100)
+                });
+                // Watch for pending message ID (async mode)
+                $watch('$wire.pendingMessageId', (value) => {
+                    if (value) {
+                        console.log('⏳ Pending message detected, starting polling:', value);
+                        startPolling();
+                    } else {
+                        console.log('✅ No pending message, stopping polling');
+                        stopPolling();
+                    }
                 });
             "
             @messages-updated.window="

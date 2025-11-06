@@ -2,6 +2,21 @@
 
 A Laravel + Filament admin panel for managing your Wreckfest game server via API.
 
+## For AI Development (Claude Code)
+
+**📘 This project includes comprehensive documentation for AI-assisted development.**
+
+**See [CLAUDE_GUIDE.md](CLAUDE_GUIDE.md) for:**
+- Complete project architecture and tech stack
+- Database models and relationships
+- Integration with C# WreckfestController
+- Development workflows and troubleshooting
+- Links to cross-project guides (Filament, Laravel, Pest, MCP)
+
+**When starting a new AI session, say:** "Read CLAUDE_GUIDE.md for context"
+
+---
+
 ## Features
 
 ### Public Homepage

@@ -64,3 +64,4 @@ deploy.php
 # Claude Code settings (may contain sensitive approved commands)
 .claude/settings.local.json
 /.mcp.json
+/.claude/

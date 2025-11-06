@@ -59,13 +59,17 @@ describe('Server Config Page', function () {
 describe('Track Rotation Page', function () {
     test('can access track rotation page when authenticated', function () {
         Http::fake([
+            '*Config/basic*' => Http::response([
+                'serverName' => 'Test Server',
+                'maxPlayers' => 24,
+            ], 200),
+            '*/Config/tracks/collection-name' => Http::response([
+                'collectionName' => null,
+            ], 200),
             '*/Config/tracks' => Http::response([
-                'count' => 2,
+                'count' => 1,
                 'tracks' => [
-                    'count' => 1,
-                    'tracks' => [
-                        ['track' => 'Track 1', 'gamemode' => 'Race', 'laps' => 5],
-                    ],
+                    ['track' => 'Track 1', 'gamemode' => 'Race', 'laps' => 5],
                 ],
             ], 200),
         ]);
@@ -90,14 +94,14 @@ describe('Track Rotation Page', function () {
                 'maxPlayers' => 24,
                 'welcomeMessage' => 'Welcome!',
             ], 200),
+            '*/Config/tracks/collection-name' => Http::response([
+                'collectionName' => null,
+            ], 200),
             '*/Config/tracks' => Http::response([
                 'count' => 2,
                 'tracks' => [
-                    'count' => 2,
-                    'tracks' => [
-                        ['track' => 'Sandpit', 'gamemode' => 'Race', 'laps' => 5],
-                        ['track' => 'Banger Racing', 'gamemode' => 'Derby', 'laps' => 3],
-                    ],
+                    ['track' => 'Sandpit', 'gamemode' => 'Race', 'laps' => 5],
+                    ['track' => 'Banger Racing', 'gamemode' => 'Derby', 'laps' => 3],
                 ],
             ], 200),
         ]);
@@ -269,6 +273,8 @@ describe('API Error Handling', function () {
 
     test('handles API failures gracefully on track rotation page', function () {
         Http::fake([
+            '*Config/basic*' => Http::response(null, 500),
+            '*/Config/tracks/collection-name' => Http::response(null, 500),
             '*/Config/tracks' => Http::response(null, 500),
         ]);
 

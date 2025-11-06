@@ -381,4 +381,119 @@ class WreckfestApiClient
             return null;
         }
     }
+
+    /**
+     * Push event schedule to C# controller
+     *
+     * @throws WreckfestApiException
+     */
+    public function pushEventSchedule(array $events): bool
+    {
+        try {
+            // Convert boolean fields to integers for C# API (0 = false, 1 = true)
+            $events = array_map(function ($event) {
+                if (isset($event['tracks'])) {
+                    $event['tracks'] = array_map(function ($track) {
+                        if (isset($track['carResetDisabled'])) {
+                            $track['carResetDisabled'] = $track['carResetDisabled'] ? 1 : 0;
+                        }
+                        if (isset($track['wrongWayLimiterDisabled'])) {
+                            $track['wrongWayLimiterDisabled'] = $track['wrongWayLimiterDisabled'] ? 1 : 0;
+                        }
+                        return $track;
+                    }, $event['tracks']);
+                }
+                return $event;
+            }, $events);
+
+            // Remove null recurring patterns to avoid C# deserialization errors
+            $events = array_map(function ($event) {
+                if (isset($event['recurringPattern'])) {
+                    // If recurringPattern has all null values, remove it entirely
+                    $pattern = $event['recurringPattern'];
+                    if (empty(array_filter($pattern, fn($v) => $v !== null))) {
+                        unset($event['recurringPattern']);
+                    }
+                }
+                return $event;
+            }, $events);
+
+            $payload = [
+                'events' => $events,
+            ];
+
+            Log::info('Sending event schedule to C# API', [
+                'event_count' => count($events),
+                'payload' => $payload,
+            ]);
+
+            $response = Http::withoutVerifying()->timeout(5)->post("{$this->baseUrl}/Events/schedule", $payload);
+
+            if (! $response->successful()) {
+                Log::error('Failed to push event schedule - API returned status: '.$response->status());
+                Log::error('Response body: '.$response->body());
+            } else {
+                Log::info('Successfully pushed event schedule', [
+                    'status' => $response->status(),
+                    'response' => $response->json(),
+                ]);
+            }
+
+            return $response->successful();
+        } catch (ConnectionException $e) {
+            Log::error('Failed to connect to Wreckfest API: '.$e->getMessage());
+            throw new WreckfestApiException;
+        } catch (Exception $e) {
+            Log::error('Failed to push event schedule: '.$e->getMessage());
+            throw new WreckfestApiException;
+        }
+    }
+
+    /**
+     * Manually activate an event
+     */
+    public function activateEvent(int $eventId): bool
+    {
+        try {
+            $response = Http::withoutVerifying()->post("{$this->baseUrl}/Events/{$eventId}/activate");
+
+            return $response->successful();
+        } catch (Exception $e) {
+            Log::error('Failed to activate event: '.$e->getMessage());
+
+            return false;
+        }
+    }
+
+    /**
+     * Get current active event from C# controller
+     */
+    public function getCurrentEvent(): ?array
+    {
+        try {
+            $response = Http::withoutVerifying()->timeout(2)->get("{$this->baseUrl}/Events/current");
+
+            return $response->successful() ? $response->json() : null;
+        } catch (Exception $e) {
+            Log::error('Failed to get current event: '.$e->getMessage());
+
+            return null;
+        }
+    }
+
+    /**
+     * Get upcoming events from C# controller
+     */
+    public function getUpcomingEvents(): array
+    {
+        try {
+            $response = Http::withoutVerifying()->timeout(2)->get("{$this->baseUrl}/Events/upcoming");
+
+            return $response->successful() ? $response->json() : [];
+        } catch (Exception $e) {
+            Log::error('Failed to get upcoming events: '.$e->getMessage());
+
+            return [];
+        }
+    }
 }

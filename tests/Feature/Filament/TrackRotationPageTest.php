@@ -10,20 +10,26 @@ use function Pest\Laravel\actingAs;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    Http::preventStrayRequests();
+
     $this->seed(\Database\Seeders\TrackSeeder::class);
     $this->user = User::factory()->create();
 });
 
 it('can render track rotation page', function () {
     Http::fake([
+        '*Config/basic*' => Http::response([
+            'serverName' => 'Test Server',
+            'maxPlayers' => 24,
+        ], 200),
+        '*/Config/tracks/collection-name' => Http::response([
+            'collectionName' => null,
+        ], 200),
         '*/Config/tracks' => Http::response([
             'count' => 2,
             'tracks' => [
-                'count' => 2,
-                'tracks' => [
-                    ['track' => 'loop', 'gamemode' => 'racing', 'laps' => 5],
-                    ['track' => 'speedway2_figure_8', 'gamemode' => 'derby', 'laps' => 3],
-                ],
+                ['track' => 'loop', 'gamemode' => 'racing', 'laps' => 5],
+                ['track' => 'speedway2_figure_8', 'gamemode' => 'derby', 'laps' => 3],
             ],
         ], 200),
     ]);
@@ -37,13 +43,17 @@ it('can render track rotation page', function () {
 
 it('displays track rotation', function () {
     Http::fake([
+        '*Config/basic*' => Http::response([
+            'serverName' => 'Test Server',
+            'maxPlayers' => 24,
+        ], 200),
+        '*/Config/tracks/collection-name' => Http::response([
+            'collectionName' => null,
+        ], 200),
         '*/Config/tracks' => Http::response([
-            'count' => 2,
+            'count' => 1,
             'tracks' => [
-                'count' => 1,
-                'tracks' => [
-                    ['track' => 'loop', 'gamemode' => 'racing', 'laps' => 5],
-                ],
+                ['track' => 'loop', 'gamemode' => 'racing', 'laps' => 5],
             ],
         ], 200),
     ]);
@@ -58,12 +68,16 @@ it('displays track rotation', function () {
 
 it('handles empty tracks gracefully', function () {
     Http::fake([
+        '*Config/basic*' => Http::response([
+            'serverName' => 'Test Server',
+            'maxPlayers' => 24,
+        ], 200),
+        '*/Config/tracks/collection-name' => Http::response([
+            'collectionName' => null,
+        ], 200),
         '*/Config/tracks' => Http::response([
-            'count' => 2,
-            'tracks' => [
-                'count' => 0,
-                'tracks' => [],
-            ],
+            'count' => 0,
+            'tracks' => [],
         ], 200),
     ]);
 
@@ -74,6 +88,8 @@ it('handles empty tracks gracefully', function () {
 
 it('handles API errors gracefully', function () {
     Http::fake([
+        '*Config/basic*' => Http::response(null, 500),
+        '*/Config/tracks/collection-name' => Http::response(null, 500),
         '*/Config/tracks' => Http::response(null, 500),
     ]);
 

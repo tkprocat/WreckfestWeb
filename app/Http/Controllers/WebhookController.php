@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\EventActivated;
 use App\Events\PlayersUpdated;
 use App\Events\TrackChanged;
+use App\Services\EventService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -49,6 +51,29 @@ class WebhookController extends Controller
         broadcast(new TrackChanged($validated['trackId']));
 
         Log::info('Broadcast sent for track changed: '.$validated['trackId']);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Handle event activated webhook from C# server
+     */
+    public function eventActivated(Request $request, EventService $eventService): JsonResponse
+    {
+        Log::info('Webhook received: event-activated', $request->all());
+
+        $validated = $request->validate([
+            'eventId' => 'required|integer',
+            'eventName' => 'nullable|string',
+        ]);
+
+        // Mark the event as active in our database
+        $eventService->activateEvent($validated['eventId']);
+
+        // Broadcast the event to all connected clients
+        broadcast(new EventActivated($validated['eventId'], $validated['eventName'] ?? null));
+
+        Log::info('Event activated: '.$validated['eventId']);
 
         return response()->json(['success' => true]);
     }

@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Http;
 use function Pest\Laravel\actingAs;
 
 beforeEach(function () {
+    Http::preventStrayRequests();
+
     $this->user = User::factory()->create();
 });
 

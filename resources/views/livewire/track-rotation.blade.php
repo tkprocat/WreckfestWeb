@@ -18,7 +18,10 @@
                     $trackName = $track['trackName'] ?? 'Unknown Track';
                     $locationName = $track['locationName'] ?? '';
                     $gamemodeName = $track['gamemodeName'] ?? '';
-                    $laps = $track['laps'] ?? null;
+                    $gamemode = strtolower($track['gamemode'] ?? 'racing');
+
+                    // Use configured laps or sensible defaults (5 for racing, 1 for derby)
+                    $laps = $track['laps'] ?? (in_array($gamemode, ['derby', 'derbydeathmatch', 'teamdeathmatch']) ? 1 : 5);
                     $bots = $track['bots'] ?? null;
 
                     // Generate image path
@@ -55,11 +58,9 @@
                                         {{ $gamemodeName }}
                                     </span>
                                 @endif
-                                @if($laps)
-                                    <span class="bg-gray-700 text-gray-300 text-xs font-semibold px-2 py-1 rounded">
-                                        {{ $laps }} Laps
-                                    </span>
-                                @endif
+                                <span class="bg-blue-600/30 text-blue-400 text-xs font-bold px-2 py-1 rounded border border-blue-600/50">
+                                    {{ $laps }} {{ $laps == 1 ? 'Lap' : 'Laps' }}
+                                </span>
                                 @if($bots)
                                     <span class="bg-gray-700 text-gray-300 text-xs font-semibold px-2 py-1 rounded">
                                         {{ $bots }} Bots

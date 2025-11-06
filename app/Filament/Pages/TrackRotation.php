@@ -158,7 +158,33 @@ class TrackRotation extends Page implements HasForms
             // Store the default gamemode from server config
             $this->defaultGamemode = $serverConfig['gamemode'] ?? 'racing';
 
-            // Try to load the last worked-on collection from session
+            // Get the current collection name from the server
+            $serverCollectionName = $apiClient->getTrackCollectionName();
+
+            // Try to find a matching collection in database by name
+            if ($serverCollectionName) {
+                $collection = TrackCollection::where('name', $serverCollectionName)->first();
+
+                if ($collection) {
+                    // Found matching collection - set it as current
+                    $this->currentCollectionId = $collection->id;
+                    $this->currentCollectionName = $collection->name;
+                    session(['track_rotation.current_collection_id' => $collection->id]);
+
+                    $this->form->fill(['tracks' => $collection->tracks]);
+                    $this->dispatch('collection-loaded', tracks: $collection->tracks);
+
+                    Notification::make()
+                        ->title('Active collection loaded')
+                        ->body("Working on: {$collection->name} (from server)")
+                        ->success()
+                        ->send();
+
+                    return;
+                }
+            }
+
+            // Try to load the last worked-on collection from session (fallback)
             $lastCollectionId = session('track_rotation.current_collection_id');
 
             if ($lastCollectionId) {
@@ -173,7 +199,7 @@ class TrackRotation extends Page implements HasForms
                 }
             }
 
-            // Otherwise load from server
+            // Otherwise load tracks directly from server
             $tracks = $apiClient->getTracks();
             $this->form->fill(['tracks' => $tracks]);
             $this->dispatch('collection-loaded', tracks: $tracks);
@@ -203,6 +229,23 @@ class TrackRotation extends Page implements HasForms
         return $allTracks;
     }
 
+    protected function searchTracksByTag(string $search): array
+    {
+        // Search for tracks by tag name
+        $variants = \App\Models\TrackVariant::with(['track', 'tags'])
+            ->whereHas('tags', function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%');
+            })
+            ->get();
+
+        $results = [];
+        foreach ($variants as $variant) {
+            $results[$variant->variant_id] = $variant->full_name;
+        }
+
+        return $results;
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
@@ -220,11 +263,17 @@ class TrackRotation extends Page implements HasForms
                                         return [];
                                     }
 
+                                    // Search by track name
                                     $tracks = $this->getAllTracks();
-
-                                    return array_filter($tracks, function ($label) use ($search) {
+                                    $nameResults = array_filter($tracks, function ($label) use ($search) {
                                         return str_contains(strtolower($label), strtolower($search));
                                     }, ARRAY_FILTER_USE_BOTH);
+
+                                    // Search by tag
+                                    $tagResults = $this->searchTracksByTag($search);
+
+                                    // Merge results (array_merge will combine and keep unique keys)
+                                    return $nameResults + $tagResults;
                                 })
                                 ->required()
                                 ->native(false),
@@ -399,7 +448,10 @@ class TrackRotation extends Page implements HasForms
 
             $apiClient = app(WreckfestApiClient::class);
 
-            if ($apiClient->updateTracks($tracks)) {
+            // Use current collection name or default to "Manual"
+            $collectionName = $this->currentCollectionName ?? 'Manual';
+
+            if ($apiClient->updateTracks($tracks, $collectionName)) {
                 Notification::make()
                     ->title('Track rotation deployed to server successfully')
                     ->success()

@@ -13,6 +13,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Seed weather conditions first, then tracks, then tags
+        $this->call([
+            WeatherConditionSeeder::class,
+            TrackSeeder::class,
+            TrackTagsSeeder::class,
+        ]);
+
         // User::factory(10)->create();
 
         User::factory()->create([
