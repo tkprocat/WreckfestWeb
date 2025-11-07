@@ -27,6 +27,9 @@ class TrackRotationChatWidget extends Component
             return;
         }
 
+        // Increase PHP execution time limit for AI requests
+        set_time_limit(600);
+
         // Store user message
         $userMessage = $this->message;
 
@@ -46,14 +49,29 @@ class TrackRotationChatWidget extends Component
 
         // Process synchronously - HAProxy now handles long timeouts
         try {
+            $startTime = microtime(true);
+            logger()->info('[TrackRotationChat] Starting AI request', ['user_id' => auth()->id()]);
+
             // Get AI response
             $chatKey = 'user_'.auth()->id();
             $agent = new TrackCollectionAgent($chatKey);
             $response = $agent->respond($userMessage);
 
+            $duration = microtime(true) - $startTime;
+            logger()->info('[TrackRotationChat] AI request completed', [
+                'user_id' => auth()->id(),
+                'duration' => round($duration, 2).'s',
+            ]);
+
             // Add assistant response
             $this->addAssistantResponse($response);
         } catch (\Exception $e) {
+            $duration = microtime(true) - ($startTime ?? microtime(true));
+            logger()->error('[TrackRotationChat] AI request failed', [
+                'user_id' => auth()->id(),
+                'duration' => round($duration, 2).'s',
+                'error' => $e->getMessage(),
+            ]);
             $this->handleAiError($e);
         }
     }

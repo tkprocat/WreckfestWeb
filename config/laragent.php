@@ -105,12 +105,12 @@ return [
         'wreckfest' => [
             'type' => \Redberry\MCPClient\Enums\Transporters::HTTP,
             'base_url' => env('APP_URL', '').'/mcp/wreckfest',
-            'timeout' => 30,
+            'timeout' => 600,
         ],
         'github' => [
             'type' => \Redberry\MCPClient\Enums\Transporters::HTTP,
             'base_url' => 'https://api.githubcopilot.com/mcp',
-            'timeout' => 30,
+            'timeout' => 600,
             'token' => env('GITHUB_API_TOKEN', null),
         ],
         'mcp_server_memory' => [
@@ -120,7 +120,7 @@ return [
                 '-y',
                 '@modelcontextprotocol/server-memory',
             ],
-            'timeout' => 30,
+            'timeout' => 600,
             'cwd' => base_path(),
         ],
     ],
