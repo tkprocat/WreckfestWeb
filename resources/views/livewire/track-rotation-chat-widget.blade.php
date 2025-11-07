@@ -3,8 +3,6 @@
         isDragging: false,
         position: { x: window.innerWidth - 450, y: 100 },
         offset: { x: 0, y: 0 },
-        pendingMessage: null,
-        pollingInterval: null,
 
         startDrag(e) {
             this.isDragging = true;
@@ -21,20 +19,6 @@
 
         stopDrag() {
             this.isDragging = false;
-        },
-
-        startPolling() {
-            // Poll every 2 seconds
-            this.pollingInterval = setInterval(() => {
-                $wire.checkPendingResponse();
-            }, 2000);
-        },
-
-        stopPolling() {
-            if (this.pollingInterval) {
-                clearInterval(this.pollingInterval);
-                this.pollingInterval = null;
-            }
         }
     }"
     @mousemove.window="drag($event)"
@@ -88,22 +72,11 @@
                 setTimeout(() => $refs.messagesContainer.scrollTop = $refs.messagesContainer.scrollHeight, 100);
                 // Watch for new messages
                 $watch('$wire.messages', (value) => {
-                    // Clear pending message when real messages update
-                    pendingMessage = null;
                     setTimeout(() => $refs.messagesContainer.scrollTop = $refs.messagesContainer.scrollHeight, 100)
-                });
-                // Watch for pending message ID (async mode)
-                $watch('$wire.pendingMessageId', (value) => {
-                    if (value) {
-                        startPolling();
-                    } else {
-                        stopPolling();
-                    }
                 });
             "
             @messages-updated.window="
                 // Force Alpine to refresh by clearing and reloading
-                pendingMessage = null;
                 $wire.$refresh();
                 setTimeout(() => {
                     $refs.messagesContainer.scrollTop = $refs.messagesContainer.scrollHeight;
@@ -134,18 +107,6 @@
                 </div>
             @endforelse
 
-            <!-- Pending user message (shown immediately before backend processes) -->
-            <div x-show="pendingMessage" class="flex justify-end">
-                <div class="max-w-[80%]">
-                    <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
-                        <div class="text-sm whitespace-pre-wrap" x-text="pendingMessage"></div>
-                    </div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 text-right">
-                        Just now
-                    </div>
-                </div>
-            </div>
-
             <!-- Loading indicator -->
             <div wire:loading wire:target="sendMessage" class="flex justify-start">
                 <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
@@ -170,14 +131,6 @@
             <form
                 wire:submit="sendMessage"
                 class="flex gap-2"
-                x-data
-                @submit="
-                    pendingMessage = $refs.messageInput.value;
-                    setTimeout(() => {
-                        $refs.messageInput.value = '';
-                        $refs.messagesContainer.scrollTop = $refs.messagesContainer.scrollHeight;
-                    }, 10);
-                "
             >
                 <input
                     x-ref="messageInput"
