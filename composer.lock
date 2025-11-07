@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6064f95a134c0327423e63a106c5d805",
+    "content-hash": "78895cd87447283323f2a0f0ed5636bb",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3733,16 +3733,16 @@
         },
         {
             "name": "maestroerror/laragent",
-            "version": "0.7.0",
+            "version": "0.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/MaestroError/LarAgent.git",
-                "reference": "722b9bb2c2463227344bcb91b9d12408c9ad82d4"
+                "reference": "f71a4bcf5894206c30275fb470366b0b328797bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/MaestroError/LarAgent/zipball/722b9bb2c2463227344bcb91b9d12408c9ad82d4",
-                "reference": "722b9bb2c2463227344bcb91b9d12408c9ad82d4",
+                "url": "https://api.github.com/repos/MaestroError/LarAgent/zipball/f71a4bcf5894206c30275fb470366b0b328797bc",
+                "reference": "f71a4bcf5894206c30275fb470366b0b328797bc",
                 "shasum": ""
             },
             "require": {
@@ -3752,7 +3752,7 @@
                 "mozex/anthropic-php": "^1.1",
                 "openai-php/client": "^0.17.1",
                 "php": "^8.3",
-                "redberry/mcp-client-laravel": "^1.0",
+                "redberry/mcp-client-laravel": "^1.1",
                 "spatie/laravel-package-tools": "^1.16"
             },
             "require-dev": {
@@ -3805,7 +3805,7 @@
             ],
             "support": {
                 "issues": "https://github.com/MaestroError/LarAgent/issues",
-                "source": "https://github.com/MaestroError/LarAgent/tree/0.7.0"
+                "source": "https://github.com/MaestroError/LarAgent/tree/0.8.0"
             },
             "funding": [
                 {
@@ -3813,7 +3813,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-10-21T10:37:21+00:00"
+            "time": "2025-11-07T18:03:51+00:00"
         },
         {
             "name": "masterminds/html5",
@@ -6721,16 +6721,16 @@
         },
         {
             "name": "redberry/mcp-client-laravel",
-            "version": "v1.0.0",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RedberryProducts/mcp-client-laravel.git",
-                "reference": "b1fd4ed393a1220742ed1b571a9a738aa9c2fa60"
+                "reference": "a582f02194d80626fcb2ed7264b5095d110a488b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RedberryProducts/mcp-client-laravel/zipball/b1fd4ed393a1220742ed1b571a9a738aa9c2fa60",
-                "reference": "b1fd4ed393a1220742ed1b571a9a738aa9c2fa60",
+                "url": "https://api.github.com/repos/RedberryProducts/mcp-client-laravel/zipball/a582f02194d80626fcb2ed7264b5095d110a488b",
+                "reference": "a582f02194d80626fcb2ed7264b5095d110a488b",
                 "shasum": ""
             },
             "require": {
@@ -6791,7 +6791,7 @@
             ],
             "support": {
                 "issues": "https://github.com/RedberryProducts/mcp-client-laravel/issues",
-                "source": "https://github.com/RedberryProducts/mcp-client-laravel/tree/v1.0.0"
+                "source": "https://github.com/RedberryProducts/mcp-client-laravel/tree/v1.1.0"
             },
             "funding": [
                 {
@@ -6799,7 +6799,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-09-29T13:20:51+00:00"
+            "time": "2025-11-07T07:29:48+00:00"
         },
         {
             "name": "ryangjchandler/blade-capture-directive",

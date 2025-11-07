@@ -14,7 +14,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "league/flysystem-sftp-v3": "^3.0",
-        "maestroerror/laragent": "0.7.0",
+        "maestroerror/laragent": "^0.8.0",
         "spatie/laravel-backup": "^9.3",
         "textalk/websocket": "^1.5"
     },
@@ -84,11 +84,6 @@
     "extra": {
         "laravel": {
             "dont-discover": []
-        },
-        "patches": {
-            "redberry/mcp-client-laravel": {
-                "Fix HttpTransporter to use empty string instead of action in POST URL": "patches/redberry-mcp-client-laravel-http-transporter-fix.patch"
-            }
         }
     },
     "config": {

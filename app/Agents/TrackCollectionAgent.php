@@ -23,12 +23,28 @@ class TrackCollectionAgent extends Agent
     {
         $this->model = config('wreckfest.ai_model', 'gpt-4o-mini');
 
+        logger()->info('[TrackCollectionAgent] Initializing agent', [
+            'model' => $this->model,
+            'provider' => $this->provider,
+            'chat_key' => $chatKey,
+        ]);
+
         // Only enable memory if npx is available (requires Node.js)
-        if ($this->isNpxAvailable()) {
+        $npxAvailable = $this->isNpxAvailable();
+        if ($npxAvailable) {
             $this->mcpServers[] = 'mcp_server_memory:*';
+            logger()->info('[TrackCollectionAgent] NPX available, memory server enabled');
+        } else {
+            logger()->info('[TrackCollectionAgent] NPX not available, memory server disabled');
         }
 
+        logger()->info('[TrackCollectionAgent] MCP servers configured', [
+            'mcp_servers' => $this->mcpServers,
+        ]);
+
         parent::__construct($chatKey);
+
+        logger()->info('[TrackCollectionAgent] Agent initialized successfully');
     }
 
     /**

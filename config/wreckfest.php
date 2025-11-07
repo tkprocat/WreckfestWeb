@@ -9,9 +9,6 @@ return [
     // Options: gpt-4o, gpt-4o-mini, gpt-4-turbo, gpt-3.5-turbo
     'ai_model' => env('WRECKFEST_AI_MODEL', 'gpt-4o-mini'),
 
-    // AI response mode: uses async job + polling to avoid PHP timeout issues
-    'ai_async' => env('WRECKFEST_AI_ASYNC', true),
-
     // Brand colors used across the application (both frontend and admin panel)
     'brand' => [
         'primary' => '#a03d00',

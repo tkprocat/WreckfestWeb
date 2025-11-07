@@ -3,10 +3,7 @@
 namespace App\Livewire;
 
 use App\Agents\TrackCollectionAgent;
-use App\Jobs\ProcessAiChatMessage;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 use Livewire\Component;
 
 class TrackRotationChatWidget extends Component
@@ -16,8 +13,6 @@ class TrackRotationChatWidget extends Component
     public array $messages = [];
 
     public bool $isMinimized = false;
-
-    public ?string $pendingMessageId = null;
 
     public function mount(): void
     {
@@ -49,23 +44,9 @@ class TrackRotationChatWidget extends Component
         $sessionKey = 'track_rotation_chat_messages_'.auth()->id();
         session([$sessionKey => $this->messages]);
 
-        // Check if we should use async processing (defaults to true)
-        $useAsync = config('wreckfest.ai_async', true);
-
-        if ($useAsync) {
-            // Async mode - dispatch job and poll for response
-            $this->sendMessageAsync($userMessage);
-        } else {
-            // Sync mode - block until response
-            $this->sendMessageSync($userMessage);
-        }
-    }
-
-    protected function sendMessageSync(string $userMessage): void
-    {
+        // Process synchronously - HAProxy now handles long timeouts
         try {
-            // Get AI response - this will block until complete
-            // Use authenticated user ID for proper memory isolation per user
+            // Get AI response
             $chatKey = 'user_'.auth()->id();
             $agent = new TrackCollectionAgent($chatKey);
             $response = $agent->respond($userMessage);
@@ -77,93 +58,6 @@ class TrackRotationChatWidget extends Component
         }
     }
 
-    protected function sendMessageAsync(string $userMessage): void
-    {
-        try {
-            // Generate unique message ID
-            $messageId = Str::uuid()->toString();
-            $this->pendingMessageId = $messageId;
-
-            // Add pending message placeholder
-            $this->messages[] = [
-                'role' => 'assistant',
-                'content' => '⏳ Thinking...',
-                'timestamp' => now()->toDateTimeString(),
-                'pending' => true,
-                'messageId' => $messageId,
-            ];
-
-            // Save to session
-            $sessionKey = 'track_rotation_chat_messages_'.auth()->id();
-            session([$sessionKey => $this->messages]);
-
-            // Dispatch job to process in background
-            $chatKey = 'user_'.auth()->id();
-            ProcessAiChatMessage::dispatch($messageId, $userMessage, $chatKey, auth()->id());
-
-            // The frontend will poll checkPendingResponse() to get the result
-        } catch (\Exception $e) {
-            $this->handleAiError($e);
-        }
-    }
-
-    public function checkPendingResponse(): void
-    {
-        if (! $this->pendingMessageId) {
-            return;
-        }
-
-        $messageId = $this->pendingMessageId;
-        $status = Cache::get("ai_message_{$messageId}_status");
-
-        if ($status === 'completed') {
-            // Get the response
-            $response = Cache::get("ai_message_{$messageId}_response");
-
-            // Remove pending message
-            $this->messages = array_filter($this->messages, function ($msg) use ($messageId) {
-                return ! isset($msg['messageId']) || $msg['messageId'] !== $messageId;
-            });
-            $this->messages = array_values($this->messages);
-
-            // Add real response
-            $this->addAssistantResponse($response);
-
-            // Clear cache
-            Cache::forget("ai_message_{$messageId}_status");
-            Cache::forget("ai_message_{$messageId}_response");
-
-            // Clear pending ID
-            $this->pendingMessageId = null;
-        } elseif ($status === 'error') {
-            // Get error message
-            $error = Cache::get("ai_message_{$messageId}_error", 'Unknown error occurred');
-
-            // Remove pending message
-            $this->messages = array_filter($this->messages, function ($msg) use ($messageId) {
-                return ! isset($msg['messageId']) || $msg['messageId'] !== $messageId;
-            });
-            $this->messages = array_values($this->messages);
-
-            // Show error
-            Notification::make()
-                ->title('Error')
-                ->body('Failed to get AI response: '.$error)
-                ->danger()
-                ->send();
-
-            // Clear cache
-            Cache::forget("ai_message_{$messageId}_status");
-            Cache::forget("ai_message_{$messageId}_error");
-
-            // Clear pending ID
-            $this->pendingMessageId = null;
-
-            // Save cleaned messages to session
-            $sessionKey = 'track_rotation_chat_messages_'.auth()->id();
-            session([$sessionKey => $this->messages]);
-        }
-    }
 
     protected function addAssistantResponse(string $response): void
     {
