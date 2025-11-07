@@ -17,21 +17,18 @@ class TrackRotationChatWidget extends Component
     public function mount(): void
     {
         // Store chat messages per authenticated user
-        $sessionKey = 'track_rotation_chat_messages_' . auth()->id();
+        $sessionKey = 'track_rotation_chat_messages_'.auth()->id();
         $this->messages = session($sessionKey, []);
     }
 
-    public function sendMessage(): void
+    public function sendMessage(?string $userMessage = null): void
     {
-        if (empty($this->message)) {
+        // If no parameter provided, use the property (for backward compatibility)
+        $userMessage = $userMessage ?? $this->message;
+
+        if (empty($userMessage)) {
             return;
         }
-
-        // Increase PHP execution time limit for AI requests
-        set_time_limit(600);
-
-        // Store user message
-        $userMessage = $this->message;
 
         // Add user message immediately
         $this->messages[] = [
@@ -40,12 +37,19 @@ class TrackRotationChatWidget extends Component
             'timestamp' => now()->toDateTimeString(),
         ];
 
-        // Clear input
-        $this->message = '';
+        // Force Livewire to detect the array change
+        $this->messages = array_values($this->messages);
 
         // Save messages to session (per user)
         $sessionKey = 'track_rotation_chat_messages_'.auth()->id();
         session([$sessionKey => $this->messages]);
+
+        // Stream user message to browser immediately before AI processing
+        $this->stream(
+            to: 'chat-messages',
+            content: view('livewire.partials.chat-messages', ['messages' => $this->messages])->render(),
+            replace: true
+        );
 
         // Process synchronously - HAProxy now handles long timeouts
         try {
@@ -75,7 +79,6 @@ class TrackRotationChatWidget extends Component
             $this->handleAiError($e);
         }
     }
-
 
     protected function addAssistantResponse(string $response): void
     {
@@ -129,7 +132,7 @@ class TrackRotationChatWidget extends Component
     public function clearChat(): void
     {
         $this->messages = [];
-        $sessionKey = 'track_rotation_chat_messages_' . auth()->id();
+        $sessionKey = 'track_rotation_chat_messages_'.auth()->id();
         session()->forget($sessionKey);
     }
 

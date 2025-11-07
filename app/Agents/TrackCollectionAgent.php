@@ -32,8 +32,8 @@ class TrackCollectionAgent extends Agent
         // Only enable memory if npx is available (requires Node.js)
         $npxAvailable = $this->isNpxAvailable();
         if ($npxAvailable) {
-            // $this->mcpServers[] = 'mcp_server_memory:*'; // Temporarily disabled for testing
-            logger()->info('[TrackCollectionAgent] NPX available, memory server disabled for testing');
+            $this->mcpServers[] = 'mcp_server_memory:*';
+            logger()->info('[TrackCollectionAgent] NPX available, memory server enabled');
         } else {
             logger()->info('[TrackCollectionAgent] NPX not available, memory server disabled');
         }
