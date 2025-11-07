@@ -1,262 +1,240 @@
-# Wreckfest Server Admin Panel
+# WreckfestWeb
 
-A Laravel + Filament admin panel for managing your Wreckfest game server via API.
+> A modern Laravel-based admin panel and web interface for managing Wreckfest dedicated servers
 
-## For AI Development (Claude Code)
-
-**📘 This project includes comprehensive documentation for AI-assisted development.**
-
-**See [CLAUDE_GUIDE.md](CLAUDE_GUIDE.md) for:**
-- Complete project architecture and tech stack
-- Database models and relationships
-- Integration with C# WreckfestController
-- Development workflows and troubleshooting
-- Links to cross-project guides (Filament, Laravel, Pest, MCP)
-
-**When starting a new AI session, say:** "Read CLAUDE_GUIDE.md for context"
+WreckfestWeb provides a powerful, user-friendly interface to configure, monitor, and control your Wreckfest game server through a beautiful web application. Built with Laravel 12, Filament 4, and real-time WebSocket updates.
 
 ---
 
-## Features
+## 🎯 About
 
-### Public Homepage
-- **Real-time Server Status** - Public-facing page showing:
-  - Live server status (online/offline)
-  - Current player count and list
-  - Server information
-  - Auto-refreshes every 30 seconds
-  - Direct link to admin login
-  - Beautiful gradient UI with Tailwind CSS
+WreckfestWeb is a comprehensive management solution for Wreckfest dedicated servers. It communicates with [WreckfestController](https://github.com/tkprocat/WreckfestController), a C# service that manages the actual game server, providing:
 
-### Admin Panel
+- **Real-time Monitoring** - Live player counts, server status, and track rotation
+- **Track Management** - Browse 122+ tracks, build custom rotations with drag-and-drop
+- **Server Control** - Start, stop, restart your server with one click
+- **Event Scheduling** - Schedule future server configurations and track rotations
+- **Public Interface** - Share server status with your community
+- **AI Assistant** - Get help building track collections with OpenAI integration
 
-- **Server Configuration** - Manage all server settings including:
-  - Basic server information (name, password, max players)
-  - Network settings (ports, LAN mode)
-  - Game settings (session mode, bots, AI difficulty)
-  - Track and race settings with intelligent filtering
-  - Advanced settings (admin controls, restrictions)
+Perfect for community server administrators who want professional tools to manage their Wreckfest servers.
 
-- **Track Browser** - Powerful track discovery tool:
-  - Search tracks by name, variant, or ID
-  - Filter by game mode compatibility
-  - Filter by track type (Derby/Racing)
-  - Filter by weather support
-  - Sortable columns (location, variant, variant ID, derby flag)
-  - Live search with debouncing
-  - View all 122+ track variants across 47 locations
+---
 
-- **Track Rotation** - Configure your server's track rotation with:
-  - Track and gamemode selection with smart compatibility
-  - Laps, bots, and team configuration
-  - Car restrictions and weather settings
-  - Reorderable track list
-  - Save/load track collections
-  - Randomize track order
-  - Deploy directly to server
+## ✨ Key Features
 
-- **Server Control** - Manage your server:
-  - View real-time server status
-  - Start, stop, and restart server
-  - One-click controls with status updates
+### 🌐 Public Homepage
+- Real-time server status (online/offline)
+- Live player list with bot detection
+- Current track rotation display
+- Upcoming scheduled events
+- Auto-refreshes every 30 seconds
 
-- **Server Logs** - Monitor your server:
-  - View server log files
-  - Configurable number of lines
-  - Real-time refresh
+### 🎮 Admin Panel
+- **Server Configuration** - Manage all server settings (name, password, max players, ports, game modes, etc.)
+- **Track Browser** - Search and filter through all available tracks with weather compatibility
+- **Track Rotation** - Build and save custom track rotations with drag-and-drop reordering
+- **Track Collections** - Save and load preset track rotations
+- **Event Scheduling** - Schedule future server configurations with recurring patterns
+- **Server Control** - Start, stop, restart the server with live status updates
+- **Server Logs** - View and monitor server logs in real-time
+- **Current Players** - See who's playing with real-time updates via WebSockets
+- **AI Assistant** - Interactive chat to help build track collections (optional)
 
-- **Current Players** - See who's playing:
-  - List of currently connected players
-  - Bot detection with visual indicators
-  - Auto-refresh functionality
+### 🔄 Real-time Features
+- WebSocket-powered live updates (via Laravel Reverb)
+- Automatic player list refresh
+- Live server status changes
+- No page refresh needed
 
-## Installation
+### 🎨 Modern UI
+- Built with Filament 4 and Tailwind CSS
+- Responsive design for desktop and mobile
+- Dark mode support
+- Intuitive drag-and-drop interfaces
 
-### Prerequisites
+---
 
-- PHP 8.2 or higher
-- Composer
-- Wreckfest server with API running on `https://localhost:5101`
+## 📸 Screenshots
 
-### Setup Steps
+*(Add screenshots here once project is deployed)*
 
-1. **Install Dependencies**
-   ```bash
-   composer install
-   ```
+<!-- Example structure:
+### Admin Dashboard
+![Dashboard](docs/screenshots/dashboard.png)
 
-2. **Configure Environment**
+### Track Rotation Builder
+![Track Rotation](docs/screenshots/track-rotation.png)
 
-   Update the `.env` file with your Wreckfest API URL:
-   ```env
-   WRECKFEST_API_URL=https://localhost:5101/api
-   ```
+### Public Server Status
+![Public Page](docs/screenshots/public-page.png)
+-->
 
-3. **Generate Application Key** (if not already done)
-   ```bash
-   php artisan key:generate
-   ```
+---
 
-4. **Run Migrations**
-   ```bash
-   php artisan migrate
-   ```
+## 🚀 Quick Start
 
-5. **Create Admin User**
-   ```bash
-   php artisan make:filament-user
-   ```
+Get up and running in minutes with the interactive installer:
 
-   Follow the prompts to create your admin user account.
+```bash
+# 1. Clone the repository
+git clone https://github.com/tkprocat/WreckfestWeb.git
+cd WreckfestWeb
 
-6. **Start the Development Server**
-   ```bash
-   php artisan serve
-   ```
+# 2. Install dependencies
+composer install
 
-7. **Access the Admin Panel**
+# 3. Set up environment
+cp .env.example .env
+php artisan key:generate
 
-   Open your browser and navigate to:
-   ```
-   http://localhost:8000/admin
-   ```
-
-   Login with the credentials you created in step 5.
-
-## Configuration
-
-### API URL
-
-The Wreckfest API URL can be configured in the `.env` file:
-
-```env
-WRECKFEST_API_URL=https://localhost:5101/api
+# 4. Run the installer (interactive setup wizard)
+php artisan wreckfest:install
 ```
 
-If your Wreckfest API is running on a different host or port, update this value accordingly.
+The installer will guide you through:
+- Database creation
+- WebSocket configuration
+- Admin user creation
+- Asset building
+- Optional features (AI assistant, SFTP backups)
 
-### SSL Certificate Verification
+**Then start your application:**
+```bash
+# Terminal 1: Start Laravel
+php artisan serve
 
-The API client is configured to skip SSL verification for localhost development. If you're using this in production with a valid SSL certificate, you should modify the `WreckfestApiClient` class to enable SSL verification.
+# Terminal 2: Start WebSocket server
+php artisan reverb:start
+```
 
-## Usage
+Visit `http://localhost:8000` and click "Login" to access the admin panel!
 
-### Public Homepage
+---
 
-Visit the homepage to see:
-- Real-time server status
-- Current players online with their information
-- Player count (e.g., 5/24 players)
-- Auto-refresh every 30 seconds
-- "Admin Login" button to access the admin panel
+## 📖 Documentation
 
-**URL:** `https://wreckfestweb.test/` or `http://localhost:8000/`
+- **[Full Installation Guide](INSTALL.md)** - Detailed installation instructions with manual setup options
+- **[AI Development Guide](CLAUDE_GUIDE.md)** - For AI-assisted development with Claude Code
+- **[Spatie Laravel Backup](https://spatie.be/docs/laravel-backup/v8/introduction)** - Backup configuration reference
 
-### Server Configuration
+---
 
-1. Navigate to **Server Config** in the admin panel
-2. Update any settings you want to change
-3. Click **Save Configuration**
-4. The changes will be sent to your Wreckfest server API
+## 🔧 Requirements
 
-### Track Rotation
+### Prerequisites
+- **PHP 8.4+** with extensions: SQLite, PDO, mbstring, XML, cURL, OpenSSL
+- **Composer 2.x**
+- **Node.js 18+** and npm
+- **SQLite** (bundled with PHP)
 
-1. Navigate to **Track Rotation** in the admin panel
-2. Add tracks using the **Add Track** button
-3. Configure each track's settings (gamemode, laps, bots, etc.)
-4. Reorder tracks by dragging them
-5. Click **Save Track Rotation**
+### External Dependencies
+- **[WreckfestController](https://github.com/tkprocat/WreckfestController)** - C# service that interfaces with the game server
+  - Must be running (default: `https://localhost:5101`)
+  - Handles actual server management and API communication
 
-### Server Control
+---
 
-1. Navigate to **Server Control** in the admin panel
-2. View the current server status
-3. Use the control buttons to:
-   - Start the server
-   - Stop the server
-   - Restart the server
-4. Click **Refresh Status** to update the status display
+## 🛠️ Tech Stack
 
-### Monitoring
+- **[Laravel 12](https://laravel.com/)** - PHP framework
+- **[Filament 4](https://filamentphp.com/)** - Admin panel framework
+- **[Livewire 3](https://livewire.laravel.com/)** - Dynamic reactive components
+- **[Laravel Reverb](https://reverb.laravel.com/)** - WebSocket server for real-time features
+- **[Tailwind CSS](https://tailwindcss.com/)** - Utility-first CSS framework
+- **[Alpine.js](https://alpinejs.dev/)** - Lightweight JavaScript framework
+- **[SQLite](https://www.sqlite.org/)** - Embedded database
+- **[Pest 3](https://pestphp.com/)** - Testing framework
 
-- **Server Logs**: View recent server log entries, adjust the number of lines displayed
-- **Current Players**: See who's currently connected to your server
+### Optional Integrations
+- **[OpenAI API](https://openai.com/)** - For AI track rotation assistant
+- **[Spatie Laravel Backup](https://spatie.be/docs/laravel-backup)** - Automated SFTP backups
 
-## Troubleshooting
+---
 
-### Can't connect to API
-
-- Ensure your Wreckfest API is running at the configured URL
-- Check the `WRECKFEST_API_URL` in your `.env` file
-- Verify network connectivity to the API server
-
-### Authentication Issues
-
-- Make sure you've created an admin user using `php artisan make:filament-user`
-- Clear your browser cache and cookies
-- Try logging out and back in
-
-### Configuration Not Saving
-
-- Check the Laravel logs at `storage/logs/laravel.log`
-- Verify the API is accepting PUT/POST requests
-- Ensure the API returns successful responses
-
-## Development
-
-### File Structure
+## 🎯 Project Structure
 
 ```
 app/
+├── Console/Commands/        # Artisan commands (including wreckfest:install)
+├── Events/                  # Event classes
 ├── Filament/
-│   ├── Pages/              # Filament admin pages
-│   │   ├── ServerConfig.php
-│   │   ├── TrackRotation.php
-│   │   ├── TrackBrowser.php
-│   │   ├── ServerControl.php
-│   │   ├── ServerLogs.php
-│   │   └── CurrentPlayers.php
-│   └── Widgets/
-│       └── CurrentPlayersWidget.php
-├── Helpers/
-│   └── TrackHelper.php     # Track compatibility utilities
-└── Services/
-    └── WreckfestApiClient.php  # API client for Wreckfest server
+│   ├── Pages/              # Admin panel pages
+│   ├── Resources/          # Filament resources (Events, etc.)
+│   └── Widgets/            # Dashboard widgets
+├── Helpers/                # Utility classes
+├── Http/Controllers/       # HTTP controllers
+├── Jobs/                   # Background jobs
+├── Livewire/              # Livewire components
+├── Models/                # Eloquent models
+├── Observers/             # Model observers
+└── Services/              # Service classes (API client, etc.)
 
 config/
-└── wreckfest.php           # Game configuration (tracks, modes, etc.)
+└── wreckfest.php          # Game configuration (tracks, weather, etc.)
+
+database/
+├── factories/             # Model factories for testing
+├── migrations/            # Database migrations
+└── seeders/              # Database seeders
 
 resources/
-└── views/
-    └── filament/
-        └── pages/          # Blade views for Filament pages
+├── js/                   # JavaScript files
+└── views/               # Blade templates
+
+tests/
+├── Feature/             # Feature tests
+└── Unit/               # Unit tests
 ```
 
-### Track Compatibility System
+---
 
-The application includes an intelligent track compatibility system:
+## 🤝 Related Projects
 
-- **Hierarchical Track Structure**: Tracks are organized by location with multiple variants
-- **Derby/Racing Separation**: Automatic filtering of tracks based on game mode
-- **Weather Restrictions**: Tracks have specific weather support (e.g., Sandstone Raceway only supports clear weather)
-- **Smart Filtering**: Track selectors automatically show only compatible options
-- **Helper Methods**: `TrackHelper` class provides utilities for track/gamemode/weather compatibility checks
+- **[WreckfestController](https://github.com/tkprocat/WreckfestController)** - C# service that manages the Wreckfest game server (required)
 
-### Adding New Features
+---
 
-To add new features:
+## 🧪 Testing
 
-1. Update `WreckfestApiClient` with new API methods
-2. Create a new Filament page in `app/Filament/Pages/`
-3. Create the corresponding view in `resources/views/filament/pages/`
+Run the test suite with Pest:
 
-## License
+```bash
+# Run all tests
+php artisan test
+
+# Run with coverage
+php artisan test --coverage
+
+# Run specific test file
+php artisan test --filter EventTest
+```
+
+---
+
+## 📝 License
 
 This project is open-source software.
 
-## Credits
+---
+
+## 🙏 Credits
 
 Built with:
-- [Laravel](https://laravel.com/) - PHP Framework
-- [Filament](https://filamentphp.com/) - Admin Panel
-- [Livewire](https://livewire.laravel.com/) - Dynamic Components
+- [Laravel](https://laravel.com/) - The PHP Framework for Web Artisans
+- [Filament](https://filamentphp.com/) - Beautiful Admin Panel Framework
+- [Livewire](https://livewire.laravel.com/) - A full-stack framework for Laravel
+- [Tailwind CSS](https://tailwindcss.com/) - A utility-first CSS framework
+- [Alpine.js](https://alpinejs.dev/) - Your new, lightweight, JavaScript framework
+
+---
+
+## 💬 Support
+
+For detailed installation instructions, troubleshooting, and configuration options, see the [Full Installation Guide](INSTALL.md).
+
+For AI-assisted development, refer to [CLAUDE_GUIDE.md](CLAUDE_GUIDE.md).
+
+---
+
+**Made with ❤️ for the Wreckfest community**
