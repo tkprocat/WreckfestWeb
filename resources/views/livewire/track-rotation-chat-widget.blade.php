@@ -24,17 +24,14 @@
         },
 
         startPolling() {
-            console.log('🔄 Starting poll for pending AI response');
             // Poll every 2 seconds
             this.pollingInterval = setInterval(() => {
-                console.log('📡 Polling for response...');
                 $wire.checkPendingResponse();
             }, 2000);
         },
 
         stopPolling() {
             if (this.pollingInterval) {
-                console.log('⏹️ Stopping poll');
                 clearInterval(this.pollingInterval);
                 this.pollingInterval = null;
             }
@@ -87,12 +84,10 @@
             class="h-96 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900"
             x-ref="messagesContainer"
             x-init="
-                console.log('🤖 Chat widget initialized');
                 // Scroll to bottom on initial load
                 setTimeout(() => $refs.messagesContainer.scrollTop = $refs.messagesContainer.scrollHeight, 100);
                 // Watch for new messages
                 $watch('$wire.messages', (value) => {
-                    console.log('📨 Messages changed, new count:', value?.length || 0);
                     // Clear pending message when real messages update
                     pendingMessage = null;
                     setTimeout(() => $refs.messagesContainer.scrollTop = $refs.messagesContainer.scrollHeight, 100)
@@ -100,22 +95,17 @@
                 // Watch for pending message ID (async mode)
                 $watch('$wire.pendingMessageId', (value) => {
                     if (value) {
-                        console.log('⏳ Pending message detected, starting polling:', value);
                         startPolling();
                     } else {
-                        console.log('✅ No pending message, stopping polling');
                         stopPolling();
                     }
                 });
             "
             @messages-updated.window="
-                console.log('✅ messages-updated event received, count:', $event.detail.count);
                 // Force Alpine to refresh by clearing and reloading
                 pendingMessage = null;
-                console.log('🔄 Calling $wire.$refresh()...');
                 $wire.$refresh();
                 setTimeout(() => {
-                    console.log('📜 Scrolling to bottom, messages count:', $wire.messages?.length || 0);
                     $refs.messagesContainer.scrollTop = $refs.messagesContainer.scrollHeight;
                 }, 100);
             "
@@ -182,7 +172,6 @@
                 class="flex gap-2"
                 x-data
                 @submit="
-                    console.log('📤 Submitting message:', $refs.messageInput.value);
                     pendingMessage = $refs.messageInput.value;
                     setTimeout(() => {
                         $refs.messageInput.value = '';

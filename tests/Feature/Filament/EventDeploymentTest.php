@@ -65,8 +65,8 @@ test('deploy event schedule button sends events to controller', function () {
     // Verify the request was made
     Http::assertSent(function ($request) {
         return $request->url() === 'https://localhost:5101/api/Events/schedule' &&
-            isset($request['request']['events']) &&
-            count($request['request']['events']) === 1;
+            isset($request['events']) &&
+            count($request['events']) === 1;
     });
 });
 
@@ -154,7 +154,7 @@ test('event schedule converts booleans to integers for C# API', function () {
     ]);
 
     Http::assertSent(function ($request) {
-        $events = $request['request']['events'];
+        $events = $request['events'];
         $track = $events[0]['tracks'][0];
 
         return $track['carResetDisabled'] === 1 &&

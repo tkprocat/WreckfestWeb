@@ -187,13 +187,6 @@ class TrackRotationChatWidget extends Component
         // Force a fresh component state by dispatching a browser event
         $this->dispatch('messages-updated', count: count($this->messages));
 
-        // Log for debugging in production
-        logger()->info('AI response added', [
-            'message_count' => count($this->messages),
-            'last_message_role' => $this->messages[count($this->messages) - 1]['role'] ?? 'unknown',
-            'response_length' => strlen($response),
-        ]);
-
         // Check if a new collection was created and auto-select it
         $newCollectionLoaded = $this->checkForNewCollection();
 
@@ -245,13 +238,7 @@ class TrackRotationChatWidget extends Component
         // (MCP runs in a different session context, so we use cache instead)
         $collectionId = cache('last_created_collection_id');
 
-        logger()->info('Checking for new collection', [
-            'collection_id' => $collectionId,
-            'cache_has_key' => cache()->has('last_created_collection_id')
-        ]);
-
         if ($collectionId) {
-            logger()->info('Auto-switching to collection', ['id' => $collectionId]);
 
             // Clear the cache flag
             cache()->forget('last_created_collection_id');
