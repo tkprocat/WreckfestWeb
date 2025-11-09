@@ -33,9 +33,38 @@ class TrackBrowser extends Page implements HasForms
 
     public ?string $derbyFilter = '';
 
+    public array $selectedTags = [];
+
     public ?string $sortColumn = 'location';
 
     public ?string $sortDirection = 'asc';
+
+    public int $visibleCount = 12;
+
+    public function updatedSearch(): void
+    {
+        $this->visibleCount = 12;
+    }
+
+    public function updatedGamemode(): void
+    {
+        $this->visibleCount = 12;
+    }
+
+    public function updatedWeather(): void
+    {
+        $this->visibleCount = 12;
+    }
+
+    public function updatedDerbyFilter(): void
+    {
+        $this->visibleCount = 12;
+    }
+
+    public function updatedSelectedTags(): void
+    {
+        $this->visibleCount = 12;
+    }
 
     public function form(Schema $schema): Schema
     {
@@ -74,6 +103,16 @@ class TrackBrowser extends Page implements HasForms
                     ])
                     ->native(false)
                     ->live(),
+
+                Select::make('selectedTags')
+                    ->label('Filter by Tags')
+                    ->multiple()
+                    ->options(fn () => Tag::orderBy('name')->pluck('name', 'id'))
+                    ->searchable()
+                    ->native(false)
+                    ->placeholder('Select tags to filter...')
+                    ->live()
+                    ->columnSpan(2),
             ])
             ->columns(4);
     }
@@ -95,89 +134,118 @@ class TrackBrowser extends Page implements HasForms
         }
     }
 
+    public function loadMore(): void
+    {
+        $this->visibleCount += 12;
+    }
+
+    public function getVisibleTracksProperty(): Collection
+    {
+        return $this->tracks->take($this->visibleCount);
+    }
+
     protected function getFilteredTracks(): Collection
     {
-        $variants = TrackVariant::with(['track', 'tags'])->get();
-        $allTracks = collect();
+        // Build query with filters applied at database level
+        $query = TrackVariant::with(['track', 'tags']);
 
-        foreach ($variants as $variant) {
-            // Get supported weather for this variant
-            $supportedWeather = $variant->weather_conditions ?? array_keys(config('wreckfest.weather_conditions', []));
+        // Search filter - apply at database level
+        if (! empty($this->search)) {
+            $search = $this->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('variant_id', 'like', "%{$search}%")
+                    ->orWhereHas('track', fn($q) => $q->where('name', 'like', "%{$search}%"));
+            });
+        }
 
-            // Get compatible game modes
-            $compatibleGamemodes = $variant->game_mode === 'Derby'
-                ? config('wreckfest.derby_gamemodes', [])
-                : config('wreckfest.racing_gamemodes', []);
+        // Derby filter
+        if (! empty($this->derbyFilter)) {
+            if ($this->derbyFilter === 'derby') {
+                $query->where('game_mode', 'Derby');
+            } elseif ($this->derbyFilter === 'racing') {
+                $query->where('game_mode', '!=', 'Derby');
+            }
+        }
 
-            $track = (object) [
+        // Tag filter - must have ALL selected tags
+        if (! empty($this->selectedTags)) {
+            foreach ($this->selectedTags as $tagId) {
+                $query->whereHas('tags', fn($q) => $q->where('tags.id', $tagId));
+            }
+        }
+
+        // Weather filter - apply at database level using JSON
+        if (! empty($this->weather) && $this->weather !== 'random') {
+            $weather = $this->weather;
+            $query->where(function ($q) use ($weather) {
+                $q->whereRaw("json_array_length(weather_conditions) = 0")
+                    ->orWhereRaw("EXISTS (SELECT 1 FROM json_each(weather_conditions) WHERE value = ?)", [$weather]);
+            });
+        }
+
+        // Apply sorting at database level
+        switch ($this->sortColumn) {
+            case 'variant':
+                $query->orderBy('name', $this->sortDirection);
+                break;
+            case 'variant_id':
+                $query->orderBy('variant_id', $this->sortDirection);
+                break;
+            case 'derby':
+                $query->orderBy('game_mode', $this->sortDirection);
+                break;
+            case 'location':
+            default:
+                $query->join('tracks', 'track_variants.track_id', '=', 'tracks.id')
+                    ->orderBy('tracks.name', $this->sortDirection)
+                    ->select('track_variants.*');
+                break;
+        }
+
+        // Get filtered variants
+        $variants = $query->get();
+
+        // Get config values once, outside the loop (optimization)
+        $allWeatherKeys = array_keys(config('wreckfest.weather_conditions', []));
+        $derbyModes = config('wreckfest.derby_gamemodes', []);
+        $racingModes = config('wreckfest.racing_gamemodes', []);
+        $gamemodeLabels = config('wreckfest.gamemodes', []);
+
+        // Map to track objects (now only processing filtered results)
+        $result = $variants->map(function ($variant) use ($allWeatherKeys, $derbyModes, $racingModes, $gamemodeLabels) {
+            $supportedWeather = $variant->weather_conditions ?? $allWeatherKeys;
+            $compatibleGamemodes = $variant->game_mode === 'Derby' ? $derbyModes : $racingModes;
+
+            // Map gamemode keys to labels
+            $gamemodeLabelsForTrack = collect($compatibleGamemodes)->mapWithKeys(function ($mode) use ($gamemodeLabels) {
+                return [$mode => $gamemodeLabels[$mode] ?? ucfirst($mode)];
+            })->toArray();
+
+            return (object) [
                 'id' => $variant->id,
                 'location' => $variant->track->name,
                 'variant' => $variant->name,
                 'variant_id' => $variant->variant_id,
                 'derby' => $variant->game_mode === 'Derby',
                 'weather' => $supportedWeather,
-                'compatible_gamemodes' => $compatibleGamemodes,
+                'compatible_gamemodes' => array_keys($gamemodeLabelsForTrack),
+                'gamemode_labels' => $gamemodeLabelsForTrack,
                 'tags' => $variant->tags,
             ];
+        })->filter(function ($track) {
+            // Only weather and gamemode filters remain in PHP (they're complex)
+            return $this->shouldIncludeTrack($track);
+        })->values();
 
-            // Apply filters
-            if ($this->shouldIncludeTrack($track)) {
-                $allTracks->push($track);
-            }
-        }
-
-        // Apply sorting
-        $allTracks = $allTracks->sortBy(function ($track) {
-            return match ($this->sortColumn) {
-                'location' => $track->location,
-                'variant' => $track->variant,
-                'variant_id' => $track->variant_id,
-                'derby' => $track->derby,
-                default => $track->location,
-            };
-        }, SORT_NATURAL | SORT_FLAG_CASE);
-
-        if ($this->sortDirection === 'desc') {
-            $allTracks = $allTracks->reverse();
-        }
-
-        return $allTracks->values();
+        return $result;
     }
 
     protected function shouldIncludeTrack($track): bool
     {
-        // Search filter
-        if (! empty($this->search)) {
-            $searchLower = strtolower($this->search);
-            $locationMatch = str_contains(strtolower($track->location), $searchLower);
-            $variantMatch = str_contains(strtolower($track->variant), $searchLower);
-            $variantIdMatch = str_contains(strtolower($track->variant_id), $searchLower);
-
-            if (! $locationMatch && ! $variantMatch && ! $variantIdMatch) {
-                return false;
-            }
-        }
-
-        // Game mode filter
+        // Game mode filter (complex logic with config arrays, kept in PHP)
         if (! empty($this->gamemode)) {
             if (! in_array($this->gamemode, $track->compatible_gamemodes)) {
-                return false;
-            }
-        }
-
-        // Derby filter
-        if (! empty($this->derbyFilter)) {
-            if ($this->derbyFilter === 'derby' && ! $track->derby) {
-                return false;
-            }
-            if ($this->derbyFilter === 'racing' && $track->derby) {
-                return false;
-            }
-        }
-
-        // Weather filter
-        if (! empty($this->weather) && $this->weather !== 'random') {
-            if (! in_array($this->weather, $track->weather)) {
                 return false;
             }
         }

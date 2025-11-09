@@ -14,15 +14,15 @@
 
         <x-filament::section>
             <x-slot name="heading">
-                Track Results ({{ $this->tracks->count() }} tracks found)
+                Track Results ({{ $this->tracks->count() }} tracks found, showing {{ $this->visibleTracks->count() }})
             </x-slot>
 
             <!-- Grid View -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                @forelse($this->tracks as $track)
+                @forelse($this->visibleTracks as $track)
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
                         <!-- Track Image -->
-                        <div class="aspect-video bg-gray-100 dark:bg-gray-900 relative overflow-hidden pt-4">
+                        <div class="aspect-[2/1] bg-gray-100 dark:bg-gray-900 relative overflow-hidden">
                             @php
                                 $imageFilename = str_replace(['/', ' '], ['_', '_'], strtolower($track->variant_id)) . '.png';
                                 $imagePath = asset("images/tracks/{$imageFilename}");
@@ -31,6 +31,7 @@
                             <img
                                 src="{{ $imagePath }}"
                                 alt="{{ $track->variant }}"
+                                loading="lazy"
                                 class="w-full h-full object-cover"
                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                             >
@@ -90,9 +91,9 @@
                             <div class="mb-2">
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Game Modes:</p>
                                 <div class="flex flex-wrap gap-1">
-                                    @foreach($track->compatible_gamemodes as $gamemode)
+                                    @foreach($track->gamemode_labels as $gamemode => $label)
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200">
-                                            {{ config("wreckfest.gamemodes.$gamemode", ucfirst($gamemode)) }}
+                                            {{ $label }}
                                         </span>
                                     @endforeach
                                 </div>
@@ -159,6 +160,34 @@
                     </div>
                 @endforelse
             </div>
+
+            <!-- Load More -->
+            @if($this->visibleTracks->count() < $this->tracks->count())
+                <div class="text-center py-6"
+                     x-data="{
+                         observer: null,
+                         init() {
+                             this.observer = new IntersectionObserver((entries) => {
+                                 if (entries[0].isIntersecting) {
+                                     $wire.call('loadMore');
+                                 }
+                             }, { threshold: 0.1 });
+                             this.observer.observe(this.$el);
+                         }
+                     }">
+                    <button
+                        wire:click="loadMore"
+                        type="button"
+                        class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
+                    >
+                        Load More Tracks
+                        <x-filament::icon icon="heroicon-m-chevron-down" class="w-5 h-5 ml-2" />
+                    </button>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                        Showing {{ $this->visibleTracks->count() }} of {{ $this->tracks->count() }} tracks
+                    </p>
+                </div>
+            @endif
 
             <!-- Table View (collapsed by default) -->
             <details class="mt-6">
@@ -230,7 +259,7 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                        @forelse($this->tracks as $track)
+                        @forelse($this->visibleTracks as $track)
                             <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                                     {{ $track->location }}
@@ -271,9 +300,9 @@
                                 </td>
                                 <td class="px-6 py-4 text-sm">
                                     <div class="flex flex-wrap gap-1">
-                                        @foreach($track->compatible_gamemodes as $gamemode)
+                                        @foreach($track->gamemode_labels as $gamemode => $label)
                                             <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200">
-                                                {{ config("wreckfest.gamemodes.$gamemode", ucfirst($gamemode)) }}
+                                                {{ $label }}
                                             </span>
                                         @endforeach
                                     </div>
