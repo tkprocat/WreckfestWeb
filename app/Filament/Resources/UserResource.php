@@ -13,7 +13,9 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ViewField;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -34,28 +36,43 @@ class UserResource extends Resource
     {
         return $schema
             ->components([
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->unique(ignoreRecord: true)
-                    ->maxLength(255),
-                TextInput::make('password')
-                    ->password()
-                    ->required(fn (string $context): bool => $context === 'create')
-                    ->dehydrated(fn ($state) => filled($state))
-                    ->revealable()
-                    ->confirmed()
-                    ->minLength(8)
-                    ->maxLength(255),
-                TextInput::make('password_confirmation')
-                    ->password()
-                    ->required(fn (string $context): bool => $context === 'create')
-                    ->dehydrated(false)
-                    ->revealable()
-                    ->maxLength(255),
+                Section::make('Profile Information')
+                    ->schema([
+                        TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->unique(ignoreRecord: true)
+                            ->maxLength(255),
+                    ]),
+                Section::make('Password')
+                    ->description('Update your password or leave blank to keep current password.')
+                    ->schema([
+                        TextInput::make('password')
+                            ->password()
+                            ->required(fn (string $context): bool => $context === 'create')
+                            ->dehydrated(fn ($state) => filled($state))
+                            ->revealable()
+                            ->confirmed()
+                            ->minLength(8)
+                            ->maxLength(255),
+                        TextInput::make('password_confirmation')
+                            ->password()
+                            ->required(fn (string $context): bool => $context === 'create')
+                            ->dehydrated(false)
+                            ->revealable()
+                            ->maxLength(255),
+                    ]),
+                Section::make('Passkey Authentication')
+                    ->description('Manage your passkeys for passwordless authentication.')
+                    ->schema([
+                        ViewField::make('passkeys')
+                            ->view('filament.forms.components.passkey-manager')
+                            ->columnSpanFull(),
+                    ])
+                    ->visible(fn (string $context): bool => $context === 'edit'),
             ]);
     }
 

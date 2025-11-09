@@ -11,3 +11,21 @@ window.Echo = new Echo({
     forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
     enabledTransports: ['ws', 'wss'],
 });
+
+// Log WebSocket connection state changes
+window.Echo.connector.pusher.connection.bind('connected', () => {
+    console.log('%c✓ WebSocket connected successfully', 'color: green; font-weight: bold');
+    console.log('Connected to:', import.meta.env.VITE_REVERB_SCHEME + '://' + import.meta.env.VITE_REVERB_HOST + ':' + import.meta.env.VITE_REVERB_PORT);
+});
+
+window.Echo.connector.pusher.connection.bind('disconnected', () => {
+    console.log('%c✗ WebSocket disconnected', 'color: orange; font-weight: bold');
+});
+
+window.Echo.connector.pusher.connection.bind('failed', () => {
+    console.log('%c✗ WebSocket connection failed', 'color: red; font-weight: bold');
+});
+
+window.Echo.connector.pusher.connection.bind('unavailable', () => {
+    console.log('%c✗ WebSocket connection unavailable', 'color: red; font-weight: bold');
+});
