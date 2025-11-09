@@ -15,6 +15,9 @@ class ServerLogs extends Page
 
     protected static ?int $navigationSort = 4;
 
+    // Hide from navigation - logs are now integrated into Server Control page
+    protected static bool $shouldRegisterNavigation = false;
+
     protected string $view = 'filament.pages.server-logs';
 
     public ?array $logs = null;

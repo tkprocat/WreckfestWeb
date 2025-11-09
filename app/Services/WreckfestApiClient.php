@@ -251,7 +251,7 @@ class WreckfestApiClient
     }
 
     /**
-     * Restart the server
+     * Restart the server (uses in-game /restart command)
      */
     public function restartServer(): bool
     {
@@ -261,6 +261,38 @@ class WreckfestApiClient
             return $response->successful();
         } catch (Exception $e) {
             Log::error('Failed to restart server: '.$e->getMessage());
+
+            return false;
+        }
+    }
+
+    /**
+     * Force stop the server (immediately kills process)
+     */
+    public function forceStopServer(): bool
+    {
+        try {
+            $response = Http::withoutVerifying()->post("{$this->baseUrl}/Server/forcestop");
+
+            return $response->successful();
+        } catch (Exception $e) {
+            Log::error('Failed to force stop server: '.$e->getMessage());
+
+            return false;
+        }
+    }
+
+    /**
+     * Force restart the server (kills process, waits 2s, starts fresh)
+     */
+    public function forceRestartServer(): bool
+    {
+        try {
+            $response = Http::withoutVerifying()->post("{$this->baseUrl}/Server/forcerestart");
+
+            return $response->successful();
+        } catch (Exception $e) {
+            Log::error('Failed to force restart server: '.$e->getMessage());
 
             return false;
         }
@@ -280,6 +312,32 @@ class WreckfestApiClient
 
             return false;
         }
+    }
+
+    /**
+     * Send a command to the server (e.g., /bot, /kick, etc.)
+     */
+    public function sendCommand(string $command): bool
+    {
+        try {
+            $response = Http::withoutVerifying()->timeout(2)->post("{$this->baseUrl}/Server/command", [
+                'command' => $command,
+            ]);
+
+            return $response->successful();
+        } catch (Exception $e) {
+            Log::error('Failed to send command to server: '.$e->getMessage());
+
+            return false;
+        }
+    }
+
+    /**
+     * Add a bot to the server using the /bot command
+     */
+    public function addBot(): bool
+    {
+        return $this->sendCommand('/bot');
     }
 
     /**
