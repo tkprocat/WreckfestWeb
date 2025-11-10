@@ -12,13 +12,28 @@
             {{ $this->form }}
         </x-filament::section>
 
-        <x-filament::section>
+        <x-filament::section wire:init="loadResults">
             <x-slot name="heading">
-                Track Results ({{ $this->tracks->count() }} tracks found, showing {{ $this->visibleTracks->count() }})
+                @if($resultsLoaded)
+                    Track Results ({{ $this->tracks->count() }} tracks found, showing {{ $this->visibleTracks->count() }})
+                @else
+                    Track Results
+                @endif
             </x-slot>
 
-            <!-- Grid View -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            @if(!$resultsLoaded)
+                <!-- Loading State -->
+                <div class="flex flex-col items-center justify-center py-16">
+                    <div class="relative">
+                        <div class="w-16 h-16 border-4 border-gray-200 dark:border-gray-700 rounded-full"></div>
+                        <div class="absolute top-0 left-0 w-16 h-16 border-4 border-primary-600 dark:border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                    <p class="mt-4 text-sm font-medium text-gray-600 dark:text-gray-400">Loading track data...</p>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-500">Please wait while we fetch all tracks</p>
+                </div>
+            @else
+                <!-- Grid View -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                 @forelse($this->visibleTracks as $track)
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
                         <!-- Track Image -->
@@ -160,9 +175,11 @@
                     </div>
                 @endforelse
             </div>
+            @endif
 
-            <!-- Load More -->
-            @if($this->visibleTracks->count() < $this->tracks->count())
+            @if($resultsLoaded)
+                <!-- Load More -->
+                @if($this->visibleTracks->count() < $this->tracks->count())
                 <div class="text-center py-6"
                      x-data="{
                          observer: null,
@@ -380,6 +397,7 @@
                 </table>
             </div>
             </details>
+            @endif
         </x-filament::section>
     </div>
 </x-filament-panels::page>

@@ -41,6 +41,8 @@ class TrackRotation extends Page implements HasForms
 
     public ?string $currentCollectionName = null;
 
+    protected ?array $allTracksCache = null;
+
     public function updatedCurrentCollectionId($value): void
     {
         if ($value === null || $value === '') {
@@ -219,14 +221,24 @@ class TrackRotation extends Page implements HasForms
 
     protected function getAllTracks(): array
     {
-        $variants = \App\Models\TrackVariant::with('track')->get();
-        $allTracks = [];
+        // Cache the tracks list so we only load it once per request
+        if ($this->allTracksCache === null) {
+            $variants = \App\Models\TrackVariant::with('track')->get();
+            $this->allTracksCache = [];
 
-        foreach ($variants as $variant) {
-            $allTracks[$variant->variant_id] = $variant->full_name;
+            foreach ($variants as $variant) {
+                $this->allTracksCache[$variant->variant_id] = $variant->full_name;
+            }
         }
 
-        return $allTracks;
+        return $this->allTracksCache;
+    }
+
+    protected function getTrackName(string $trackId): string
+    {
+        // Reuse the cached tracks list
+        $tracks = $this->getAllTracks();
+        return $tracks[$trackId] ?? $trackId;
     }
 
     protected function searchTracksByTag(string $search): array
@@ -336,8 +348,7 @@ class TrackRotation extends Page implements HasForms
                             return 'New Track';
                         }
 
-                        $tracks = $this->getAllTracks();
-                        $trackName = $tracks[$state['track']] ?? $state['track'];
+                        $trackName = $this->getTrackName($state['track']);
                         $gamemodeName = config('wreckfest.gamemodes.'.($state['gamemode'] ?? $this->defaultGamemode), ucfirst($state['gamemode'] ?? $this->defaultGamemode));
                         $lapsText = isset($state['laps']) ? ' - '.$state['laps'].' laps' : '';
 

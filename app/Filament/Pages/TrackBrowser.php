@@ -41,6 +41,8 @@ class TrackBrowser extends Page implements HasForms
 
     public int $visibleCount = 12;
 
+    public bool $resultsLoaded = false;
+
     public function updatedSearch(): void
     {
         $this->visibleCount = 12;
@@ -64,6 +66,11 @@ class TrackBrowser extends Page implements HasForms
     public function updatedSelectedTags(): void
     {
         $this->visibleCount = 12;
+    }
+
+    public function loadResults(): void
+    {
+        $this->resultsLoaded = true;
     }
 
     public function form(Schema $schema): Schema
@@ -107,7 +114,7 @@ class TrackBrowser extends Page implements HasForms
                 Select::make('selectedTags')
                     ->label('Filter by Tags')
                     ->multiple()
-                    ->options(fn () => Tag::orderBy('name')->pluck('name', 'id'))
+                    ->options(fn () => $this->availableTags->pluck('name', 'id'))
                     ->searchable()
                     ->native(false)
                     ->placeholder('Select tags to filter...')
@@ -119,6 +126,10 @@ class TrackBrowser extends Page implements HasForms
 
     public function getTracksProperty(): Collection
     {
+        if (! $this->resultsLoaded) {
+            return collect();
+        }
+
         return $this->getFilteredTracks();
     }
 
@@ -141,13 +152,34 @@ class TrackBrowser extends Page implements HasForms
 
     public function getVisibleTracksProperty(): Collection
     {
-        return $this->tracks->take($this->visibleCount);
+        $visibleTracks = $this->tracks->take($this->visibleCount);
+
+        // Now load tags ONLY for the visible tracks
+        $variantIds = $visibleTracks->pluck('id')->filter()->unique();
+
+        if ($variantIds->isNotEmpty()) {
+            // Single query to load all tags for visible variants
+            $variantsWithTags = TrackVariant::with('tags')
+                ->whereIn('id', $variantIds->toArray())
+                ->get()
+                ->keyBy('id');
+
+            // Attach tags to the visible track objects
+            foreach ($visibleTracks as $track) {
+                if (isset($variantsWithTags[$track->id])) {
+                    $track->tags = $variantsWithTags[$track->id]->tags;
+                }
+            }
+        }
+
+        return $visibleTracks;
     }
 
     protected function getFilteredTracks(): Collection
     {
         // Build query with filters applied at database level
-        $query = TrackVariant::with(['track', 'tags']);
+        // Only eager load 'track', not 'tags' (tags will be loaded separately for visible tracks)
+        $query = TrackVariant::with(['track']);
 
         // Search filter - apply at database level
         if (! empty($this->search)) {
@@ -231,7 +263,7 @@ class TrackBrowser extends Page implements HasForms
                 'weather' => $supportedWeather,
                 'compatible_gamemodes' => array_keys($gamemodeLabelsForTrack),
                 'gamemode_labels' => $gamemodeLabelsForTrack,
-                'tags' => $variant->tags,
+                'tags' => null, // Will be loaded separately for visible tracks only
             ];
         })->filter(function ($track) {
             // Only weather and gamemode filters remain in PHP (they're complex)
