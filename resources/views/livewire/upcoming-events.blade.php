@@ -155,11 +155,11 @@
                                         </div>
 
                                         <!-- Track Image -->
-                                        <div class="w-20 h-14 flex-shrink-0 relative">
+                                        <div class="w-20 h-14 flex-shrink-0 relative bg-black/50">
                                             <img
                                                 src="{{ $imagePath }}"
                                                 alt="{{ $trackName }}"
-                                                class="w-full h-full object-cover"
+                                                class="w-full h-full object-contain"
                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                                             >
                                             <div class="absolute inset-0 flex items-center justify-center bg-black/30" style="display: none;">

@@ -464,20 +464,32 @@ class WreckfestApiClient
                 return $event;
             }, $events);
 
-            // Remove null recurring patterns to avoid C# deserialization errors
+            // Remove null recurring patterns and format time field for C# TimeSpan
             $events = array_map(function ($event) {
                 if (isset($event['recurringPattern'])) {
                     // If recurringPattern has all null values, remove it entirely
                     $pattern = $event['recurringPattern'];
                     if (empty(array_filter($pattern, fn($v) => $v !== null))) {
                         unset($event['recurringPattern']);
+                    } else {
+                        // Format time field as HH:mm:ss for C# TimeSpan deserialization
+                        if (isset($pattern['time'])) {
+                            // Ensure time is in HH:mm:ss format
+                            if (is_string($pattern['time'])) {
+                                // If it's already a string, ensure proper format
+                                $event['recurringPattern']['time'] = substr($pattern['time'], 0, 8); // Take first HH:mm:ss
+                            } elseif ($pattern['time'] instanceof \DateTimeInterface) {
+                                // If it's a DateTime object, format it
+                                $event['recurringPattern']['time'] = $pattern['time']->format('H:i:s');
+                            }
+                        }
                     }
                 }
                 return $event;
             }, $events);
 
             $payload = [
-                'events' => $events,
+                'Events' => $events,  // Capital 'Events' to match C# EventScheduleRequest property
             ];
 
             Log::info('Sending event schedule to C# API', [

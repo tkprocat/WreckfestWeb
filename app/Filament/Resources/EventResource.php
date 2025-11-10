@@ -56,7 +56,7 @@ class EventResource extends Resource
                             ->required()
                             ->native(false)
                             ->seconds(false)
-                            ->label('Start Date & Time (Copenhagen)')
+                            ->label('Start Date & Time')
                             ->helperText('Enter time in Copenhagen timezone - stored as UTC')
                             ->timezone('Europe/Copenhagen')
                             ->displayFormat('M d, Y H:i'),
