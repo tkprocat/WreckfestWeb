@@ -473,15 +473,40 @@ class WreckfestApiClient
                         unset($event['recurringPattern']);
                     } else {
                         // Format time field as HH:mm:ss for C# TimeSpan deserialization
-                        if (isset($pattern['time'])) {
-                            // Ensure time is in HH:mm:ss format
-                            if (is_string($pattern['time'])) {
-                                // If it's already a string, ensure proper format
-                                $event['recurringPattern']['time'] = substr($pattern['time'], 0, 8); // Take first HH:mm:ss
-                            } elseif ($pattern['time'] instanceof \DateTimeInterface) {
-                                // If it's a DateTime object, format it
-                                $event['recurringPattern']['time'] = $pattern['time']->format('H:i:s');
+                        if (isset($pattern['time']) && $pattern['time'] !== null && $pattern['time'] !== '') {
+                            $timeString = $pattern['time'];
+
+                            // Handle DateTime objects
+                            if ($timeString instanceof \DateTimeInterface) {
+                                $timeString = $timeString->format('H:i:s');
                             }
+
+                            // Ensure string format has seconds (HH:mm:ss)
+                            if (is_string($timeString)) {
+                                // Remove any whitespace
+                                $timeString = trim($timeString);
+
+                                // If format is HH:mm (5 chars), add :00 for seconds
+                                if (strlen($timeString) === 5 && substr_count($timeString, ':') === 1) {
+                                    $timeString .= ':00';
+                                }
+
+                                // Validate and ensure HH:mm:ss format
+                                if (preg_match('/^\d{1,2}:\d{2}(:\d{2})?$/', $timeString)) {
+                                    // Pad hour if needed (9:30 -> 09:30)
+                                    $parts = explode(':', $timeString);
+                                    $parts[0] = str_pad($parts[0], 2, '0', STR_PAD_LEFT);
+                                    if (!isset($parts[2])) {
+                                        $parts[2] = '00';
+                                    }
+                                    $timeString = implode(':', $parts);
+                                }
+
+                                $event['recurringPattern']['time'] = $timeString;
+                            }
+                        } else {
+                            // If time is null/empty, remove the entire recurring pattern
+                            unset($event['recurringPattern']);
                         }
                     }
                 }
