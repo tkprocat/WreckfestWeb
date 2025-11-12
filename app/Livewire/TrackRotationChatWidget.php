@@ -23,12 +23,15 @@ class TrackRotationChatWidget extends Component
 
     public function sendMessage(?string $userMessage = null): void
     {
-        // If no parameter provided, use the property (for backward compatibility)
+        // If no parameter provided, use the property
         $userMessage = $userMessage ?? $this->message;
 
         if (empty($userMessage)) {
             return;
         }
+
+        // Clear the input field
+        $this->message = '';
 
         // Add user message immediately
         $this->messages[] = [
@@ -44,33 +47,62 @@ class TrackRotationChatWidget extends Component
         $sessionKey = 'track_rotation_chat_messages_'.auth()->id();
         session([$sessionKey => $this->messages]);
 
-        // Don't stream yet - wait until after AI processing to avoid incomplete chunked encoding
-        // The user message will be shown when the component re-renders after AI completes
+        // Dispatch event to ensure UI updates immediately with user message
+        $this->dispatch('messages-updated', count: count($this->messages));
 
-        // Process synchronously - HAProxy now handles long timeouts
+        // Stream AI response using Livewire's wire:stream
         try {
-            $startTime = microtime(true);
-            logger()->info('[TrackRotationChat] Starting AI request', ['user_id' => auth()->id()]);
-
-            // Get AI response
             $chatKey = 'user_'.auth()->id();
             $agent = new TrackCollectionAgent($chatKey);
-            $response = $agent->respond($userMessage);
 
-            $duration = microtime(true) - $startTime;
-            logger()->info('[TrackRotationChat] AI request completed', [
-                'user_id' => auth()->id(),
-                'duration' => round($duration, 2).'s',
+            logger()->info('[Chat] About to call respondStreamed', ['message' => $userMessage]);
+
+            // Use respondStreamed for streaming response
+            $fullResponse = '';
+            $chunkCount = 0;
+            foreach ($agent->respondStreamed($userMessage) as $chunk) {
+                $chunkCount++;
+
+                // Check chunk type and log for debugging
+                logger()->info('[Chat] Received chunk', [
+                    'chunk_number' => $chunkCount,
+                    'type' => get_class($chunk),
+                    'chunk' => method_exists($chunk, 'getLastChunk') ? $chunk->getLastChunk() : 'no method',
+                ]);
+
+                // Handle StreamedAssistantMessage
+                if (method_exists($chunk, 'getLastChunk')) {
+                    $delta = $chunk->getLastChunk();
+
+                    if ($delta && is_string($delta) && $delta !== '') {
+                        $fullResponse .= $delta;
+
+                        // Stream each chunk to the browser
+                        $this->stream(
+                            to: 'ai-response',
+                            content: $delta,
+                            replace: false
+                        );
+                    }
+                }
+            }
+
+            logger()->info('[Chat] Finished streaming', [
+                'total_chunks' => $chunkCount,
+                'response_length' => strlen($fullResponse)
             ]);
 
-            // Add assistant response
-            $this->addAssistantResponse($response);
+            // Save the complete response
+            if ($fullResponse) {
+                $this->addAssistantResponse($fullResponse);
+            } else {
+                logger()->warning('[Chat] No response received from agent');
+            }
         } catch (\Exception $e) {
-            $duration = microtime(true) - ($startTime ?? microtime(true));
             logger()->error('[TrackRotationChat] AI request failed', [
                 'user_id' => auth()->id(),
-                'duration' => round($duration, 2).'s',
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
             $this->handleAiError($e);
         }
@@ -168,6 +200,7 @@ class TrackRotationChatWidget extends Component
 
         return false;
     }
+
 
     public function render()
     {

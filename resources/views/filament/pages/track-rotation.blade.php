@@ -67,7 +67,7 @@
         <select
             x-ref="collectionSelect"
             @change="confirmSwitch($event)"
-            class="mt-1 block w-full max-w-md rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500"
+            class="mt-1 block w-full max-w-md rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 px-3 py-2"
         >
             <option value="">Loaded from server (unsaved)</option>
             @foreach(\App\Models\TrackCollection::orderBy('updated_at', 'desc')->get() as $collection)

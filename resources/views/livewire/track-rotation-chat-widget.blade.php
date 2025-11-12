@@ -3,7 +3,8 @@
         isDragging: false,
         position: { x: window.innerWidth - 450, y: 100 },
         offset: { x: 0, y: 0 },
-        isStreaming: false,
+        messagesContainer: null,
+        pendingUserMessage: '',
 
         startDrag(e) {
             this.isDragging = true;
@@ -11,66 +12,11 @@
             this.offset.y = e.clientY - this.position.y;
         },
 
-        drag(e) {
-            if (this.isDragging) {
-                this.position.x = e.clientX - this.offset.x;
-                this.position.y = e.clientY - this.offset.y;
-            }
-        },
-
         stopDrag() {
             this.isDragging = false;
-        },
-
-        async sendMessageStream(message) {
-            if (!message || !message.trim()) return;
-
-            this.isStreaming = true;
-
-            try {
-                const response = await fetch('/api/chat/stream', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').content
-                    },
-                    body: JSON.stringify({ message: message })
-                });
-
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let aiResponse = '';
-
-                // Read the stream
-                while (true) {
-                    const { done, value } = await reader.read();
-
-                    if (done) break;
-
-                    const chunk = decoder.decode(value);
-                    aiResponse += chunk;
-
-                    // Update the streaming response element
-                    const streamingEl = document.getElementById('streaming-response');
-                    if (streamingEl) {
-                        streamingEl.textContent = aiResponse;
-                    }
-
-                    // Scroll to bottom
-                    this.$refs.messagesContainer.scrollTop = this.$refs.messagesContainer.scrollHeight;
-                }
-
-                // Save complete conversation to Livewire component
-                await $wire.call('saveMessage', message, aiResponse);
-
-            } catch (error) {
-                console.error('Streaming error:', error);
-            } finally {
-                this.isStreaming = false;
-            }
         }
     }"
-    @mousemove.window="drag($event)"
+    @mousemove.window="if (isDragging) { position.x = $event.clientX - offset.x; position.y = $event.clientY - offset.y; }"
     @mouseup.window="stopDrag()"
     class="fixed z-50"
     :style="'left: ' + position.x + 'px; top: ' + position.y + 'px;'"
@@ -114,48 +60,63 @@
         <div
             x-show="!$wire.isMinimized"
             x-transition
-            class="h-96 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900"
+            class="overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900"
             x-ref="messagesContainer"
-            x-data="{
-                scrollToBottom() {
-                    this.$refs.messagesContainer.scrollTop = this.$refs.messagesContainer.scrollHeight;
-                }
-            }"
             x-init="
-                // Scroll to bottom on initial load
-                $nextTick(() => scrollToBottom());
+                // Store ref to messagesContainer in parent scope
+                messagesContainer = $refs.messagesContainer;
+
+                // Scroll to bottom on initial load and when messages update
+                $nextTick(() => {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                });
+
+                // Listen for messages-updated event
+                $watch('$wire.messages', () => {
+                    $nextTick(() => {
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    });
+                    // Clear pending message when backend updates
+                    pendingUserMessage = '';
+                });
+
+                // Watch for pending message changes
+                $watch('pendingUserMessage', () => {
+                    $nextTick(() => {
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    });
+                });
             "
-            style="max-height: 400px !important;"
+            style="min-height: 400px; max-height: 400px;"
         >
             <!-- Existing messages from Livewire -->
             @foreach($messages as $message)
                 <div class="flex {{ $message['role'] === 'user' ? 'justify-end' : 'justify-start' }}">
-                    <div class="max-w-[80%] {{ $message['role'] === 'user' ? 'bg-primary-600 text-white' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700' }} rounded-lg p-3 shadow-sm">
-                        <p class="text-sm whitespace-pre-wrap">{{ $message['content'] }}</p>
+                    <div class="max-w-[80%] {{ $message['role'] === 'user' ? 'bg-primary-600 text-white' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700' }} rounded-lg px-4 py-3 shadow-sm">
+                        <p class="text-sm whitespace-pre-wrap leading-relaxed">{{ $message['content'] }}</p>
                     </div>
                 </div>
             @endforeach
 
-            <!-- Streaming AI response (shown during streaming) -->
-            <div x-show="isStreaming" class="flex justify-start">
-                <div class="max-w-[80%] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm">
-                    <p id="streaming-response" class="text-sm whitespace-pre-wrap"></p>
+            <!-- Pending user message (shown immediately when form submitted) -->
+            <div x-show="pendingUserMessage !== ''" class="flex justify-end">
+                <div class="max-w-[80%] bg-primary-600 text-white rounded-lg px-4 py-3 shadow-sm">
+                    <p class="text-sm whitespace-pre-wrap leading-relaxed" x-text="pendingUserMessage"></p>
                 </div>
             </div>
 
-            <!-- Loading indicator -->
-            <div wire:loading wire:target="sendMessage" class="flex justify-start">
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
-                    <div class="flex items-center gap-2">
-                        <div class="flex gap-1">
-                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
-                        </div>
-                        <span class="text-xs text-gray-500">AI is thinking...</span>
-                    </div>
+            <!-- Streaming AI response -->
+            <div
+                wire:loading
+                wire:target="sendMessage"
+                class="flex justify-start"
+            >
+                <div class="max-w-[80%] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm">
+                    <!-- Streamed text content -->
+                    <p wire:stream="ai-response" class="text-sm whitespace-pre-wrap leading-relaxed"></p>
                 </div>
             </div>
+
         </div>
 
         <!-- Input Area -->
@@ -164,21 +125,12 @@
             x-transition
             class="p-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 rounded-b-lg"
         >
-            <form
-                @submit.prevent="
-                    const msg = $refs.messageInput.value;
-                    if (msg && msg.trim()) {
-                        $refs.messageInput.value = '';
-                        sendMessageStream(msg);
-                    }
-                "
-                class="flex gap-2"
-            >
+            <form wire:submit="sendMessage" class="flex gap-2" @submit="pendingUserMessage = $wire.message">
                 <input
-                    x-ref="messageInput"
+                    wire:model="message"
                     type="text"
                     placeholder="Ask about tracks, collections..."
-                    class="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                    class="flex-1 px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                 />
                 <button
                     type="submit"
