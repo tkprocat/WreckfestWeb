@@ -3,6 +3,7 @@
         isDragging: false,
         position: { x: window.innerWidth - 450, y: 100 },
         offset: { x: 0, y: 0 },
+        isStreaming: false,
 
         startDrag(e) {
             this.isDragging = true;
@@ -19,6 +20,54 @@
 
         stopDrag() {
             this.isDragging = false;
+        },
+
+        async sendMessageStream(message) {
+            if (!message || !message.trim()) return;
+
+            this.isStreaming = true;
+
+            try {
+                const response = await fetch('/api/chat/stream', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').content
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let aiResponse = '';
+
+                // Read the stream
+                while (true) {
+                    const { done, value } = await reader.read();
+
+                    if (done) break;
+
+                    const chunk = decoder.decode(value);
+                    aiResponse += chunk;
+
+                    // Update the streaming response element
+                    const streamingEl = document.getElementById('streaming-response');
+                    if (streamingEl) {
+                        streamingEl.textContent = aiResponse;
+                    }
+
+                    // Scroll to bottom
+                    this.$refs.messagesContainer.scrollTop = this.$refs.messagesContainer.scrollHeight;
+                }
+
+                // Save complete conversation to Livewire component
+                await $wire.call('saveMessage', message, aiResponse);
+
+            } catch (error) {
+                console.error('Streaming error:', error);
+            } finally {
+                this.isStreaming = false;
+            }
         }
     }"
     @mousemove.window="drag($event)"
@@ -75,23 +124,23 @@
             x-init="
                 // Scroll to bottom on initial load
                 $nextTick(() => scrollToBottom());
-                // Watch for new messages
-                $watch('$wire.messages', (value) => {
-                    $nextTick(() => scrollToBottom());
-                });
             "
-            @messages-updated.window="
-                $wire.$refresh();
-                $nextTick(() => scrollToBottom());
-            "
-            @message-sent.window="
-                $nextTick(() => scrollToBottom());
-            "
-            wire:stream.rendered="$nextTick(() => scrollToBottom())"
             style="max-height: 400px !important;"
         >
-            <div wire:stream="chat-messages">
-                @include('livewire.partials.chat-messages', ['messages' => $messages])
+            <!-- Existing messages from Livewire -->
+            @foreach($messages as $message)
+                <div class="flex {{ $message['role'] === 'user' ? 'justify-end' : 'justify-start' }}">
+                    <div class="max-w-[80%] {{ $message['role'] === 'user' ? 'bg-primary-600 text-white' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700' }} rounded-lg p-3 shadow-sm">
+                        <p class="text-sm whitespace-pre-wrap">{{ $message['content'] }}</p>
+                    </div>
+                </div>
+            @endforeach
+
+            <!-- Streaming AI response (shown during streaming) -->
+            <div x-show="isStreaming" class="flex justify-start">
+                <div class="max-w-[80%] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm">
+                    <p id="streaming-response" class="text-sm whitespace-pre-wrap"></p>
+                </div>
             </div>
 
             <!-- Loading indicator -->
@@ -117,23 +166,19 @@
         >
             <form
                 @submit.prevent="
-                    const msg = $wire.message;
+                    const msg = $refs.messageInput.value;
                     if (msg && msg.trim()) {
                         $refs.messageInput.value = '';
-                        $wire.message = '';
-                        $wire.call('sendMessage', msg);
+                        sendMessageStream(msg);
                     }
                 "
                 class="flex gap-2"
             >
                 <input
                     x-ref="messageInput"
-                    wire:model.live="message"
                     type="text"
                     placeholder="Ask about tracks, collections..."
-                    class="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                    wire:loading.attr="disabled"
-                    wire:target="sendMessage"
+                    class="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 />
                 <button
                     type="submit"

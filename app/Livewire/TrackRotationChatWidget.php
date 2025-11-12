@@ -44,12 +44,8 @@ class TrackRotationChatWidget extends Component
         $sessionKey = 'track_rotation_chat_messages_'.auth()->id();
         session([$sessionKey => $this->messages]);
 
-        // Stream user message to browser immediately before AI processing
-        $this->stream(
-            to: 'chat-messages',
-            content: view('livewire.partials.chat-messages', ['messages' => $this->messages])->render(),
-            replace: true
-        );
+        // Don't stream yet - wait until after AI processing to avoid incomplete chunked encoding
+        // The user message will be shown when the component re-renders after AI completes
 
         // Process synchronously - HAProxy now handles long timeouts
         try {
