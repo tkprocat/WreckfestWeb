@@ -1,12 +1,21 @@
 <div
     x-data="{
+        isDocked: false,
         isDragging: false,
+        isResizing: false,
         position: { x: window.innerWidth - 450, y: 100 },
+        size: { width: 384, height: 500 },
         offset: { x: 0, y: 0 },
+        resizeStart: { x: 0, y: 0, width: 0, height: 0 },
         messagesContainer: null,
         pendingUserMessage: '',
 
+        toggleDock() {
+            this.isDocked = !this.isDocked;
+        },
+
         startDrag(e) {
+            if (this.isDocked) return;
             this.isDragging = true;
             this.offset.x = e.clientX - this.position.x;
             this.offset.y = e.clientY - this.position.y;
@@ -14,18 +23,45 @@
 
         stopDrag() {
             this.isDragging = false;
+        },
+
+        startResize(e) {
+            if (this.isDocked) return;
+            e.stopPropagation();
+            this.isResizing = true;
+            this.resizeStart.x = e.clientX;
+            this.resizeStart.y = e.clientY;
+            this.resizeStart.width = this.size.width;
+            this.resizeStart.height = this.size.height;
+        },
+
+        stopResize() {
+            this.isResizing = false;
+        },
+
+        handleMouseMove(e) {
+            if (this.isDragging && !this.isDocked) {
+                this.position.x = e.clientX - this.offset.x;
+                this.position.y = e.clientY - this.offset.y;
+            } else if (this.isResizing && !this.isDocked) {
+                const deltaX = e.clientX - this.resizeStart.x;
+                const deltaY = e.clientY - this.resizeStart.y;
+                this.size.width = Math.max(300, this.resizeStart.width + deltaX);
+                this.size.height = Math.max(400, this.resizeStart.height + deltaY);
+            }
         }
     }"
-    @mousemove.window="if (isDragging) { position.x = $event.clientX - offset.x; position.y = $event.clientY - offset.y; }"
-    @mouseup.window="stopDrag()"
-    class="fixed z-50"
-    :style="'left: ' + position.x + 'px; top: ' + position.y + 'px;'"
+    @mousemove.window="handleMouseMove($event)"
+    @mouseup.window="stopDrag(); stopResize()"
+    :class="isDocked ? 'relative mb-4' : 'fixed z-50'"
+    :style="isDocked ? 'width: 100%; height: 500px;' : 'left: ' + position.x + 'px; top: ' + position.y + 'px; width: ' + size.width + 'px; height: ' + size.height + 'px;'"
 >
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 w-96">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 h-full flex flex-col relative">
         <!-- Header -->
         <div
             @mousedown="startDrag($event)"
-            class="flex items-center justify-between p-3 bg-primary-600 dark:bg-primary-700 text-white rounded-t-lg cursor-move"
+            class="flex items-center justify-between p-3 bg-primary-600 dark:bg-primary-700 text-white rounded-t-lg"
+            :class="!isDocked ? 'cursor-move' : ''"
         >
             <div class="flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -34,6 +70,20 @@
                 <span class="font-semibold text-sm">AI Assistant</span>
             </div>
             <div class="flex items-center gap-1">
+                <button
+                    @click="toggleDock()"
+                    class="p-1 hover:bg-primary-700 dark:hover:bg-primary-800 rounded transition"
+                    :title="isDocked ? 'Undock (floating)' : 'Pin to top'"
+                >
+                    <!-- Pin icon when not docked -->
+                    <svg x-show="!isDocked" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                    </svg>
+                    <!-- Unpin icon when docked -->
+                    <svg x-show="isDocked" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                    </svg>
+                </button>
                 <button
                     wire:click="toggleMinimize"
                     class="p-1 hover:bg-primary-700 dark:hover:bg-primary-800 rounded transition"
@@ -60,7 +110,7 @@
         <div
             x-show="!$wire.isMinimized"
             x-transition
-            class="overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900"
+            class="overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900 flex-1"
             x-ref="messagesContainer"
             x-init="
                 // Store ref to messagesContainer in parent scope
@@ -87,12 +137,11 @@
                     });
                 });
             "
-            style="min-height: 400px; max-height: 400px;"
         >
             <!-- Existing messages from Livewire -->
             @foreach($messages as $message)
                 <div class="flex {{ $message['role'] === 'user' ? 'justify-end' : 'justify-start' }}">
-                    <div class="max-w-[80%] {{ $message['role'] === 'user' ? 'bg-primary-600 text-white' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700' }} rounded-lg px-4 py-3 shadow-sm">
+                    <div class="max-w-[80%] {{ $message['role'] === 'user' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700' }} rounded-lg px-4 py-3 shadow-sm">
                         <p class="text-sm whitespace-pre-wrap leading-relaxed">{{ $message['content'] }}</p>
                     </div>
                 </div>
@@ -100,7 +149,7 @@
 
             <!-- Pending user message (shown immediately when form submitted) -->
             <div x-show="pendingUserMessage !== ''" class="flex justify-end">
-                <div class="max-w-[80%] bg-primary-600 text-white rounded-lg px-4 py-3 shadow-sm">
+                <div class="max-w-[80%] bg-blue-600 text-white rounded-lg px-4 py-3 shadow-sm">
                     <p class="text-sm whitespace-pre-wrap leading-relaxed" x-text="pendingUserMessage"></p>
                 </div>
             </div>
@@ -112,6 +161,9 @@
                 class="flex justify-start"
             >
                 <div class="max-w-[80%] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm">
+                    <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                        <span>AI is thinking...</span>
+                    </div>
                     <!-- Streamed text content -->
                     <p wire:stream="ai-response" class="text-sm whitespace-pre-wrap leading-relaxed"></p>
                 </div>
@@ -147,6 +199,18 @@
                     </svg>
                 </button>
             </form>
+        </div>
+
+        <!-- Resize Handle (only show when floating) -->
+        <div
+            x-show="!isDocked"
+            @mousedown="startResize($event)"
+            class="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize"
+            title="Drag to resize"
+        >
+            <svg class="w-4 h-4 text-gray-400 dark:text-gray-600" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M16 16V10h-2v4h-4v2h6zM16 6V0h-2v4h-4v2h6z"/>
+            </svg>
         </div>
     </div>
 </div>
