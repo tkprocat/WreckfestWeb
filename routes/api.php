@@ -25,6 +25,11 @@ Route::post('/set-timezone', function (Request $request) {
 Route::post('/webhooks/players-updated', [WebhookController::class, 'playersUpdated']);
 Route::post('/webhooks/track-changed', [WebhookController::class, 'trackChanged']);
 Route::post('/webhooks/event-activated', [WebhookController::class, 'eventActivated']);
+Route::post('/webhooks/server-started', [WebhookController::class, 'serverStarted']);
+Route::post('/webhooks/server-stopped', [WebhookController::class, 'serverStopped']);
+Route::post('/webhooks/server-restarted', [WebhookController::class, 'serverRestarted']);
+Route::post('/webhooks/server-attached', [WebhookController::class, 'serverAttached']);
+Route::post('/webhooks/server-restart-pending', [WebhookController::class, 'serverRestartPending']);
 
 
 Route::get('test', function () {

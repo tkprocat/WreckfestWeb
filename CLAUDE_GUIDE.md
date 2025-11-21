@@ -181,9 +181,71 @@ Tag
 ### API
 
 **Public Webhooks** (from C# Controller):
+
+**Player & Game State:**
 - `/api/webhooks/players-updated` - Player list changes
 - `/api/webhooks/track-changed` - Track change notifications
-- `/api/webhooks/event-activated` - Event activation *(NEW)*
+- `/api/webhooks/event-activated` - Event activation
+
+**Server Lifecycle (NEW):**
+- `/api/webhooks/server-started` - Server successfully started
+- `/api/webhooks/server-stopped` - Server stopped (graceful or force)
+- `/api/webhooks/server-restarted` - Server restarted (command or full)
+- `/api/webhooks/server-attached` - Controller attached to running server
+- `/api/webhooks/server-restart-pending` - Smart restart countdown in progress
+
+**Webhook Details:**
+
+All webhooks broadcast events via Laravel Reverb to the `server-updates` channel for real-time UI updates.
+
+**Server Lifecycle Webhook Payloads:**
+
+```php
+// server-started
+{
+    "processId": 12345,
+    "processName": "Wreckfest_x64",
+    "startTime": "2025-01-15T20:30:00Z",
+    "timestamp": "2025-01-15T20:30:02Z"
+}
+// Broadcasts: server.started
+
+// server-stopped
+{
+    "processId": 12345,
+    "stopMethod": "Graceful", // or "Force"
+    "timestamp": "2025-01-15T21:00:00Z"
+}
+// Broadcasts: server.stopped
+
+// server-restarted
+{
+    "oldProcessId": 12345,
+    "newProcessId": 12567,
+    "restartMethod": "Command", // or "Full"
+    "timestamp": "2025-01-15T21:05:00Z"
+}
+// Broadcasts: server.restarted
+
+// server-attached
+{
+    "processId": 15234,
+    "processName": "Wreckfest_x64",
+    "startTime": "2025-01-15T18:00:00Z",
+    "timestamp": "2025-01-15T20:45:00Z"
+}
+// Broadcasts: server.attached
+
+// server-restart-pending
+{
+    "minutesRemaining": 3,
+    "eventName": "Weekend Derby Event",
+    "eventId": 42,
+    "scheduledRestartTime": "2025-01-15T21:10:00Z",
+    "timestamp": "2025-01-15T21:07:00Z"
+}
+// Broadcasts: server.restart-pending
+```
 
 ---
 
@@ -426,6 +488,11 @@ WreckfestWeb/
 │   ├── Events/             # Laravel events
 │   │   ├── EventActivated.php
 │   │   ├── PlayersUpdated.php
+│   │   ├── ServerAttached.php
+│   │   ├── ServerRestartPending.php
+│   │   ├── ServerRestarted.php
+│   │   ├── ServerStarted.php
+│   │   ├── ServerStopped.php
 │   │   └── TrackChanged.php
 │   ├── Http/
 │   │   ├── Controllers/
@@ -479,10 +546,11 @@ WreckfestWeb/
 ---
 
 **Last Updated**: January 2025
-**Project Version**: 1.0.0 (Events Feature in Progress)
+**Project Version**: 1.0.0
 
 **Recent Features**:
-- Events system for scheduling server configurations
-- Smart restart with player-friendly timing
-- Event activation notifications
-- Recurring event support
+- ✅ Events system for scheduling server configurations
+- ✅ Smart restart with player-friendly timing
+- ✅ Event activation notifications
+- ✅ Recurring event support
+- ✅ Server lifecycle webhooks (started, stopped, restarted, attached, restart-pending)
