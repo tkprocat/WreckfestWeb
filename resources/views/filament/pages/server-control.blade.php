@@ -159,64 +159,45 @@
         {{-- Server Logs --}}
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6"
              x-data="{
-                ws: null,
+                channel: null,
                 wsConnected: false,
                 wsError: null,
 
-                connectWebSocket() {
-                    // Close existing connection if any
-                    if (this.ws) {
-                        this.ws.close();
-                    }
-
-                    // Get WebSocket URL from Laravel config
-                    const apiUrl = '{{ config('wreckfest.api_url', 'https://localhost:5101/api') }}';
-                    const wsUrl = apiUrl.replace('https://', 'wss://').replace('http://', 'ws://').replace('/api', '/ws/console');
-
-                    console.log('Connecting to WebSocket:', wsUrl);
-
+                connectReverb() {
                     try {
-                        this.ws = new WebSocket(wsUrl);
+                        // Subscribe to the server-console channel via Laravel Echo/Reverb
+                        this.channel = window.Echo.channel('server-console');
 
-                        this.ws.onopen = () => {
-                            console.log('WebSocket connected to server logs');
-                            this.wsConnected = true;
-                            this.wsError = null;
-                        };
+                        this.channel.listen('.ConsoleLogReceived', (event) => {
+                            console.log('Received console logs:', event.logs);
 
-                        this.ws.onmessage = (event) => {
-                            // Append new log line
-                            $wire.call('appendLog', event.data);
-                        };
+                            // Append all logs from the batch
+                            event.logs.forEach(log => {
+                                $wire.call('appendLog', log);
+                            });
+                        });
 
-                        this.ws.onerror = (error) => {
-                            console.error('WebSocket error:', error);
-                            this.wsError = 'Failed to connect to server logs WebSocket';
-                            this.wsConnected = false;
-                        };
-
-                        this.ws.onclose = () => {
-                            console.log('WebSocket disconnected');
-                            this.wsConnected = false;
-                            // Auto-reconnect after 5 seconds
-                            setTimeout(() => this.connectWebSocket(), 5000);
-                        };
+                        // Set connected state
+                        this.wsConnected = true;
+                        this.wsError = null;
+                        console.log('Subscribed to server-console channel via Reverb');
                     } catch (error) {
-                        console.error('Failed to create WebSocket:', error);
+                        console.error('Failed to connect to Reverb:', error);
                         this.wsError = error.message;
+                        this.wsConnected = false;
                     }
                 },
 
-                disconnectWebSocket() {
-                    if (this.ws) {
-                        this.ws.close();
-                        this.ws = null;
+                disconnectReverb() {
+                    if (this.channel) {
+                        window.Echo.leave('server-console');
+                        this.channel = null;
                         this.wsConnected = false;
                     }
                 }
             }"
-             x-init="connectWebSocket()"
-             @beforeunload.window="disconnectWebSocket()">
+             x-init="connectReverb()"
+             @beforeunload.window="disconnectReverb()">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center gap-3">
                     <h3 class="text-lg font-semibold">Server Logs</h3>

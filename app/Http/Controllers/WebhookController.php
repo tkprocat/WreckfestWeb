@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ConsoleLogReceived;
 use App\Events\EventActivated;
 use App\Events\PlayersUpdated;
 use App\Events\ServerAttached;
@@ -214,6 +215,22 @@ class WebhookController extends Controller
         ));
 
         Log::info('Server restart pending: '.$validated['minutesRemaining'].' minutes remaining');
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Handle console logs webhook from C# server
+     */
+    public function consoleLogs(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'logs' => 'required|array',
+            'logs.*' => 'required|string',
+        ]);
+
+        // Broadcast the logs to all connected clients via Reverb
+        broadcast(new ConsoleLogReceived($validated['logs']));
 
         return response()->json(['success' => true]);
     }

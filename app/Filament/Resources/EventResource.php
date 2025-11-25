@@ -148,6 +148,15 @@ class EventResource extends Resource
                     ->label('Track Rotation')
                     ->searchable(),
 
+                IconColumn::make('recurring_pattern')
+                    ->label('Recurring')
+                    ->boolean()
+                    ->getStateUsing(fn ($record) => !empty($record->recurring_pattern))
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('gray'),
+
                 IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean()

@@ -18,7 +18,17 @@
                 </svg>
                 <span class="text-wreckfest font-bold uppercase tracking-wider text-sm">Currently Active</span>
             </div>
-            <h3 class="text-white font-bold text-lg">{{ $activeEvent['name'] }}</h3>
+            <div class="flex items-center gap-2">
+                <h3 class="text-white font-bold text-lg">{{ $activeEvent['name'] }}</h3>
+                @if($activeEvent['is_recurring'])
+                    <span class="bg-purple-600/30 text-purple-400 text-xs font-bold px-2 py-1 rounded border border-purple-600/50 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        RECURRING
+                    </span>
+                @endif
+            </div>
             @if($activeEvent['description'])
                 <div class="text-gray-300 text-sm mt-1 prose prose-sm prose-invert max-w-none">{!! $activeEvent['description'] !!}</div>
             @endif
@@ -31,7 +41,17 @@
             @foreach($events as $event)
                 <div x-data="{ expanded: false }" class="bg-black/30 rounded p-4 hover:bg-black/40 transition-colors border-l-4 border-blue-500 shadow-lg">
                     <div class="flex items-start justify-between mb-2">
-                        <h3 class="text-white font-bold text-xl">{{ $event['name'] }}</h3>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-white font-bold text-xl">{{ $event['name'] }}</h3>
+                            @if($event['is_recurring'])
+                                <span class="bg-purple-600/30 text-purple-400 text-xs font-bold px-2 py-1 rounded border border-purple-600/50 flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    RECURRING
+                                </span>
+                            @endif
+                        </div>
                         <div
                             class="text-gray-400 text-base font-mono whitespace-nowrap ml-4"
                             x-data="{

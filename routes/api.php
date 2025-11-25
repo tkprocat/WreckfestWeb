@@ -30,6 +30,7 @@ Route::post('/webhooks/server-stopped', [WebhookController::class, 'serverStoppe
 Route::post('/webhooks/server-restarted', [WebhookController::class, 'serverRestarted']);
 Route::post('/webhooks/server-attached', [WebhookController::class, 'serverAttached']);
 Route::post('/webhooks/server-restart-pending', [WebhookController::class, 'serverRestartPending']);
+Route::post('/webhooks/console-logs', [WebhookController::class, 'consoleLogs']);
 
 
 Route::get('test', function () {
