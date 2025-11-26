@@ -16,6 +16,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\KeyValue;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\Action;
@@ -41,93 +42,123 @@ class EventResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Event Details')
+                Grid::make(2)
+                    ->columnSpanFull()
                     ->schema([
-                        TextInput::make('name')
-                            ->required()
-                            ->maxLength(255)
-                            ->columnSpanFull(),
+                        // Left column - Event Details and Schedule
+                        Grid::make(1)
+                            ->schema([
+                                Section::make('Event Details')
+                                    ->schema([
+                                        TextInput::make('name')
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->columnSpanFull(),
 
-                        RichEditor::make('description')
-                            ->nullable()
-                            ->columnSpanFull(),
+                                        RichEditor::make('description')
+                                            ->nullable()
+                                            ->columnSpanFull(),
 
-                        DateTimePicker::make('start_time')
-                            ->required()
-                            ->native(false)
-                            ->seconds(false)
-                            ->label('Start Date & Time')
-                            ->helperText('Enter time in Copenhagen timezone - stored as UTC')
-                            ->timezone('Europe/Copenhagen')
-                            ->displayFormat('M d, Y H:i'),
+                                        Select::make('track_collection_id')
+                                            ->label('Track Rotation')
+                                            ->relationship('trackCollection', 'name')
+                                            ->required()
+                                            ->searchable()
+                                            ->preload()
+                                            ->createOptionForm([
+                                                TextInput::make('name')
+                                                    ->required()
+                                                    ->label('Collection Name'),
+                                            ])
+                                            ->columnSpanFull(),
+                                    ]),
 
-                        Select::make('track_collection_id')
-                            ->label('Track Rotation')
-                            ->relationship('trackCollection', 'name')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->createOptionForm([
-                                TextInput::make('name')
-                                    ->required()
-                                    ->label('Collection Name'),
-                            ]),
-                    ])
-                    ->columns(2),
+                                Section::make('Schedule')
+                                    ->schema([
+                                        Select::make('occurrence_type')
+                                            ->label('Occurrence')
+                                            ->options([
+                                                'single' => 'Single',
+                                                'daily' => 'Daily',
+                                                'weekly' => 'Weekly',
+                                            ])
+                                            ->default('single')
+                                            ->live()
+                                            ->dehydrated(false)
+                                            ->afterStateHydrated(function ($state, $set, $record) {
+                                                if ($record && $record->repeat && !empty($record->repeat['frequency'])) {
+                                                    $set('occurrence_type', $record->repeat['frequency']);
+                                                } else {
+                                                    $set('occurrence_type', 'single');
+                                                }
+                                            })
+                                            ->afterStateUpdated(function ($state, $set) {
+                                                if ($state === 'single') {
+                                                    $set('repeat', null);
+                                                } else {
+                                                    $set('repeat.frequency', $state);
+                                                }
+                                            }),
 
-                Section::make('Server Configuration')
-                    ->description('Server settings that will be applied when this event activates')
-                    ->schema([
-                        TextInput::make('server_config.serverName')
-                            ->label('Server Name (supports color codes)')
-                            ->maxLength(255)
-                            ->suffixIcon('heroicon-o-paint-brush')
-                            ->view('components.wreckfest-text-input'),
+                                        DateTimePicker::make('start_time')
+                                            ->label('Start Date & Time')
+                                            ->native(false)
+                                            ->seconds(false)
+                                            ->helperText('Enter time in Copenhagen timezone - stored as UTC')
+                                            ->timezone('Europe/Copenhagen')
+                                            ->displayFormat('M d, Y H:i')
+                                            ->visible(fn ($get) => $get('occurrence_type') === 'single')
+                                            ->required(fn ($get) => $get('occurrence_type') === 'single'),
 
-                        \Filament\Forms\Components\Textarea::make('server_config.welcomeMessage')
-                            ->label('Welcome Message (supports color codes)')
-                            ->rows(3)
-                            ->view('components.wreckfest-textarea-input'),
+                                        Select::make('repeat.days')
+                                            ->label('Days of Week')
+                                            ->options([
+                                                1 => 'Monday',
+                                                2 => 'Tuesday',
+                                                3 => 'Wednesday',
+                                                4 => 'Thursday',
+                                                5 => 'Friday',
+                                                6 => 'Saturday',
+                                                0 => 'Sunday',
+                                            ])
+                                            ->multiple()
+                                            ->visible(fn ($get) => $get('occurrence_type') === 'weekly')
+                                            ->required(fn ($get) => $get('occurrence_type') === 'weekly'),
 
-                        TextInput::make('server_config.serverPassword')
-                            ->label('Server Password')
-                            ->password()
-                            ->maxLength(255),
-                    ])
-                    ->collapsible(),
-
-                Section::make('Recurring Pattern')
-                    ->description('Optional: Make this event repeat automatically')
-                    ->schema([
-                        Select::make('recurring_pattern.type')
-                            ->label('Frequency')
-                            ->options([
-                                'daily' => 'Daily',
-                                'weekly' => 'Weekly',
+                                        TextInput::make('repeat.time')
+                                            ->label('Time')
+                                            ->placeholder('23:00')
+                                            ->helperText('Time of day for the event (HH:MM)')
+                                            ->visible(fn ($get) => in_array($get('occurrence_type'), ['daily', 'weekly']))
+                                            ->required(fn ($get) => in_array($get('occurrence_type'), ['daily', 'weekly'])),
+                                    ])
+                                    ->columns(2),
                             ])
-                            ->reactive(),
+                            ->columnSpan(1),
 
-                        Select::make('recurring_pattern.days')
-                            ->label('Days of Week')
-                            ->options([
-                                1 => 'Monday',
-                                2 => 'Tuesday',
-                                3 => 'Wednesday',
-                                4 => 'Thursday',
-                                5 => 'Friday',
-                                6 => 'Saturday',
-                                0 => 'Sunday',
+                        // Right column - Server Configuration
+                        Section::make('Server Configuration')
+                            ->description('Server settings that will be applied when this event activates')
+                            ->schema([
+                                TextInput::make('server_config.serverName')
+                                    ->label('Server Name (supports color codes)')
+                                    ->maxLength(255)
+                                    ->suffixIcon('heroicon-o-paint-brush')
+                                    ->view('components.wreckfest-text-input'),
+
+                                \Filament\Forms\Components\Textarea::make('server_config.welcomeMessage')
+                                    ->label('Welcome Message (supports color codes)')
+                                    ->rows(3)
+                                    ->view('components.wreckfest-textarea-input'),
+
+                                TextInput::make('server_config.serverPassword')
+                                    ->label('Server Password')
+                                    ->password()
+                                    ->maxLength(255),
                             ])
-                            ->multiple()
-                            ->visible(fn ($get) => $get('recurring_pattern.type') === 'weekly'),
-
-                        TextInput::make('recurring_pattern.time')
-                            ->label('Time')
-                            ->placeholder('20:00')
-                            ->helperText('Format: HH:MM'),
-                    ])
-                    ->collapsed()
-                    ->collapsible(),
+                            ->collapsible()
+                            ->columnSpan(1),
+                    ]),
             ]);
     }
 
@@ -148,13 +179,13 @@ class EventResource extends Resource
                     ->label('Track Rotation')
                     ->searchable(),
 
-                IconColumn::make('recurring_pattern')
-                    ->label('Recurring')
+                IconColumn::make('repeat')
+                    ->label('Repeat')
                     ->boolean()
-                    ->getStateUsing(fn ($record) => !empty($record->recurring_pattern))
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-x-circle')
-                    ->trueColor('success')
+                    ->getStateUsing(fn ($record) => $record->isRecurring())
+                    ->trueIcon('heroicon-o-arrow-path')
+                    ->falseIcon('heroicon-o-minus')
+                    ->trueColor('info')
                     ->falseColor('gray'),
 
                 IconColumn::make('is_active')

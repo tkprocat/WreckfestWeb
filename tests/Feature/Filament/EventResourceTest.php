@@ -161,15 +161,15 @@ describe('Create Event Page', function () {
         ]);
     });
 
-    it('can create event with recurring pattern', function () {
+    it('can create event with repeat pattern', function () {
         Livewire::actingAs($this->user)
             ->test(CreateEvent::class)
             ->fillForm([
                 'name' => 'Weekly Event',
                 'start_time' => now()->addDay(),
                 'track_collection_id' => $this->collection->id,
-                'recurring_pattern' => [
-                    'type' => 'weekly',
+                'repeat' => [
+                    'frequency' => 'weekly',
                     'days' => [1, 3, 5], // Monday, Wednesday, Friday
                     'time' => '20:00',
                 ],
@@ -179,8 +179,8 @@ describe('Create Event Page', function () {
 
         $event = Event::where('name', 'Weekly Event')->first();
 
-        expect($event->recurring_pattern)->toBe([
-            'type' => 'weekly',
+        expect($event->repeat)->toBe([
+            'frequency' => 'weekly',
             'days' => [1, 3, 5],
             'time' => '20:00',
         ]);

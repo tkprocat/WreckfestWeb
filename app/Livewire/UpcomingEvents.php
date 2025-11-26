@@ -36,8 +36,8 @@ class UpcomingEvents extends Component
                     'track_collection_name' => $event->trackCollection?->name,
                     'track_count' => count($event->trackCollection?->tracks ?? []),
                     'tracks' => $event->trackCollection?->tracks ?? [],
-                    'is_recurring' => !empty($event->recurring_pattern),
-                    'recurring_pattern' => $event->recurring_pattern,
+                    'is_recurring' => $event->isRecurring(),
+                    'repeat' => $event->repeat,
                 ];
             })
             ->toArray();
@@ -54,8 +54,8 @@ class UpcomingEvents extends Component
                 'description' => $activeEvent->description,
                 'track_collection_name' => $activeEvent->trackCollection?->name,
                 'tracks' => $activeEvent->trackCollection?->tracks ?? [],
-                'is_recurring' => !empty($activeEvent->recurring_pattern),
-                'recurring_pattern' => $activeEvent->recurring_pattern,
+                'is_recurring' => $activeEvent->isRecurring(),
+                'repeat' => $activeEvent->repeat,
             ];
         } else {
             $this->activeEvent = null;

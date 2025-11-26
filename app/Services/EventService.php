@@ -22,7 +22,7 @@ class EventService
             ->where(function ($query) {
                 $query->where('is_active', true)
                     ->orWhere('start_time', '>=', now())
-                    ->orWhereNotNull('recurring_pattern'); // Include recurring events even if start_time is past
+                    ->orWhereNotNull('repeat'); // Include recurring events
             })
             ->orderBy('start_time')
             ->get();
@@ -37,7 +37,7 @@ class EventService
                 'serverConfig' => $event->server_config,
                 'tracks' => $event->trackCollection?->tracks ?? [],
                 'collectionName' => $event->trackCollection?->name,
-                'recurringPattern' => $event->recurring_pattern,
+                'repeat' => $event->isRecurring() ? $event->repeat : null,
             ];
         })->toArray();
     }

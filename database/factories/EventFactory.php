@@ -27,7 +27,7 @@ class EventFactory extends Factory
             'start_time' => fake()->dateTimeBetween('now', '+1 month'),
             'is_active' => false,
             'server_config' => null,
-            'recurring_pattern' => null,
+            'repeat' => null,
             'track_collection_id' => TrackCollection::factory(),
             'created_by' => User::factory(),
         ];
@@ -64,8 +64,8 @@ class EventFactory extends Factory
     public function dailyRecurring(): static
     {
         return $this->state(fn (array $attributes) => [
-            'recurring_pattern' => [
-                'type' => 'daily',
+            'repeat' => [
+                'frequency' => 'daily',
                 'time' => fake()->time('H:i'),
             ],
         ]);
@@ -77,8 +77,8 @@ class EventFactory extends Factory
     public function weeklyRecurring(): static
     {
         return $this->state(fn (array $attributes) => [
-            'recurring_pattern' => [
-                'type' => 'weekly',
+            'repeat' => [
+                'frequency' => 'weekly',
                 'days' => fake()->randomElements([0, 1, 2, 3, 4, 5, 6], fake()->numberBetween(1, 3)),
                 'time' => fake()->time('H:i'),
             ],

@@ -10,7 +10,7 @@ it('has fillable attributes', function () {
         'description' => 'Test Description',
         'start_time' => now(),
         'server_config' => ['serverName' => 'Test'],
-        'recurring_pattern' => ['type' => 'daily'],
+        'repeat' => ['frequency' => 'daily', 'time' => '20:00'],
         'track_collection_id' => 1,
         'created_by' => 1,
     ]);
@@ -18,7 +18,7 @@ it('has fillable attributes', function () {
     expect($event->name)->toBe('Test Event')
         ->and($event->description)->toBe('Test Description')
         ->and($event->server_config)->toBe(['serverName' => 'Test'])
-        ->and($event->recurring_pattern)->toBe(['type' => 'daily']);
+        ->and($event->repeat)->toBe(['frequency' => 'daily', 'time' => '20:00']);
 });
 
 it('casts server_config to array', function () {
@@ -31,14 +31,14 @@ it('casts server_config to array', function () {
         ->and($event->server_config['maxPlayers'])->toBe(24);
 });
 
-it('casts recurring_pattern to array', function () {
+it('casts repeat to array', function () {
     $event = Event::factory()->create([
-        'recurring_pattern' => ['type' => 'weekly', 'days' => [1, 3, 5]],
+        'repeat' => ['frequency' => 'weekly', 'days' => [1, 3, 5], 'time' => '20:00'],
     ]);
 
-    expect($event->recurring_pattern)->toBeArray()
-        ->and($event->recurring_pattern['type'])->toBe('weekly')
-        ->and($event->recurring_pattern['days'])->toBe([1, 3, 5]);
+    expect($event->repeat)->toBeArray()
+        ->and($event->repeat['frequency'])->toBe('weekly')
+        ->and($event->repeat['days'])->toBe([1, 3, 5]);
 });
 
 it('belongs to a track collection', function () {
@@ -97,10 +97,24 @@ it('has upcoming scope for future events', function () {
         ->and($upcomingEvents->first()->id)->toBe($upcomingEvent->id);
 });
 
-it('can have null recurring pattern', function () {
-    $event = Event::factory()->create(['recurring_pattern' => null]);
+it('can have null repeat', function () {
+    $event = Event::factory()->create(['repeat' => null]);
 
-    expect($event->recurring_pattern)->toBeNull();
+    expect($event->repeat)->toBeNull();
+});
+
+it('isRecurring returns true when repeat frequency is set', function () {
+    $event = Event::factory()->create([
+        'repeat' => ['frequency' => 'weekly', 'days' => [0], 'time' => '20:00'],
+    ]);
+
+    expect($event->isRecurring())->toBeTrue();
+});
+
+it('isRecurring returns false when repeat is null', function () {
+    $event = Event::factory()->create(['repeat' => null]);
+
+    expect($event->isRecurring())->toBeFalse();
 });
 
 it('can have null server config', function () {

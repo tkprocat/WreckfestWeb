@@ -17,16 +17,24 @@ class Event extends Model
         'server_config',
         'start_time',
         'is_active',
-        'recurring_pattern',
+        'repeat',
         'created_by',
     ];
 
     protected $casts = [
         'server_config' => 'array',
-        'recurring_pattern' => 'array',
+        'repeat' => 'array',
         'start_time' => 'datetime',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Check if this event is recurring
+     */
+    public function isRecurring(): bool
+    {
+        return !empty($this->repeat['frequency']);
+    }
 
     public function trackCollection(): BelongsTo
     {
