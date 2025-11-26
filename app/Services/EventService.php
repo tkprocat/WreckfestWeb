@@ -44,8 +44,9 @@ class EventService
 
     /**
      * Push the complete event schedule to the Wreckfest Controller
+     * Returns the number of events pushed, or -1 on failure
      */
-    public function pushScheduleToController(): bool
+    public function pushScheduleToController(): int
     {
         try {
             $schedule = $this->buildEventSchedule();
@@ -54,10 +55,12 @@ class EventService
                 'event_count' => count($schedule)
             ]);
 
-            return $this->apiClient->pushEventSchedule($schedule);
+            $success = $this->apiClient->pushEventSchedule($schedule);
+
+            return $success ? count($schedule) : -1;
         } catch (\Exception $e) {
             Log::error('Failed to push event schedule to controller: ' . $e->getMessage());
-            return false;
+            return -1;
         }
     }
 

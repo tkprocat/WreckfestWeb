@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\EventResource\Pages;
 
 use App\Filament\Resources\EventResource;
-use App\Models\Event;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Notifications\Notification;
@@ -28,11 +27,9 @@ class ListEvents extends ListRecords
                     try {
                         // Use EventService to build and push the schedule (same as EventObserver)
                         $eventService = app(\App\Services\EventService::class);
-                        $success = $eventService->pushScheduleToController();
+                        $eventCount = $eventService->pushScheduleToController();
 
-                        $eventCount = Event::where('start_time', '>=', now())->count();
-
-                        if ($success) {
+                        if ($eventCount >= 0) {
                             Notification::make()
                                 ->title('Event schedule deployed')
                                 ->body($eventCount . ' event(s) have been pushed to the Wreckfest Controller.')
