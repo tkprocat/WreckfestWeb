@@ -84,19 +84,11 @@ class EventResource extends Resource
                                             ])
                                             ->default('single')
                                             ->live()
-                                            ->dehydrated(false)
                                             ->afterStateHydrated(function ($state, $set, $record) {
                                                 if ($record && $record->repeat && !empty($record->repeat['frequency'])) {
                                                     $set('occurrence_type', $record->repeat['frequency']);
                                                 } else {
                                                     $set('occurrence_type', 'single');
-                                                }
-                                            })
-                                            ->afterStateUpdated(function ($state, $set) {
-                                                if ($state === 'single') {
-                                                    $set('repeat', null);
-                                                } else {
-                                                    $set('repeat.frequency', $state);
                                                 }
                                             }),
 

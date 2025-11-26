@@ -32,7 +32,7 @@ class EventService
                 'id' => $event->id,
                 'name' => $event->name,
                 'description' => $event->description,
-                'startTime' => $event->start_time->utc()->toIso8601ZuluString(), // Always send UTC with Z suffix
+                'startTime' => $event->start_time?->utc()->toIso8601ZuluString(), // Null for recurring events without start_time
                 'isActive' => $event->is_active,
                 'serverConfig' => $event->server_config,
                 'tracks' => $event->trackCollection?->tracks ?? [],

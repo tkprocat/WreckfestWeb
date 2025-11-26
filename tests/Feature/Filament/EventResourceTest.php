@@ -105,11 +105,10 @@ describe('Create Event Page', function () {
 
         Livewire::actingAs($this->user)
             ->test(CreateEvent::class)
-            ->fillForm([
-                'name' => 'New Event',
-                'start_time' => $startTime,
-                'track_collection_id' => $this->collection->id,
-            ])
+            ->set('data.name', 'New Event')
+            ->set('data.occurrence_type', 'single')
+            ->set('data.start_time', $startTime)
+            ->set('data.track_collection_id', $this->collection->id)
             ->call('create')
             ->assertHasNoFormErrors();
 
@@ -124,12 +123,11 @@ describe('Create Event Page', function () {
     it('can create event with description', function () {
         Livewire::actingAs($this->user)
             ->test(CreateEvent::class)
-            ->fillForm([
-                'name' => 'Event with Description',
-                'description' => '<p>This is a test event</p>',
-                'start_time' => now()->addDay(),
-                'track_collection_id' => $this->collection->id,
-            ])
+            ->set('data.name', 'Event with Description')
+            ->set('data.description', '<p>This is a test event</p>')
+            ->set('data.occurrence_type', 'single')
+            ->set('data.start_time', now()->addDay())
+            ->set('data.track_collection_id', $this->collection->id)
             ->call('create')
             ->assertHasNoFormErrors();
 
@@ -141,15 +139,12 @@ describe('Create Event Page', function () {
     it('can create event with server config', function () {
         Livewire::actingAs($this->user)
             ->test(CreateEvent::class)
-            ->fillForm([
-                'name' => 'Event with Config',
-                'start_time' => now()->addDay(),
-                'track_collection_id' => $this->collection->id,
-                'server_config' => [
-                    'serverName' => 'Special Event Server',
-                    'welcomeMessage' => 'Welcome to the event!',
-                ],
-            ])
+            ->set('data.name', 'Event with Config')
+            ->set('data.occurrence_type', 'single')
+            ->set('data.start_time', now()->addDay())
+            ->set('data.track_collection_id', $this->collection->id)
+            ->set('data.server_config.serverName', 'Special Event Server')
+            ->set('data.server_config.welcomeMessage', 'Welcome to the event!')
             ->call('create')
             ->assertHasNoFormErrors();
 
@@ -164,36 +159,30 @@ describe('Create Event Page', function () {
     it('can create event with repeat pattern', function () {
         Livewire::actingAs($this->user)
             ->test(CreateEvent::class)
-            ->fillForm([
-                'name' => 'Weekly Event',
-                'start_time' => now()->addDay(),
-                'track_collection_id' => $this->collection->id,
-                'repeat' => [
-                    'frequency' => 'weekly',
-                    'days' => [1, 3, 5], // Monday, Wednesday, Friday
-                    'time' => '20:00',
-                ],
-            ])
+            ->set('data.name', 'Weekly Event')
+            ->set('data.occurrence_type', 'weekly')
+            ->set('data.track_collection_id', $this->collection->id)
+            ->set('data.repeat.days', [1, 3, 5]) // Monday, Wednesday, Friday
+            ->set('data.repeat.time', '20:00')
             ->call('create')
             ->assertHasNoFormErrors();
 
         $event = Event::where('name', 'Weekly Event')->first();
 
         expect($event->repeat)->toBe([
-            'frequency' => 'weekly',
             'days' => [1, 3, 5],
             'time' => '20:00',
+            'frequency' => 'weekly',
         ]);
     });
 
     it('validates required fields', function () {
         Livewire::actingAs($this->user)
             ->test(CreateEvent::class)
-            ->fillForm([
-                'name' => '',
-                'start_time' => null,
-                'track_collection_id' => null,
-            ])
+            ->set('data.name', '')
+            ->set('data.occurrence_type', 'single')
+            ->set('data.start_time', null)
+            ->set('data.track_collection_id', null)
             ->call('create')
             ->assertHasFormErrors(['name', 'start_time', 'track_collection_id']);
     });
@@ -231,15 +220,15 @@ describe('Edit Event Page', function () {
     it('can update event', function () {
         $event = Event::factory()->create([
             'name' => 'Old Name',
+            'start_time' => now()->addDay(),
             'track_collection_id' => $this->collection->id,
             'created_by' => $this->user->id,
         ]);
 
         Livewire::actingAs($this->user)
             ->test(EditEvent::class, ['record' => $event->getRouteKey()])
-            ->fillForm([
-                'name' => 'New Name',
-            ])
+            ->set('data.name', 'New Name')
+            ->set('data.occurrence_type', 'single')
             ->call('save')
             ->assertHasNoFormErrors();
 
@@ -248,6 +237,7 @@ describe('Edit Event Page', function () {
 
     it('can update server config', function () {
         $event = Event::factory()->create([
+            'start_time' => now()->addDay(),
             'track_collection_id' => $this->collection->id,
             'created_by' => $this->user->id,
             'server_config' => null,
@@ -255,11 +245,8 @@ describe('Edit Event Page', function () {
 
         Livewire::actingAs($this->user)
             ->test(EditEvent::class, ['record' => $event->getRouteKey()])
-            ->fillForm([
-                'server_config' => [
-                    'serverName' => 'Updated Server Name',
-                ],
-            ])
+            ->set('data.occurrence_type', 'single')
+            ->set('data.server_config.serverName', 'Updated Server Name')
             ->call('save')
             ->assertHasNoFormErrors();
 

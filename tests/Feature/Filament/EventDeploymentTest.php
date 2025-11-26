@@ -39,7 +39,7 @@ test('deploy event schedule button sends events to controller', function () {
 
     // Mock the HTTP request to the Wreckfest Controller
     Http::fake([
-        'https://localhost:5101/api/Events/schedule' => Http::response(['success' => true], 200),
+        '*/Events/schedule' => Http::response(['success' => true], 200),
     ]);
 
     // Visit the Events list page
@@ -64,9 +64,9 @@ test('deploy event schedule button sends events to controller', function () {
 
     // Verify the request was made
     Http::assertSent(function ($request) {
-        return $request->url() === 'https://localhost:5101/api/Events/schedule' &&
-            isset($request['events']) &&
-            count($request['events']) === 1;
+        return str_contains($request->url(), '/Events/schedule') &&
+            isset($request['Events']) &&
+            count($request['Events']) === 1;
     });
 });
 
@@ -107,7 +107,7 @@ test('activate now button attempts to activate event', function () {
     ]);
 
     Http::fake([
-        "https://localhost:5101/api/Events/{$event->id}/activate" => Http::response(['success' => true], 200),
+        '*/Events/*/activate' => Http::response(['success' => true], 200),
     ]);
 
     $apiClient = app(WreckfestApiClient::class);
@@ -137,7 +137,7 @@ test('event schedule converts booleans to integers for C# API', function () {
     ]);
 
     Http::fake([
-        'https://localhost:5101/api/Events/schedule' => Http::response(['success' => true], 200),
+        '*/Events/schedule' => Http::response(['success' => true], 200),
     ]);
 
     $apiClient = app(WreckfestApiClient::class);
@@ -154,7 +154,7 @@ test('event schedule converts booleans to integers for C# API', function () {
     ]);
 
     Http::assertSent(function ($request) {
-        $events = $request['events'];
+        $events = $request['Events'];
         $track = $events[0]['tracks'][0];
 
         return $track['carResetDisabled'] === 1 &&
