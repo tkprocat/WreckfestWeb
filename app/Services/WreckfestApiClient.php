@@ -441,7 +441,7 @@ class WreckfestApiClient
     }
 
     /**
-     * Push event schedule to C# controller
+     * Push event schedule to Wreckfest Controller
      *
      * @throws WreckfestApiException
      */
@@ -561,7 +561,7 @@ class WreckfestApiClient
     }
 
     /**
-     * Get current active event from C# controller
+     * Get current active event from Wreckfest Controller
      */
     public function getCurrentEvent(): ?array
     {
@@ -577,7 +577,7 @@ class WreckfestApiClient
     }
 
     /**
-     * Get upcoming events from C# controller
+     * Get upcoming events from Wreckfest Controller
      */
     public function getUpcomingEvents(): array
     {

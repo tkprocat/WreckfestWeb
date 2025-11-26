@@ -45,7 +45,7 @@ Before installing WreckfestWeb, ensure you have the following installed:
 ### External Dependencies
 
 - **WreckfestController** (C# service)
-  - This Laravel app communicates with a C# controller service
+  - This Laravel app communicates with a Wreckfest Controller service
   - Repository: https://github.com/tkprocat/WreckfestController
   - Must be running on `https://localhost:5101` (or configure a different URL)
 

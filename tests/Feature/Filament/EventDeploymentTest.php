@@ -37,7 +37,7 @@ test('deploy event schedule button sends events to controller', function () {
         'is_active' => false,
     ]);
 
-    // Mock the HTTP request to the C# controller
+    // Mock the HTTP request to the Wreckfest Controller
     Http::fake([
         'https://localhost:5101/api/Events/schedule' => Http::response(['success' => true], 200),
     ]);

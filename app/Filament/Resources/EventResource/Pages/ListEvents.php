@@ -22,7 +22,7 @@ class ListEvents extends ListRecords
                 ->color('success')
                 ->requiresConfirmation()
                 ->modalHeading('Deploy Event Schedule to Controller')
-                ->modalDescription('This will push all upcoming events to the C# controller so it can automatically activate them at the scheduled times.')
+                ->modalDescription('This will push all upcoming events to the Wreckfest Controller so it can automatically activate them at the scheduled times.')
                 ->modalSubmitActionLabel('Deploy Schedule')
                 ->action(function () {
                     try {
@@ -35,13 +35,13 @@ class ListEvents extends ListRecords
                         if ($success) {
                             Notification::make()
                                 ->title('Event schedule deployed')
-                                ->body($eventCount . ' event(s) have been pushed to the C# controller.')
+                                ->body($eventCount . ' event(s) have been pushed to the Wreckfest Controller.')
                                 ->success()
                                 ->send();
                         } else {
                             Notification::make()
                                 ->title('Failed to deploy event schedule')
-                                ->body('Could not communicate with the C# controller.')
+                                ->body('Could not communicate with the Wreckfest Controller.')
                                 ->danger()
                                 ->send();
                         }

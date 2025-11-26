@@ -53,7 +53,7 @@ class EventObserver
     }
 
     /**
-     * Push the updated schedule to the C# controller
+     * Push the updated schedule to the Wreckfest Controller
      */
     protected function pushSchedule(string $action, Event $event): void
     {

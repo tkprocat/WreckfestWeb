@@ -186,13 +186,13 @@ class EventResource extends Resource
                             if ($success) {
                                 Notification::make()
                                     ->title('Event activation initiated')
-                                    ->body('The C# controller will activate this event shortly.')
+                                    ->body('The Wreckfest Controller will activate this event shortly.')
                                     ->success()
                                     ->send();
                             } else {
                                 Notification::make()
                                     ->title('Failed to activate event')
-                                    ->body('Could not communicate with the C# controller.')
+                                    ->body('Could not communicate with the Wreckfest Controller.')
                                     ->danger()
                                     ->send();
                             }

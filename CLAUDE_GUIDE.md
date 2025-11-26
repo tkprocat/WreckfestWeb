@@ -423,7 +423,7 @@ Via Filament:
 2. Click "Create"
 3. Fill in event details, select track rotation
 4. Set start time and server config
-5. Save - automatically pushed to C# controller
+5. Save - automatically pushed to Wreckfest Controller
 
 ---
 

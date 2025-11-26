@@ -12,16 +12,17 @@ class EventService
     ) {}
 
     /**
-     * Build the event schedule for the C# controller
+     * Build the event schedule for the Wreckfest Controller
      * Returns array of events with all necessary data
      */
     public function buildEventSchedule(): array
     {
-        // Get all upcoming and active events, ordered by start_time
+        // Get all upcoming, active, and recurring events, ordered by start_time
         $events = Event::with(['trackCollection', 'creator'])
             ->where(function ($query) {
                 $query->where('is_active', true)
-                    ->orWhere('start_time', '>=', now());
+                    ->orWhere('start_time', '>=', now())
+                    ->orWhereNotNull('recurring_pattern'); // Include recurring events even if start_time is past
             })
             ->orderBy('start_time')
             ->get();
@@ -42,7 +43,7 @@ class EventService
     }
 
     /**
-     * Push the complete event schedule to the C# controller
+     * Push the complete event schedule to the Wreckfest Controller
      */
     public function pushScheduleToController(): bool
     {
